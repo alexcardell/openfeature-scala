@@ -1,0 +1,7 @@
+.direnv/
+.metals/
+**/.js/
+**/.jvm/
+**/.native/
+.bloop/
+**/target/
