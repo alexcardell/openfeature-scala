@@ -57,7 +57,7 @@ lazy val commonDepSettings = Seq(
 lazy val root = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("."))
-  .aggregate(core, mtl)
+  .aggregate(core) // , mtl)
   .settings(
     name := "ff4s",
     moduleName := "ff4s"
@@ -70,20 +70,25 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(commonDepSettings: _*)
   .settings(
     moduleName := "ff4s-core",
-    testFrameworks += new TestFramework("weaver.framework.CatsEffect")
-  )
-
-lazy val mtl = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .crossType(CrossType.Pure)
-  .in(file("mtl"))
-  .settings(commonSettings: _*)
-  .settings(commonDepSettings: _*)
-  .settings(
-    moduleName := "ff4s-mtl",
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "cats-mtl" % "1.3.0"
     ),
-    testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
-    publishArtifact := false
+    testFrameworks += new TestFramework("weaver.framework.CatsEffect")
   )
-  .dependsOn(core)
+
+/* lazy val mtl = crossProject(JVMPlatform, JSPlatform, NativePlatform) */
+/*   .crossType(CrossType.Pure) */
+/*   .in(file("mtl")) */
+/*   .settings(commonSettings: _*) */
+/*   .settings(commonDepSettings: _*) */
+/*   .settings( */
+/*     moduleName := "ff4s-mtl", */
+/*     libraryDependencies ++= Seq( */
+/*       "org.typelevel" %%% "cats-mtl" % "1.3.0" */
+/*     ), */
+/*     testFrameworks += new TestFramework("weaver.framework.CatsEffect"), */
+/*     publishArtifact := false */
+/*   ) */
+/*   .dependsOn(core) */
+
+addCommandAlias("fix", "scalafixAll;scalafmtAll;scalafmtSbt")
