@@ -115,4 +115,5 @@ lazy val examples =
     )
     .dependsOn(core, fliptJavaSdk)
 
-addCommandAlias("fix", "scalafixAll;scalafmtAll;scalafmtSbt")
+addCommandAlias("fix", "scalafixAll; scalafmtAll; scalafmtSbt")
+addCommandAlias("check", "scalafmtCheckAll; scalafmtSbtCheck; scalafix --check")
