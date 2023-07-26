@@ -3,7 +3,11 @@
 Intended to eventually provide a decent common interface
 for multiple feature flag platforms, using Cats/Cats Effect.
 
-Very WIP. If using LaunchDarkly there's always typelevel/catapult
+Very WIP. If using LaunchDarkly there's always 
+[typelevel/catapult](https://github.com/typelevel/catapult)
+
+The first pass is to support applications using flags,
+before adding any flag administration capabilities.
 
 ## Installing 
 
