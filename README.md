@@ -1,8 +1,27 @@
 # Functional (feature) flags for Scala
 
+Intended to eventually provide a decent common interface
+for multiple feature flag platforms, using Cats/Cats Effect.
+
+Very WIP. If using LaunchDarkly there's always typelevel/catapult
+
 ## Installing 
 
+```sbt
+libraryDependencies += "io.cardell" %% "ff4s" % "0.0.1"
+```
+
 ## Usage
+
+See [examples](./examples)
+
+## Backends 
+
+| Backend        | On/Off Flags        | Variants       | Segments       |
+| -------        | ------------        | --------       |  ------        |
+| Flipt          | :white_check_marks: | :construction: | :construction: |
+| LaunchDarkly   | :construction       | :construction: | :construction: |
+| GrowthBook     | :construction       | :construction: | :construction: |
 
 ## License
 
