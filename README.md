@@ -19,9 +19,9 @@ See [examples](./examples)
 
 | Backend        | On/Off Flags        | Variants       | Segments       |
 | -------        | ------------        | --------       |  ------        |
-| Flipt          | :white_check_marks: | :construction: | :construction: |
-| LaunchDarkly   | :construction       | :construction: | :construction: |
-| GrowthBook     | :construction       | :construction: | :construction: |
+| Flipt          | :construction:      | :construction: | :construction: |
+| LaunchDarkly   | :construction:      | :construction: | :construction: |
+| GrowthBook     | :construction:      | :construction: | :construction: |
 
 ## License
 
