@@ -1,4 +1,3 @@
 import sbt._
 
-object dependencies {
-}
+object dependencies {}
