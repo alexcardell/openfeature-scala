@@ -1,5 +1,5 @@
 package io.cardell.flipt
 
-import fliptapi.FlagsServiceGet
+import io.cardell.flipt.api.FliptApi
 
 object X {}
