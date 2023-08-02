@@ -19,13 +19,9 @@ libraryDependencies += "io.cardell" %% "ff4s" % "0.0.1"
 
 See [examples](./examples)
 
-## Backends 
+## Supported Backends 
 
-| Backend        | On/Off Flags        | Variants       | Segments       |
-| -------        | ------------        | --------       |  ------        |
-| Flipt          | :construction:      | :construction: | :construction: |
-| LaunchDarkly   | :construction:      | :construction: | :construction: |
-| GrowthBook     | :construction:      | :construction: | :construction: |
+- [Flipt](./flipt/README.md)
 
 ## License
 
