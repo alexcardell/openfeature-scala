@@ -11,6 +11,7 @@
           buildInputs = with pkgs; [
             jdk11
             sbt
+            coursier
           ];
         };
         # packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;

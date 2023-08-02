@@ -63,17 +63,17 @@ lazy val commonDepSettings = Seq(
 )
 
 lazy val root =
-  crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  crossProject(JVMPlatform, JSPlatform)
     .crossType(CrossType.Pure)
     .in(file("."))
     .settings(
       name := "ff4s",
       moduleName := "ff4s"
     )
-    .aggregate(core, fliptJavaSdk, examples)
+    .aggregate(core, flipt, fliptJavaSdk, examples)
 
 lazy val core =
-  crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  crossProject(JVMPlatform, JSPlatform)
     .crossType(CrossType.Pure)
     .in(file("core"))
     .configs(IntegrationTest)
@@ -82,6 +82,23 @@ lazy val core =
     .settings(commonDepSettings: _*)
     .settings(
       moduleName := "ff4s-core"
+    )
+
+lazy val flipt =
+  crossProject(JVMPlatform, JSPlatform)
+    .crossType(CrossType.Pure)
+    .in(file("flipt"))
+    .enablePlugins(Smithy4sCodegenPlugin)
+    .configs(IntegrationTest)
+    .settings(Defaults.itSettings)
+    .settings(commonSettings: _*)
+    .settings(commonDepSettings: _*)
+    .settings(
+      moduleName := "ff4s-flipt",
+      libraryDependencies ++= Seq(
+        "com.disneystreaming.smithy4s" %%% "smithy4s-core" % smithy4sVersion.value,
+        "com.disneystreaming.smithy4s" %%% "smithy4s-http4s" % smithy4sVersion.value
+      )
     )
 
 lazy val fliptJavaSdk =
