@@ -62,28 +62,27 @@ lazy val commonDepSettings = Seq(
   ).map(_ % "test,it")
 )
 
-//lazy val root =
-//  project
-//    .in(file("."))
-//    .settings(
-//      name := "ff4s",
-//      moduleName := "ff4s"
-//    )
-//    .aggregate(flipt)
-//  crossProject(JVMPlatform, JSPlatform)
-//    .crossType(CrossType.Pure)
-//    .in(file("."))
-//    .settings(
-//      name := "ff4s",
-//      moduleName := "ff4s"
-//    )
-//    .aggregate(core, flipt, fliptJavaSdk, examples)
+lazy val root =
+  project
+    .in(file("."))
+    .settings(
+      name := "ff4s",
+      moduleName := "ff4s"
+    )
+    .aggregate(
+      Seq(
+        core,
+        flipt,
+        fliptJavaSdk,
+        examples
+      ).map(_.projectRefs).flatten: _*
+    )
 
 lazy val core =
-  // crossProject(JVMPlatform, JSPlatform)
-  //  .crossType(CrossType.Pure)
-  project
+  projectMatrix
     .in(file("core"))
+    .jvmPlatform(crossVersions)
+    .jsPlatform(crossVersions)
     .configs(IntegrationTest)
     .settings(Defaults.itSettings)
     .settings(commonSettings: _*)
@@ -93,10 +92,11 @@ lazy val core =
     )
 
 lazy val flipt =
-   crossProject(JVMPlatform, JSPlatform)
-    .crossType(CrossType.Pure)
+  projectMatrix
     .in(file("flipt"))
     .enablePlugins(Smithy4sCodegenPlugin)
+    .jvmPlatform(crossVersions)
+    .jsPlatform(crossVersions)
     .configs(IntegrationTest)
     .settings(Defaults.itSettings)
     .settings(commonSettings: _*)
@@ -108,37 +108,38 @@ lazy val flipt =
         "com.disneystreaming.smithy4s" %%% "smithy4s-http4s" % smithy4sVersion.value
       )
     )
+    .dependsOn(core)
 
-// lazy val fliptJavaSdk =
-//   crossProject(JVMPlatform)
-//     .crossType(CrossType.Pure)
-//     .in(file("flipt-java-sdk"))
-//     .configs(IntegrationTest)
-//     .settings(Defaults.itSettings)
-//     .settings(commonSettings: _*)
-//     .settings(commonDepSettings: _*)
-//     .settings(
-//       moduleName := "ff4s-flipt-java-sdk",
-//       libraryDependencies ++= Seq(
-//         "io.flipt" % "flipt-java" % "0.2.6"
-//       )
-//     )
-//     .dependsOn(core)
-// 
-// lazy val examples =
-//   crossProject(JVMPlatform)
-//     .crossType(CrossType.Pure)
-//     .in(file("examples"))
-//     .configs(IntegrationTest)
-//     .settings(commonSettings: _*)
-//     .settings(commonDepSettings: _*)
-//     .settings(
-//       moduleName := "ff4s-examples",
-//       libraryDependencies ++= Seq(
-//         "org.typelevel" %%% "cats-effect" % V.catsEffect
-//       )
-//     )
-//     .dependsOn(core, fliptJavaSdk)
+lazy val fliptJavaSdk =
+  projectMatrix
+    .in(file("flipt-java-sdk"))
+    .jvmPlatform(crossVersions)
+    .configs(IntegrationTest)
+    .settings(Defaults.itSettings)
+    .settings(commonSettings: _*)
+    .settings(commonDepSettings: _*)
+    .settings(
+      moduleName := "ff4s-flipt-java-sdk",
+      libraryDependencies ++= Seq(
+        "io.flipt" % "flipt-java" % "0.2.6"
+      )
+    )
+    .dependsOn(core)
+
+lazy val examples =
+  projectMatrix
+    .in(file("examples"))
+    .jvmPlatform(crossVersions)
+    .configs(IntegrationTest)
+    .settings(commonSettings: _*)
+    .settings(commonDepSettings: _*)
+    .settings(
+      moduleName := "ff4s-examples",
+      libraryDependencies ++= Seq(
+        "org.typelevel" %%% "cats-effect" % V.catsEffect
+      )
+    )
+    .dependsOn(core, fliptJavaSdk)
 
 addCommandAlias("fix", "scalafixAll; scalafmtAll; scalafmtSbt")
 addCommandAlias("check", "scalafmtCheckAll; scalafmtSbtCheck; scalafix --check")
