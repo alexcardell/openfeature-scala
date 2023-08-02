@@ -105,7 +105,9 @@ lazy val flipt =
       moduleName := "ff4s-flipt",
       libraryDependencies ++= Seq(
         "com.disneystreaming.smithy4s" %%% "smithy4s-core" % smithy4sVersion.value,
-        "com.disneystreaming.smithy4s" %%% "smithy4s-http4s" % smithy4sVersion.value
+        "com.disneystreaming.smithy4s" %%% "smithy4s-http4s" % smithy4sVersion.value,
+        "com.disneystreaming.alloy" % "alloy-core" % "0.2.3",
+        "com.disneystreaming.smithy" % "smithytranslate-traits" % "0.3.9"
       )
     )
     .dependsOn(core)

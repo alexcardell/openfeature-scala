@@ -1,5 +1,7 @@
 package io.cardell.flipt
 
-import io.cardell.flipt.api.FliptApi
+import fliptapi.FliptOpenapiService
 
-object X {}
+object X {
+
+}
