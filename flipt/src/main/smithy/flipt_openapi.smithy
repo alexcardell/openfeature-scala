@@ -2,9 +2,11 @@ $version: "2.0"
 
 namespace fliptapi
 
+use alloy#simpleRestJson
 use smithytranslate#contentType
 
 @httpBearerAuth
+@simpleRestJson
 service FliptOpenapiService {
     operations: [
         AuthMethodK8SServiceVerifyServiceAccount

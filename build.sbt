@@ -107,7 +107,8 @@ lazy val flipt =
         "com.disneystreaming.smithy4s" %%% "smithy4s-core" % smithy4sVersion.value,
         "com.disneystreaming.smithy4s" %%% "smithy4s-http4s" % smithy4sVersion.value,
         "com.disneystreaming.alloy" % "alloy-core" % "0.2.3",
-        "com.disneystreaming.smithy" % "smithytranslate-traits" % "0.3.9"
+        "com.disneystreaming.smithy" % "smithytranslate-traits" % "0.3.9",
+        "org.http4s" %%% "http4s-ember-client" % "0.23.23"
       )
     )
     .dependsOn(core)
@@ -141,7 +142,7 @@ lazy val examples =
         "org.typelevel" %%% "cats-effect" % V.catsEffect
       )
     )
-    .dependsOn(core, fliptJavaSdk)
+    .dependsOn(core, flipt) //, fliptJavaSdk)
 
 addCommandAlias("fix", "scalafixAll; scalafmtAll; scalafmtSbt")
 addCommandAlias("check", "scalafmtCheckAll; scalafmtSbtCheck; scalafix --check")
