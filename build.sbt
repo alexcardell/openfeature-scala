@@ -53,12 +53,12 @@ lazy val commonSettings = Seq(
 
 lazy val commonDepSettings = Seq(
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "cats-core" % "2.8.0",
-    "org.typelevel" %% "cats-effect-kernel" % V.catsEffect
+    "org.typelevel" %%% "cats-core" % "2.8.0",
+    "org.typelevel" %%% "cats-effect-kernel" % V.catsEffect
   ),
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "cats-effect" % V.catsEffect,
-    "com.disneystreaming" %% "weaver-cats" % "0.8.0"
+    "org.typelevel" %%% "cats-effect" % V.catsEffect,
+    "com.disneystreaming" %%% "weaver-cats" % "0.8.0"
   ).map(_ % "test,it")
 )
 
