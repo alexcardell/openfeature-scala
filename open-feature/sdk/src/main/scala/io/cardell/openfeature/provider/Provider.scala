@@ -9,5 +9,29 @@ trait Provider[F[_]] {
       flagKey: String,
       defaultValue: Boolean,
       context: EvaluationContext
-  ): F[Boolean]
+  ): F[ResolutionDetails[Boolean]]
+
+  def resolveStringValue(
+      flagKey: String,
+      defaultValue: String,
+      context: EvaluationContext
+  ): F[ResolutionDetails[String]]
+
+  def resolveIntValue(
+      flagKey: String,
+      defaultValue: Int,
+      context: EvaluationContext
+  ): F[ResolutionDetails[Int]]
+
+  def resolveDoubleValue(
+      flagKey: String,
+      defaultValue: Double,
+      context: EvaluationContext
+  ): F[ResolutionDetails[Double]]
+
+  def resolveStructureValue[A: Resolvable](
+      flagKey: String,
+      defaultValue: A,
+      context: EvaluationContext
+  ): F[ResolutionDetails[A]]
 }

@@ -61,56 +61,63 @@ object ErrorCode {
   case object General extends ErrorCode
 }
 
-trait FlagMetadata
+sealed trait FlagMetadataValue
+object FlagMetadataValue {
+  case class Boolean(value: Boolean) extends FlagMetadataValue
+  case class String(value: String) extends FlagMetadataValue
+  case class Int(value: String) extends FlagMetadataValue
+  case class Double(value: Double) extends FlagMetadataValue
+  // TODO circe unwrapped codecs
+}
 
-sealed trait Reason
+sealed trait ResolutionReason
 
-object Reason {
+object ResolutionReason {
 
   /** The resolved value is static (no dynamic evaluation). */
-  case object Static extends Reason
+  case object Static extends ResolutionReason
 
   /** The resolved value fell back to a pre-configured value (no dynamic
     * evaluation occurred or dynamic evaluation yielded no result).
     */
-  case object Default extends Reason
+  case object Default extends ResolutionReason
 
   /** The resolved value was the result of a dynamic evaluation, such as a rule
     * or specific user-targeting.
     */
-  case object TargetingMatch extends Reason
+  case object TargetingMatch extends ResolutionReason
 
   /** The resolved value was the result of pseudorandom assignment. */
-  case object Split extends Reason
+  case object Split extends ResolutionReason
 
   /** The resolved value was retrieved from cache. */
-  case object Cached extends Reason
+  case object Cached extends ResolutionReason
 
   /** The resolved value was the result of the flag being disabled in the
     * management system.
     */
-  case object Disabled extends Reason
+  case object Disabled extends ResolutionReason
 
   /** The reason for the resolved value could not be determined. */
-  case object Unknown extends Reason
+  case object Unknown extends ResolutionReason
 
   /** The resolved value is non-authoritative or possibly out of date */
-  case object Stale extends Reason
+  case object Stale extends ResolutionReason
 
   /** The resolved value was the result of an error. */
-  case object Error extends Reason
+  case object Error extends ResolutionReason
 
   /** Any other provider-defined reason */
-  case class Other(reason: String) extends Reason
+  case class Other(reason: String) extends ResolutionReason
 }
 
 trait Resolvable[A] {}
 
-case class ResolutionDetails[A: Resolvable](
+case class ResolutionDetails[A](
     value: A,
     errorCode: Option[ErrorCode],
     errorMessage: Option[String],
-    reason: Option[Reason],
+    reason: Option[ResolutionReason],
     variant: Option[String],
     metadata: Option[FlagMetadata]
 )
