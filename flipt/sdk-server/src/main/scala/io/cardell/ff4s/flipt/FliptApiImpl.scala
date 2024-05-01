@@ -27,7 +27,6 @@ import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
 import io.cardell.ff4s.flipt.model.BatchEvaluationRequest
 import io.cardell.ff4s.flipt.model.BatchEvaluationResponse
 import io.circe.Decoder
-import io.cardell.ff4s.flipt.model.StructuredVariantEvaluationResponse
 
 protected[flipt] class FliptApiImpl[F[_]: Concurrent](
     client: Client[F],
@@ -36,45 +35,35 @@ protected[flipt] class FliptApiImpl[F[_]: Concurrent](
 
   override def evaluateBoolean(
       request: EvaluationRequest
-  ): F[BooleanEvaluationResponse] = {
+  ): F[BooleanEvaluationResponse[Unit]] = {
     val req = Request[F](
       method = Method.POST,
       uri = baseUri / "evaluate" / "v1" / "boolean"
     ).withEntity(request)
 
-    client.expect[BooleanEvaluationResponse](req)
+    client.expect[BooleanEvaluationResponse[Unit]](req)
   }
-  override def evaluateVariant(
+
+  override def evaluateVariant[A: Decoder](
       request: EvaluationRequest
-  ): F[VariantEvaluationResponse] = {
+  ): F[VariantEvaluationResponse[A]] = {
     val req = Request[F](
       method = Method.POST,
       uri = baseUri / "evaluate" / "v1" / "variant"
     ).withEntity(request)
 
-    client.expect[VariantEvaluationResponse](req)
+    client.expect[VariantEvaluationResponse[A]](req)
   }
 
-  override def evaluateStructuredVariant[A: Decoder](
-      request: EvaluationRequest
-  ): F[StructuredVariantEvaluationResponse[A]] = {
-    val req = Request[F](
-      method = Method.POST,
-      uri = baseUri / "evaluate" / "v1" / "variant"
-    ).withEntity(request)
-
-    client.expect[StructuredVariantEvaluationResponse[A]](req)
-  }
-
-  override def evaluateBatch(
+  override def evaluateBatch[A: Decoder](
       request: BatchEvaluationRequest
-  ): F[BatchEvaluationResponse] = {
+  ): F[BatchEvaluationResponse[A]] = {
     val req = Request[F](
       method = Method.POST,
       uri = baseUri / "evaluate" / "v1" / "batch"
     ).withEntity(request)
 
-    client.expect[BatchEvaluationResponse](req)
+    client.expect[BatchEvaluationResponse[A]](req)
   }
 
 }

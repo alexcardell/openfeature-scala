@@ -21,30 +21,32 @@ import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
 import scala.annotation.unused
 
-sealed trait EvaluationResponse
+sealed trait EvaluationResponse[A]
 
 object EvaluationResponse {
-  implicit val d: Decoder[EvaluationResponse] =
-    List[Decoder[EvaluationResponse]](
-      Decoder[BooleanEvaluationResponse].widen,
-      Decoder[VariantEvaluationResponse].widen,
-      Decoder[ErrorEvaluationResponse].widen
+  implicit def d[A](implicit a: Decoder[A]): Decoder[EvaluationResponse[A]] =
+    List[Decoder[EvaluationResponse[A]]](
+      Decoder[BooleanEvaluationResponse[A]].widen,
+      Decoder[VariantEvaluationResponse[A]].widen,
+      Decoder[ErrorEvaluationResponse[A]].widen
     ).reduceLeft(_ or _)
 }
 
-case class BooleanEvaluationResponse(
+case class BooleanEvaluationResponse[A](
     enabled: Boolean,
     flagKey: String,
     reason: EvaluationReason,
     requestDurationMillis: Double,
     timestamp: String
-) extends EvaluationResponse
+) extends EvaluationResponse[A]
 
 object BooleanEvaluationResponse {
-  implicit val d: Decoder[BooleanEvaluationResponse] = deriveDecoder
+  implicit def decoder[A](implicit
+      @unused a: Decoder[A]
+  ): Decoder[BooleanEvaluationResponse[A]] = deriveDecoder
 }
 
-case class VariantEvaluationResponse(
+case class VariantEvaluationResponse[A](
     `match`: Boolean,
     segmentKeys: List[String],
     reason: EvaluationReason,
@@ -53,35 +55,22 @@ case class VariantEvaluationResponse(
     variantAttachment: String,
     requestDurationMillis: Float,
     timestamp: String
-) extends EvaluationResponse
+) extends EvaluationResponse[A]
 
 object VariantEvaluationResponse {
-  implicit val d: Decoder[VariantEvaluationResponse] = deriveDecoder
-}
-
-case class StructuredVariantEvaluationResponse[A](
-    `match`: Boolean,
-    segmentKeys: List[String],
-    reason: EvaluationReason,
-    flagKey: String,
-    variantKey: String,
-    variantAttachment: A,
-    requestDurationMillis: Float,
-    timestamp: String
-) extends EvaluationResponse
-
-object StructuredVariantEvaluationResponse {
   implicit def d[A](implicit
       @unused da: Decoder[A]
-  ): Decoder[StructuredVariantEvaluationResponse[A]] = deriveDecoder
+  ): Decoder[VariantEvaluationResponse[A]] = deriveDecoder
 }
 
-case class ErrorEvaluationResponse(
+case class ErrorEvaluationResponse[A](
     flagKey: String,
     namespaceKey: String,
     reason: ErrorEvaluationReason
-) extends EvaluationResponse
+) extends EvaluationResponse[A]
 
 object ErrorEvaluationResponse {
-  implicit val d: Decoder[ErrorEvaluationResponse] = deriveDecoder
+  implicit def decoder[A](implicit
+      @unused a: Decoder[A]
+  ): Decoder[ErrorEvaluationResponse[A]] = deriveDecoder
 }

@@ -18,11 +18,14 @@ package io.cardell.ff4s.flipt.model
 
 import io.circe.generic.semiauto.deriveDecoder
 import io.circe.Decoder
+import scala.annotation.unused
 
-case class BatchEvaluationResponse(
-    responses: List[EvaluationResponse]
+case class BatchEvaluationResponse[A](
+    responses: List[EvaluationResponse[A]]
 )
 
 object BatchEvaluationResponse {
-  implicit val d: Decoder[BatchEvaluationResponse] = deriveDecoder
+  implicit def decoder[A](implicit
+      @unused d: Decoder[A]
+  ): Decoder[BatchEvaluationResponse[A]] = deriveDecoder
 }
