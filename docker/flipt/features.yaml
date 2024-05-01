@@ -11,6 +11,8 @@ flags:
   enabled: true
   variants:
   - key: key-1
+    attachment: 
+      jsonKey: value
   rules:
   - segment: default-ns-segment-1
     distributions:

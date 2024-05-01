@@ -19,34 +19,31 @@ package io.cardell.ff4s.flipt.model
 import cats.syntax.functor._
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
-import scala.annotation.unused
 
-sealed trait EvaluationResponse[A]
+sealed trait EvaluationResponse
 
 object EvaluationResponse {
-  implicit def d[A](implicit a: Decoder[A]): Decoder[EvaluationResponse[A]] =
-    List[Decoder[EvaluationResponse[A]]](
-      Decoder[BooleanEvaluationResponse[A]].widen,
-      Decoder[VariantEvaluationResponse[A]].widen,
-      Decoder[ErrorEvaluationResponse[A]].widen
+  implicit def decoder: Decoder[EvaluationResponse] =
+    List[Decoder[EvaluationResponse]](
+      Decoder[BooleanEvaluationResponse].widen,
+      Decoder[VariantEvaluationResponse].widen,
+      Decoder[ErrorEvaluationResponse].widen
     ).reduceLeft(_ or _)
 }
 
-case class BooleanEvaluationResponse[A](
+case class BooleanEvaluationResponse(
     enabled: Boolean,
     flagKey: String,
     reason: EvaluationReason,
     requestDurationMillis: Double,
     timestamp: String
-) extends EvaluationResponse[A]
+) extends EvaluationResponse
 
 object BooleanEvaluationResponse {
-  implicit def decoder[A](implicit
-      @unused a: Decoder[A]
-  ): Decoder[BooleanEvaluationResponse[A]] = deriveDecoder
+  implicit def decoder: Decoder[BooleanEvaluationResponse] = deriveDecoder
 }
 
-case class VariantEvaluationResponse[A](
+case class VariantEvaluationResponse(
     `match`: Boolean,
     segmentKeys: List[String],
     reason: EvaluationReason,
@@ -55,22 +52,18 @@ case class VariantEvaluationResponse[A](
     variantAttachment: String,
     requestDurationMillis: Float,
     timestamp: String
-) extends EvaluationResponse[A]
+) extends EvaluationResponse
 
 object VariantEvaluationResponse {
-  implicit def d[A](implicit
-      @unused da: Decoder[A]
-  ): Decoder[VariantEvaluationResponse[A]] = deriveDecoder
+  implicit def d: Decoder[VariantEvaluationResponse] = deriveDecoder
 }
 
-case class ErrorEvaluationResponse[A](
+case class ErrorEvaluationResponse(
     flagKey: String,
     namespaceKey: String,
     reason: ErrorEvaluationReason
-) extends EvaluationResponse[A]
+) extends EvaluationResponse
 
 object ErrorEvaluationResponse {
-  implicit def decoder[A](implicit
-      @unused a: Decoder[A]
-  ): Decoder[ErrorEvaluationResponse[A]] = deriveDecoder
+  implicit def decoder: Decoder[ErrorEvaluationResponse] = deriveDecoder
 }

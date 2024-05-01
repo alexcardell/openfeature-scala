@@ -67,7 +67,7 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
       api(containers).use { flipt =>
         val segmentContext = Map("test-property" -> "test-property-value")
         for {
-          res <- flipt.evaluateVariant[String](
+          res <- flipt.evaluateVariant(
             EvaluationRequest(
               "default",
               "variant-flag-1",
@@ -86,7 +86,7 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
       api(containers).use { flipt =>
         val segmentContext = Map("test-property" -> "unmatched-property-value")
         for {
-          res <- flipt.evaluateVariant[String](
+          res <- flipt.evaluateVariant(
             EvaluationRequest(
               "default",
               "variant-flag-1",
