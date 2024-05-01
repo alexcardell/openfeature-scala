@@ -15,6 +15,7 @@ ThisBuild / tlSonatypeUseLegacyHost := false
 
 // publish website from this branch
 ThisBuild / tlSitePublishBranch := Some("main")
+ThisBuild / tlSiteKeepFiles := false
 
 val Scala213 = "2.13.12"
 val Scala33 = "3.3.3"
@@ -22,9 +23,7 @@ ThisBuild / crossScalaVersions := Seq(Scala213, Scala33)
 ThisBuild / scalaVersion := Scala213 // the default Scala
 
 lazy val projects = Seq(
-  `flipt-sdk-server`,
-  `open-feature-sdk`,
-  `open-feature-provider-flipt`
+  `flipt-sdk-server`
 )
 
 lazy val commonDependencies = Seq(
@@ -53,26 +52,17 @@ lazy val `flipt-sdk-server` =
       )
     )
 
-lazy val `open-feature-sdk` =
-  crossProject(JVMPlatform, JSPlatform, NativePlatform)
-    .crossType(CrossType.Pure)
-    .in(file("open-feature/sdk"))
-    .settings(commonDependencies)
+lazy val docs =
+  project
+    .in(file("site"))
+    .enablePlugins(TypelevelSitePlugin)
     .settings(
-      name := "ff4s-open-feature-sdk"
+      tlSiteHelium := {
+        import laika.helium.config.IconLink
+        import laika.helium.config.HeliumIcon
+        import laika.ast.Path.Root
+        tlSiteHelium.value.site.topNavigationBar(
+          homeLink = IconLink.internal(Root / "index.md", HeliumIcon.home)
+        )
+      }
     )
-
-lazy val `open-feature-provider-flipt` =
-  crossProject(JVMPlatform, JSPlatform, NativePlatform)
-    .crossType(CrossType.Pure)
-    .in(file("open-feature/provider-flipt"))
-    .settings(commonDependencies)
-    .settings(
-      name := "ff4s-open-provider-flipt"
-    )
-    .dependsOn(
-      `open-feature-sdk`,
-      `flipt-sdk-server`
-    )
-
-lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
