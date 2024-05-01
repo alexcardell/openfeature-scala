@@ -17,7 +17,7 @@ import java.io.File
 class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
 
   override val containerDef: ContainerDef = DockerComposeContainer.Def(
-    new File("../../../docker-compose.yaml"),
+    new File("docker-compose.yaml"),
     exposedServices = Seq(
       ExposedService("flipt", 8080, Wait.forLogMessage("^UI: http.*", 1))
     ),
