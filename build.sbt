@@ -30,8 +30,8 @@ lazy val commonDependencies = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %%% "cats-core" % "2.10.0",
     "org.typelevel" %%% "cats-effect" % "3.5.3",
-    "org.scalameta" %%% "munit" % "1.0.0-RC1" % Test,
-    "org.typelevel" %%% "munit-cats-effect" % "2.0.0-M5" % Test
+    "org.scalameta" %%% "munit" % "1.0.0-RC1" % "test,it",
+    "org.typelevel" %%% "munit-cats-effect" % "2.0.0-M5" % "test,it"
   )
 )
 
@@ -39,17 +39,21 @@ lazy val root = tlCrossRootProject.aggregate(projects: _*)
 
 lazy val `flipt-sdk-server` =
   crossProject(JVMPlatform, JSPlatform, NativePlatform)
-    .crossType(CrossType.Pure)
+    .crossType(CrossType.Full)
     .in(file("flipt/sdk-server"))
     .settings(commonDependencies)
+    .configs(IntegrationTest)
+    .settings(Defaults.itSettings)
     .settings(
       name := "ff4s-flipt-sdk-server",
       libraryDependencies ++= Seq(
         "org.http4s" %%% "http4s-client" % "0.23.26",
         "org.http4s" %%% "http4s-ember-client" % "0.23.26",
         "org.http4s" %%% "http4s-circe" % "0.23.26",
-        "io.circe" %%% "circe-generic" % "0.14.7"
-      )
+        "io.circe" %%% "circe-generic" % "0.14.7",
+        "com.dimafeng" %% "testcontainers-scala-munit" % "0.41.3" % "it"
+      ),
+      IntegrationTest / fork := true
     )
 
 lazy val docs =
