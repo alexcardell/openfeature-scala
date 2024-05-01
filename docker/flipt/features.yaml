@@ -1,0 +1,29 @@
+version: "1.2"
+namespace: default
+flags:
+- key: boolean-flag-1
+  name: boolean-flag-1
+  type: BOOLEAN_FLAG_TYPE
+  enabled: true
+- key: variant-flag-1
+  name: variant-flag-1
+  type: VARIANT_FLAG_TYPE
+  enabled: true
+  variants:
+  - key: key-1
+    attachment: 
+      jsonKey: value
+  rules:
+  - segment: default-ns-segment-1
+    distributions:
+    - variant: key-1
+      rollout: 100
+segments:
+- key: default-ns-segment-1
+  name: default-ns-segment-1
+  constraints:
+  - type: STRING_COMPARISON_TYPE
+    property: test-property
+    operator: eq
+    value: test-property-value
+  match_type: ALL_MATCH_TYPE

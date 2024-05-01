@@ -23,7 +23,7 @@ import io.circe.generic.semiauto.deriveDecoder
 sealed trait EvaluationResponse
 
 object EvaluationResponse {
-  implicit val d: Decoder[EvaluationResponse] =
+  implicit def decoder: Decoder[EvaluationResponse] =
     List[Decoder[EvaluationResponse]](
       Decoder[BooleanEvaluationResponse].widen,
       Decoder[VariantEvaluationResponse].widen,
@@ -40,7 +40,7 @@ case class BooleanEvaluationResponse(
 ) extends EvaluationResponse
 
 object BooleanEvaluationResponse {
-  implicit val d: Decoder[BooleanEvaluationResponse] = deriveDecoder
+  implicit def decoder: Decoder[BooleanEvaluationResponse] = deriveDecoder
 }
 
 case class VariantEvaluationResponse(
@@ -55,7 +55,7 @@ case class VariantEvaluationResponse(
 ) extends EvaluationResponse
 
 object VariantEvaluationResponse {
-  implicit val d: Decoder[VariantEvaluationResponse] = deriveDecoder
+  implicit def d: Decoder[VariantEvaluationResponse] = deriveDecoder
 }
 
 case class ErrorEvaluationResponse(
@@ -65,5 +65,5 @@ case class ErrorEvaluationResponse(
 ) extends EvaluationResponse
 
 object ErrorEvaluationResponse {
-  implicit val d: Decoder[ErrorEvaluationResponse] = deriveDecoder
+  implicit def decoder: Decoder[ErrorEvaluationResponse] = deriveDecoder
 }

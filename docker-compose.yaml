@@ -1,0 +1,10 @@
+services:
+  flipt:
+    image: flipt/flipt:v1.40.2
+    ports:
+      - "8080:8080"
+    environment:
+      FLIPT_STORAGE_TYPE: "local"
+      FLIPT_STORAGE_LOCAL_PATH: "/config"
+    volumes:
+      - "./docker/flipt/features.yaml:/config/features.yaml"

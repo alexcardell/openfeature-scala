@@ -16,13 +16,13 @@
 
 package io.cardell.ff4s.flipt.model
 
-import io.circe.generic.semiauto.deriveDecoder
 import io.circe.Decoder
+import io.circe.generic.semiauto.deriveDecoder
 
 case class BatchEvaluationResponse(
     responses: List[EvaluationResponse]
 )
 
 object BatchEvaluationResponse {
-  implicit val d: Decoder[BatchEvaluationResponse] = deriveDecoder
+  implicit def decoder: Decoder[BatchEvaluationResponse] = deriveDecoder
 }

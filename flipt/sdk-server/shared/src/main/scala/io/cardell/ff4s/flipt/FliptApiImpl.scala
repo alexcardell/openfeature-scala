@@ -16,16 +16,16 @@
 
 package io.cardell.ff4s.flipt
 
-import org.http4s.circe.CirceEntityCodec._
 import cats.effect.Concurrent
-import org.http4s.client.Client
-import org.http4s.Request
-import org.http4s.Method
-import org.http4s.Uri
-import io.cardell.ff4s.flipt.model.BooleanEvaluationResponse
-import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
 import io.cardell.ff4s.flipt.model.BatchEvaluationRequest
 import io.cardell.ff4s.flipt.model.BatchEvaluationResponse
+import io.cardell.ff4s.flipt.model.BooleanEvaluationResponse
+import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
+import org.http4s.Method
+import org.http4s.Request
+import org.http4s.Uri
+import org.http4s.circe.CirceEntityCodec._
+import org.http4s.client.Client
 
 protected[flipt] class FliptApiImpl[F[_]: Concurrent](
     client: Client[F],
@@ -42,6 +42,7 @@ protected[flipt] class FliptApiImpl[F[_]: Concurrent](
 
     client.expect[BooleanEvaluationResponse](req)
   }
+
   override def evaluateVariant(
       request: EvaluationRequest
   ): F[VariantEvaluationResponse] = {

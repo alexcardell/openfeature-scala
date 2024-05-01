@@ -23,7 +23,8 @@ ThisBuild / crossScalaVersions := Seq(Scala213, Scala33)
 ThisBuild / scalaVersion := Scala213 // the default Scala
 
 lazy val projects = Seq(
-  `flipt-sdk-server`
+  `flipt-sdk-server`,
+  `flipt-sdk-server-it`
 )
 
 lazy val commonDependencies = Seq(
@@ -39,7 +40,7 @@ lazy val root = tlCrossRootProject.aggregate(projects: _*)
 
 lazy val `flipt-sdk-server` =
   crossProject(JVMPlatform, JSPlatform, NativePlatform)
-    .crossType(CrossType.Pure)
+    .crossType(CrossType.Full)
     .in(file("flipt/sdk-server"))
     .settings(commonDependencies)
     .settings(
@@ -49,6 +50,18 @@ lazy val `flipt-sdk-server` =
         "org.http4s" %%% "http4s-ember-client" % "0.23.26",
         "org.http4s" %%% "http4s-circe" % "0.23.26",
         "io.circe" %%% "circe-generic" % "0.14.7"
+      )
+    )
+
+lazy val `flipt-sdk-server-it` =
+  crossProject(JVMPlatform)
+    .crossType(CrossType.Pure)
+    .in(file("flipt/sdk-server-it"))
+    .dependsOn(`flipt-sdk-server`)
+    .settings(commonDependencies)
+    .settings(
+      libraryDependencies ++= Seq(
+        "com.dimafeng" %% "testcontainers-scala-munit" % "0.41.3" % Test
       )
     )
 
