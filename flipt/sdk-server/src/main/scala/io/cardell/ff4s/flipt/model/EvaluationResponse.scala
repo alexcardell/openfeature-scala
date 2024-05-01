@@ -19,6 +19,7 @@ package io.cardell.ff4s.flipt.model
 import cats.syntax.functor._
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
+import scala.annotation.unused
 
 sealed trait EvaluationResponse
 
@@ -56,6 +57,23 @@ case class VariantEvaluationResponse(
 
 object VariantEvaluationResponse {
   implicit val d: Decoder[VariantEvaluationResponse] = deriveDecoder
+}
+
+case class StructuredVariantEvaluationResponse[A](
+    `match`: Boolean,
+    segmentKeys: List[String],
+    reason: EvaluationReason,
+    flagKey: String,
+    variantKey: String,
+    variantAttachment: A,
+    requestDurationMillis: Float,
+    timestamp: String
+) extends EvaluationResponse
+
+object StructuredVariantEvaluationResponse {
+  implicit def d[A](implicit
+      @unused da: Decoder[A]
+  ): Decoder[StructuredVariantEvaluationResponse[A]] = deriveDecoder
 }
 
 case class ErrorEvaluationResponse(

@@ -25,10 +25,15 @@ import io.cardell.ff4s.flipt.model.BooleanEvaluationResponse
 import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
 import io.cardell.ff4s.flipt.model.BatchEvaluationRequest
 import io.cardell.ff4s.flipt.model.BatchEvaluationResponse
+import io.circe.Decoder
+import io.cardell.ff4s.flipt.model.StructuredVariantEvaluationResponse
 
 trait FliptApi[F[_]] {
   def evaluateBoolean(request: EvaluationRequest): F[BooleanEvaluationResponse]
   def evaluateVariant(request: EvaluationRequest): F[VariantEvaluationResponse]
+  def evaluateStructuredVariant[A: Decoder](
+      request: EvaluationRequest
+  ): F[StructuredVariantEvaluationResponse[A]]
   def evaluateBatch(request: BatchEvaluationRequest): F[BatchEvaluationResponse]
 }
 

@@ -26,6 +26,8 @@ import io.cardell.ff4s.flipt.model.BooleanEvaluationResponse
 import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
 import io.cardell.ff4s.flipt.model.BatchEvaluationRequest
 import io.cardell.ff4s.flipt.model.BatchEvaluationResponse
+import io.circe.Decoder
+import io.cardell.ff4s.flipt.model.StructuredVariantEvaluationResponse
 
 protected[flipt] class FliptApiImpl[F[_]: Concurrent](
     client: Client[F],
@@ -51,6 +53,17 @@ protected[flipt] class FliptApiImpl[F[_]: Concurrent](
     ).withEntity(request)
 
     client.expect[VariantEvaluationResponse](req)
+  }
+
+  override def evaluateStructuredVariant[A: Decoder](
+      request: EvaluationRequest
+  ): F[StructuredVariantEvaluationResponse[A]] = {
+    val req = Request[F](
+      method = Method.POST,
+      uri = baseUri / "evaluate" / "v1" / "variant"
+    ).withEntity(request)
+
+    client.expect[StructuredVariantEvaluationResponse[A]](req)
   }
 
   override def evaluateBatch(
