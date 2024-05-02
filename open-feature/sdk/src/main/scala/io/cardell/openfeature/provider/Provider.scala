@@ -5,33 +5,33 @@ import io.cardell.openfeature.EvaluationContext
 trait Provider[F[_]] {
   def metadata: ProviderMetadata
 
-  def resolveBooleanValue(
+  def getBooleanEvaluation(
       flagKey: String,
       defaultValue: Boolean,
       context: EvaluationContext
-  ): F[ResolutionDetails[Boolean]]
+  ): F[ProviderEvaluation[Boolean]]
 
-  def resolveStringValue(
+  def getStringEvaluation(
       flagKey: String,
       defaultValue: String,
       context: EvaluationContext
-  ): F[ResolutionDetails[String]]
+  ): F[ProviderEvaluation[String]]
 
-  def resolveIntValue(
+  def getIntEvaluation(
       flagKey: String,
       defaultValue: Int,
       context: EvaluationContext
-  ): F[ResolutionDetails[Int]]
+  ): F[ProviderEvaluation[Int]]
 
-  def resolveDoubleValue(
+  def getDoubleEvaluation(
       flagKey: String,
       defaultValue: Double,
       context: EvaluationContext
-  ): F[ResolutionDetails[Double]]
+  ): F[ProviderEvaluation[Double]]
 
-  def resolveStructureValue[A: Resolvable](
+  def getObjectEvaluation[A](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
-  ): F[ResolutionDetails[A]]
+  ): F[ProviderEvaluation[A]]
 }

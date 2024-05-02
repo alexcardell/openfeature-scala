@@ -1,3 +1,8 @@
 package io.cardell.openfeature
 
-private final class OpenFeatureImpl[F[_]](providers: Providers[F]) {}
+import io.cardell.openfeature.provider.ProviderMetadata
+
+trait OpenFeature[F[_]] {
+  def client: FeatureClient[F]
+  def providerMetadata: ProviderMetadata
+}

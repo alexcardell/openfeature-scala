@@ -24,7 +24,8 @@ ThisBuild / scalaVersion := Scala213 // the default Scala
 
 lazy val projects = Seq(
   `flipt-sdk-server`,
-  `flipt-sdk-server-it`
+  `flipt-sdk-server-it`,
+  `open-feature-sdk`
 )
 
 lazy val commonDependencies = Seq(
@@ -64,6 +65,18 @@ lazy val `flipt-sdk-server-it` =
     .settings(
       libraryDependencies ++= Seq(
         "com.dimafeng" %% "testcontainers-scala-munit" % "0.41.3" % Test
+      )
+    )
+
+lazy val `open-feature-sdk` =
+  crossProject(JVMPlatform, JSPlatform, NativePlatform)
+    .crossType(CrossType.Pure)
+    .in(file("open-feature/sdk"))
+    .settings(commonDependencies)
+    .settings(
+      name := "ff4s-open-feature-sdk",
+      libraryDependencies ++= Seq(
+        "io.circe" %%% "circe-generic" % "0.14.7"
       )
     )
 
