@@ -16,16 +16,20 @@
 
 package io.cardell.ff4s.flipt
 
+import cats.Monad
+import cats.syntax.all.*
 import cats.effect.Concurrent
 import io.cardell.ff4s.flipt.model.BatchEvaluationRequest
 import io.cardell.ff4s.flipt.model.BatchEvaluationResponse
 import io.cardell.ff4s.flipt.model.BooleanEvaluationResponse
 import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
+import io.cardell.ff4s.flipt.model.StructuredVariantEvaluationResponse
 import org.http4s.Method
 import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.client.Client
+import io.circe.Decoder
 
 protected[flipt] class FliptApiImpl[F[_]: Concurrent](
     client: Client[F],
@@ -52,6 +56,15 @@ protected[flipt] class FliptApiImpl[F[_]: Concurrent](
     ).withEntity(request)
 
     client.expect[VariantEvaluationResponse](req)
+  }
+
+  override def evaluateStructuredVariant[A: Decoder](
+      request: EvaluationRequest
+  ): F[Decoder.Result[StructuredVariantEvaluationResponse[A]]] = {
+    evaluateVariant(request).map{s => 
+      println(s)
+      StructuredVariantEvaluationResponse[A](s)
+    }
   }
 
   override def evaluateBatch(

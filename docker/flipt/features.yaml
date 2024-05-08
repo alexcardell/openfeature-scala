@@ -11,8 +11,9 @@ flags:
   enabled: true
   variants:
   - key: key-1
-    attachment: 
-      jsonKey: value
+    attachment:
+      field: string
+      intField: 33
   rules:
   - segment: default-ns-segment-1
     distributions:
@@ -25,5 +26,5 @@ segments:
   - type: STRING_COMPARISON_TYPE
     property: test-property
     operator: eq
-    value: test-property-value
+    value: matched-property-value
   match_type: ALL_MATCH_TYPE

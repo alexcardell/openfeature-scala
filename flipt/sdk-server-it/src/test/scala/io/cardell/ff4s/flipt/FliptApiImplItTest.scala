@@ -23,6 +23,8 @@ import com.dimafeng.testcontainers.DockerComposeContainer
 import com.dimafeng.testcontainers.ExposedService
 import com.dimafeng.testcontainers.munit.TestContainerForAll
 import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
+import io.circe.Decoder
+import io.circe.generic.semiauto.deriveDecoder
 import munit.CatsEffectSuite
 import org.http4s.Uri
 import org.http4s.ember.client.EmberClientBuilder
@@ -81,7 +83,7 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
   test("receives variant match when in segment rule") {
     withContainers { containers =>
       api(containers).use { flipt =>
-        val segmentContext = Map("test-property" -> "test-property-value")
+        val segmentContext = Map("test-property" -> "matched-property-value")
         for {
           res <- flipt.evaluateVariant(
             EvaluationRequest(
@@ -112,6 +114,33 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
             )
           )
         } yield assertEquals(res.`match`, false)
+      }
+    }
+  }
+
+  case class TestVariant(field: String, intField: Int)
+  object TestVariant {
+    implicit val decoder: Decoder[TestVariant] = deriveDecoder
+  }
+
+  test("can serialise variant match") {
+    withContainers { containers =>
+      api(containers).use { flipt =>
+        val segmentContext = Map("test-property" -> "matched-property-value")
+
+        for {
+          res <- flipt.evaluateStructuredVariant[TestVariant](
+            EvaluationRequest(
+              "default",
+              "variant-flag-1",
+              None,
+              segmentContext,
+              None
+            )
+          )
+          _ <- IO.println(res)
+          result = res.map(_.variantAttachment)
+        } yield assertEquals(result, Right(TestVariant("string", 33)))
       }
     }
   }

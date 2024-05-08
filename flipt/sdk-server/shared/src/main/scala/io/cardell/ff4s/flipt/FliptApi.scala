@@ -23,8 +23,10 @@ import io.cardell.ff4s.flipt.model.BatchEvaluationRequest
 import io.cardell.ff4s.flipt.model.BatchEvaluationResponse
 import io.cardell.ff4s.flipt.model.BooleanEvaluationResponse
 import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
+import io.cardell.ff4s.flipt.model.StructuredVariantEvaluationResponse
 import org.http4s.Uri
 import org.http4s.client.Client
+import io.circe.Decoder
 
 trait FliptApi[F[_]] {
   def evaluateBoolean(
@@ -33,6 +35,9 @@ trait FliptApi[F[_]] {
   def evaluateVariant(
       request: EvaluationRequest
   ): F[VariantEvaluationResponse]
+  def evaluateStructuredVariant[A: Decoder](
+      request: EvaluationRequest
+  ): F[Decoder.Result[StructuredVariantEvaluationResponse[A]]]
   def evaluateBatch(
       request: BatchEvaluationRequest
   ): F[BatchEvaluationResponse]
