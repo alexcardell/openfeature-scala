@@ -36,6 +36,12 @@ trait FliptApi[F[_]] {
   def evaluateVariant(
       request: EvaluationRequest
   ): F[VariantEvaluationResponse]
+
+  /** If a variant matches, attempt to deserialise a variant attachment
+    *
+    * This method assumes all variant attachments match the JSON model of the
+    * type parameter
+    */
   def evaluateStructuredVariant[A: Decoder](
       request: EvaluationRequest
   ): F[Either[AttachmentDecodingError, StructuredVariantEvaluationResponse[A]]]
