@@ -123,7 +123,7 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
     implicit val decoder: Decoder[TestVariant] = deriveDecoder
   }
 
-  test("can serialise variant match") {
+  test("can deserialise variant match") {
     withContainers { containers =>
       api(containers).use { flipt =>
         val segmentContext = Map("test-property" -> "matched-property-value")
@@ -140,7 +140,29 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
           )
           _ <- IO.println(res)
           result = res.map(_.variantAttachment)
-        } yield assertEquals(result, Right(TestVariant("string", 33)))
+        } yield assertEquals(result, Right(Some(TestVariant("string", 33))))
+      }
+    }
+  }
+
+  test("does not attempt variant deserialisation without a match") {
+    withContainers { containers =>
+      api(containers).use { flipt =>
+        val segmentContext = Map("test-property" -> "unmatched-property-value")
+
+        for {
+          res <- flipt.evaluateStructuredVariant[TestVariant](
+            EvaluationRequest(
+              "default",
+              "variant-flag-1",
+              None,
+              segmentContext,
+              None
+            )
+          )
+          _ <- IO.println(res)
+          result = res.map(_.variantAttachment)
+        } yield assertEquals(result, Right(None))
       }
     }
   }
