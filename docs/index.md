@@ -12,7 +12,7 @@
 ## Installing
 
 ```scala
-libraryDependencies += "io.cardell" % "ff4s-flipt-server-sdk" % "@VERSION@"
+libraryDependencies += "io.cardell" %%% "ff4s-flipt-server-sdk" % "@VERSION@"
 ```
 
 ## Usage
