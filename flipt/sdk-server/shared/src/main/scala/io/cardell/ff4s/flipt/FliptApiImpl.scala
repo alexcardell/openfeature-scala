@@ -17,10 +17,14 @@
 package io.cardell.ff4s.flipt
 
 import cats.effect.Concurrent
+import cats.syntax.all.*
+import io.cardell.ff4s.flipt.model.AttachmentDecodingError
 import io.cardell.ff4s.flipt.model.BatchEvaluationRequest
 import io.cardell.ff4s.flipt.model.BatchEvaluationResponse
 import io.cardell.ff4s.flipt.model.BooleanEvaluationResponse
+import io.cardell.ff4s.flipt.model.StructuredVariantEvaluationResponse
 import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
+import io.circe.Decoder
 import org.http4s.Method
 import org.http4s.Request
 import org.http4s.Uri
@@ -32,12 +36,14 @@ protected[flipt] class FliptApiImpl[F[_]: Concurrent](
     baseUri: Uri
 ) extends FliptApi[F] {
 
+  private val evalUri = baseUri / "evaluate" / "v1"
+
   override def evaluateBoolean(
       request: EvaluationRequest
   ): F[BooleanEvaluationResponse] = {
     val req = Request[F](
       method = Method.POST,
-      uri = baseUri / "evaluate" / "v1" / "boolean"
+      uri = evalUri / "boolean"
     ).withEntity(request)
 
     client.expect[BooleanEvaluationResponse](req)
@@ -48,10 +54,18 @@ protected[flipt] class FliptApiImpl[F[_]: Concurrent](
   ): F[VariantEvaluationResponse] = {
     val req = Request[F](
       method = Method.POST,
-      uri = baseUri / "evaluate" / "v1" / "variant"
+      uri = evalUri / "variant"
     ).withEntity(request)
 
     client.expect[VariantEvaluationResponse](req)
+  }
+
+  override def evaluateStructuredVariant[A: Decoder](
+      request: EvaluationRequest
+  ): F[
+    Either[AttachmentDecodingError, StructuredVariantEvaluationResponse[A]]
+  ] = {
+    evaluateVariant(request).map(StructuredVariantEvaluationResponse[A](_))
   }
 
   override def evaluateBatch(
@@ -59,7 +73,7 @@ protected[flipt] class FliptApiImpl[F[_]: Concurrent](
   ): F[BatchEvaluationResponse] = {
     val req = Request[F](
       method = Method.POST,
-      uri = baseUri / "evaluate" / "v1" / "batch"
+      uri = evalUri / "batch"
     ).withEntity(request)
 
     client.expect[BatchEvaluationResponse](req)
