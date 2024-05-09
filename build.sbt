@@ -81,3 +81,4 @@ lazy val docs =
         )
       }
     )
+    .dependsOn(`flipt-sdk-server`.jvm)
