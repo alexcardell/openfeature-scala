@@ -80,6 +80,8 @@
 
   <ul class="nav-list">
     <li class="level1 nav-leaf"><a href="#goals">Goals</a></li>
+    <li class="level1 nav-leaf"><a href="#installing">Installing</a></li>
+    <li class="level1 nav-leaf"><a href="#usage">Usage</a></li>
   </ul>
 
   <p class="footer"></p>
@@ -99,6 +101,67 @@
           <li>Implementation of a Scala LaunchDarkly OpenFeature provider, e.g. with
           <a href="https://typelevel.org/catapult">Catalyst</a></li>
         </ul>
+        
+        <h2 id="installing" class="section"><a class="anchor-link left" href="#installing"><i class="icofont-laika link">&#xef71;</i></a>Installing</h2>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;io.cardell&quot;</span><span> % </span><span class="string-literal">&quot;ff4s-flipt-server-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.0.1-alpha2&quot;</span></code></pre>
+        
+        <h2 id="usage" class="section"><a class="anchor-link left" href="#usage"><i class="icofont-laika link">&#xef71;</i></a>Usage</h2>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">org</span><span>.</span><span class="identifier">http4s</span><span>.</span><span class="identifier">ember</span><span>.</span><span class="identifier">client</span><span>.</span><span class="type-name">EmberClientBuilder</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">org</span><span>.</span><span class="identifier">http4s</span><span>.</span><span class="type-name">Uri</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">ff4s</span><span>.</span><span class="identifier">flipt</span><span>.</span><span class="type-name">FliptApi</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">ff4s</span><span>.</span><span class="identifier">flipt</span><span>.</span><span class="type-name">EvaluationRequest</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">ff4s</span><span>.</span><span class="identifier">flipt</span><span>.</span><span class="identifier">auth</span><span>.</span><span class="type-name">AuthenticationStrategy</span><span>
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">url</span><span>: </span><span class="type-name">Uri</span><span> = </span><span class="type-name">Uri</span><span>.</span><span class="identifier">unsafeFromString</span><span>(</span><span class="string-literal">&quot;https://flipt.example.com&quot;</span><span>)
+</span><span class="comment">// url: Uri = Uri(
+//   scheme = Some(value = Scheme(https)),
+//   authority = Some(
+//     value = Authority(
+//       userInfo = None,
+//       host = RegName(host = flipt.example.com),
+//       port = None
+//     )
+//   ),
+//   path = ,
+//   query = ,
+//   fragment = None
+// )
+</span><span class="keyword">val</span><span> </span><span class="identifier">token</span><span>: </span><span class="type-name">String</span><span> = </span><span class="string-literal">&quot;token&quot;</span><span>
+</span><span class="comment">// token: String = &quot;token&quot;
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">resource</span><span> = </span><span class="type-name">EmberClientBuilder</span><span>
+    .</span><span class="keyword">default</span><span>[</span><span class="type-name">IO</span><span>]
+    .</span><span class="identifier">build</span><span>
+    .</span><span class="identifier">map</span><span>(</span><span class="identifier">client</span><span> =&gt;
+        </span><span class="type-name">FliptApi</span><span>[</span><span class="type-name">IO</span><span>](</span><span class="identifier">client</span><span>, </span><span class="identifier">url</span><span>, </span><span class="type-name">AuthenticationStrategy</span><span>.</span><span class="type-name">ClientToken</span><span>(</span><span class="string-literal">&quot;token&quot;</span><span>))
+    )
+</span><span class="comment">// resource: cats.effect.kernel.Resource[IO, FliptApi[IO]] = Bind(
+//   source = Bind(
+//     source = Eval(fa = Pure(value = ())),
+//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$10767/0x0000000103046840@66948a31
+//   ),
+//   fs = cats.effect.kernel.Resource$$Lambda$10768/0x0000000103045840@c8f485f
+// )
+</span><span>
+</span><span class="identifier">resource</span><span>.</span><span class="identifier">use</span><span> { </span><span class="identifier">flipt</span><span> =&gt; 
+    </span><span class="keyword">for</span><span> {
+        </span><span class="identifier">res</span><span> &lt;- </span><span class="identifier">flipt</span><span>.</span><span class="identifier">evaluateBoolean</span><span>(
+            </span><span class="type-name">EvaluationRequest</span><span>(
+                </span><span class="identifier">namespaceKey</span><span> = </span><span class="string-literal">&quot;default&quot;</span><span>,
+                </span><span class="identifier">flagKey</span><span> = </span><span class="string-literal">&quot;my-flag-1&quot;</span><span>,
+                </span><span class="identifier">entityId</span><span> = </span><span class="type-name">None</span><span>,
+                </span><span class="identifier">context</span><span> = </span><span class="type-name">Map</span><span>.</span><span class="identifier">empty</span><span>,
+                </span><span class="identifier">reference</span><span> = </span><span class="type-name">None</span><span>
+            )
+        )
+    } </span><span class="keyword">yield</span><span> </span><span class="identifier">res</span><span>.</span><span class="identifier">enabled</span><span>
+}
+</span><span class="comment">// res0: IO[Boolean] = FlatMap(
+//   ioe = Pure(value = ()),
+//   f = cats.effect.kernel.Resource$$Lambda$10770/0x0000000103059040@48661ca9,
+//   event = cats.effect.tracing.TracingEvent$StackTrace
+// )</span></code></pre>
 
         
 <hr class="footer-rule"/>
