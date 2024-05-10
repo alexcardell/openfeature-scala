@@ -1,6 +1,17 @@
 package io.cardell.openfeature
+import io.cardell.openfeature.ContextValue.BooleanValue
+import io.cardell.openfeature.ContextValue.StringValue
+import io.cardell.openfeature.ContextValue.IntValue
+import io.cardell.openfeature.ContextValue.DoubleValue
 
-sealed trait ContextValue
+sealed trait ContextValue {
+  def stringValue: String = this match {
+    case StringValue(value)  => value
+    case BooleanValue(value) => value.toString()
+    case IntValue(value)     => value.toString()
+    case DoubleValue(value)  => value.toString()
+  }
+}
 
 object ContextValue {
   case class BooleanValue(value: Boolean) extends ContextValue

@@ -25,7 +25,8 @@ ThisBuild / scalaVersion := Scala213 // the default Scala
 lazy val projects = Seq(
   `flipt-sdk-server`,
   `flipt-sdk-server-it`,
-  `open-feature-sdk`
+  `open-feature-sdk`,
+  `open-feature-provider-flipt`
 )
 
 lazy val commonDependencies = Seq(
@@ -70,15 +71,29 @@ lazy val `flipt-sdk-server-it` =
 
 lazy val `open-feature-sdk` =
   crossProject(JVMPlatform, JSPlatform, NativePlatform)
-    .enablePlugins(NoPublishPlugin)
     .crossType(CrossType.Pure)
     .in(file("open-feature/sdk"))
+    .enablePlugins(NoPublishPlugin)
     .settings(commonDependencies)
     .settings(
       name := "ff4s-open-feature-sdk",
       libraryDependencies ++= Seq(
         "io.circe" %%% "circe-generic" % "0.14.7"
       )
+    )
+
+lazy val `open-feature-provider-flipt` =
+  crossProject(JVMPlatform, JSPlatform, NativePlatform)
+    .crossType(CrossType.Pure)
+    .in(file("open-feature/provider-flipt"))
+    .enablePlugins(NoPublishPlugin)
+    .settings(commonDependencies)
+    .settings(
+      name := "ff4s-open-feature-provider-flipt"
+    )
+    .dependsOn(
+      `open-feature-sdk`,
+      `flipt-sdk-server`
     )
 
 lazy val docs =
