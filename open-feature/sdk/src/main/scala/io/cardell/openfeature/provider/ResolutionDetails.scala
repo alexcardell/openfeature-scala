@@ -13,8 +13,7 @@ object FlagMetadataValue {
   // TODO circe unwrapped codecs
 }
 
-
-case class ProviderEvaluation[A](
+case class ResolutionDetails[A](
     value: A,
     errorCode: Option[ErrorCode],
     errorMessage: Option[String],

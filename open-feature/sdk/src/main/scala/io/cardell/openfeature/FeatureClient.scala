@@ -13,10 +13,6 @@ object EvaluationOptions {
   val Defaults: EvaluationOptions = EvaluationOptions()
 }
 
-// trait Hook
-
-case class EvaluationDetails[A](value: A)
-
 trait FeatureClient[F[_]] {
 
   def providerMetadata: ProviderMetadata
@@ -40,6 +36,22 @@ trait FeatureClient[F[_]] {
       context: EvaluationContext,
       options: EvaluationOptions
   ): F[Boolean]
+
+  def getBooleanDetails(
+      flagKey: String,
+      default: Boolean
+  ): F[EvaluationDetails[Boolean]]
+  def getBooleanDetails(
+      flagKey: String,
+      default: Boolean,
+      context: EvaluationContext
+  ): F[EvaluationDetails[Boolean]]
+  def getBooleanDetails(
+      flagKey: String,
+      default: Boolean,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[EvaluationDetails[Boolean]]
 
   def getStringValue(flagKey: String, default: String): F[String]
   def getStringValue(
@@ -133,13 +145,35 @@ protected final class OpenFeatureClient[F[_]: Monad](
       context: EvaluationContext,
       options: EvaluationOptions // TODO handle options
   ): F[Boolean] =
+    getBooleanDetails(flagKey, default, context, options)
+      .map(_.value)
+
+  override def getBooleanDetails(
+      flagKey: String,
+      default: Boolean
+  ): F[EvaluationDetails[Boolean]] =
+    getBooleanDetails(flagKey, default, EvaluationContext.empty)
+
+  override def getBooleanDetails(
+      flagKey: String,
+      default: Boolean,
+      context: EvaluationContext
+  ): F[EvaluationDetails[Boolean]] =
+    getBooleanDetails(flagKey, default, context, EvaluationOptions.Defaults)
+
+  override def getBooleanDetails(
+      flagKey: String,
+      default: Boolean,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[EvaluationDetails[Boolean]] =
     provider
-      .getBooleanEvaluation(
+      .resolveBooleanValue(
         flagKey,
         default,
         clientEvaluationContext ++ context
       )
-      .map(_.value)
+      .map(EvaluationDetails[Boolean](flagKey, _))
 
   override def getStringValue(flagKey: String, default: String): F[String] =
     getStringValue(flagKey, default, EvaluationContext.empty)
@@ -163,7 +197,7 @@ protected final class OpenFeatureClient[F[_]: Monad](
       options: EvaluationOptions
   ): F[String] =
     provider
-      .getStringEvaluation(
+      .resolveStringValue(
         flagKey,
         default,
         clientEvaluationContext ++ context
@@ -186,7 +220,7 @@ protected final class OpenFeatureClient[F[_]: Monad](
       options: EvaluationOptions
   ): F[Int] =
     provider
-      .getIntEvaluation(
+      .resolveIntValue(
         flagKey,
         default,
         clientEvaluationContext ++ context
@@ -210,7 +244,7 @@ protected final class OpenFeatureClient[F[_]: Monad](
       options: EvaluationOptions
   ): F[Double] =
     provider
-      .getDoubleEvaluation(
+      .resolveDoubleValue(
         flagKey,
         default,
         clientEvaluationContext ++ context
