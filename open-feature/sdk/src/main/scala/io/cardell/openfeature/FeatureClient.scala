@@ -1,12 +1,9 @@
 package io.cardell.openfeature
 
-import cats.syntax.all._
 import io.cardell.openfeature.provider.ProviderMetadata
-import io.cardell.openfeature.provider.Provider
-import cats.Monad
 
 // TODO implement circe
-trait ObjectDecoder[A]
+trait StructureDecoder[A]
 
 case class EvaluationOptions()
 object EvaluationOptions {
@@ -121,223 +118,51 @@ trait FeatureClient[F[_]] {
       options: EvaluationOptions
   ): F[Double]
 
-  def getObjectValue[A: ObjectDecoder](flagKey: String, default: A): F[A]
-  def getObjectValue[A: ObjectDecoder](
+  def getDoubleDetails(
       flagKey: String,
-      default: A,
-      context: EvaluationContext
-  ): F[A]
-  def getObjectValue[A: ObjectDecoder](
-      flagKey: String,
-      default: A,
-      context: EvaluationContext,
-      options: EvaluationOptions
-  ): F[A]
-}
-
-protected final class OpenFeatureClient[F[_]: Monad](
-    provider: Provider[F],
-    clientEvaluationContext: EvaluationContext
-) extends FeatureClient[F] {
-
-  override def providerMetadata: ProviderMetadata = provider.metadata
-
-  override def evaluationContext: EvaluationContext = clientEvaluationContext
-
-  override def withEvaluationContext(
-      context: EvaluationContext
-  ): FeatureClient[F] =
-    new OpenFeatureClient[F](provider, clientEvaluationContext ++ context)
-
-  // override def hooks: List[Hook] = ???
-  // override def withHook(hook: Hook): FeatureClient[F] = ???
-  // override def withHooks(hooks: List[Hook]): FeatureClient[F] = ???
-
-  override def getBooleanValue(flagKey: String, default: Boolean): F[Boolean] =
-    getBooleanValue(flagKey, default, EvaluationContext.empty)
-
-  override def getBooleanValue(
-      flagKey: String,
-      default: Boolean,
-      context: EvaluationContext
-  ): F[Boolean] =
-    getBooleanValue(
-      flagKey,
-      default,
-      context,
-      EvaluationOptions.Defaults
-    )
-
-  override def getBooleanValue(
-      flagKey: String,
-      default: Boolean,
-      context: EvaluationContext,
-      options: EvaluationOptions // TODO handle options
-  ): F[Boolean] =
-    getBooleanDetails(flagKey, default, context, options)
-      .map(_.value)
-
-  override def getBooleanDetails(
-      flagKey: String,
-      default: Boolean
-  ): F[EvaluationDetails[Boolean]] =
-    getBooleanDetails(flagKey, default, EvaluationContext.empty)
-
-  override def getBooleanDetails(
-      flagKey: String,
-      default: Boolean,
-      context: EvaluationContext
-  ): F[EvaluationDetails[Boolean]] =
-    getBooleanDetails(flagKey, default, context, EvaluationOptions.Defaults)
-
-  override def getBooleanDetails(
-      flagKey: String,
-      default: Boolean,
-      context: EvaluationContext,
-      options: EvaluationOptions
-  ): F[EvaluationDetails[Boolean]] =
-    provider
-      .resolveBooleanValue(
-        flagKey,
-        default,
-        clientEvaluationContext ++ context
-      )
-      .map(EvaluationDetails[Boolean](flagKey, _))
-
-  override def getStringValue(flagKey: String, default: String): F[String] =
-    getStringValue(flagKey, default, EvaluationContext.empty)
-
-  override def getStringValue(
-      flagKey: String,
-      default: String,
-      context: EvaluationContext
-  ): F[String] =
-    getStringValue(
-      flagKey,
-      default,
-      context,
-      EvaluationOptions.Defaults
-    )
-
-  override def getStringValue(
-      flagKey: String,
-      default: String,
-      context: EvaluationContext,
-      options: EvaluationOptions
-  ): F[String] =
-    getStringDetails(flagKey, default, context, EvaluationOptions.Defaults)
-      .map(_.value)
-
-  override def getStringDetails(
-      flagKey: String,
-      default: String
-  ): F[EvaluationDetails[String]] =
-    getStringDetails(flagKey, default, EvaluationContext.empty)
-
-  override def getStringDetails(
-      flagKey: String,
-      default: String,
-      context: EvaluationContext
-  ): F[EvaluationDetails[String]] =
-    getStringDetails(flagKey, default, context, EvaluationOptions.Defaults)
-
-  override def getStringDetails(
-      flagKey: String,
-      default: String,
-      context: EvaluationContext,
-      options: EvaluationOptions
-  ): F[EvaluationDetails[String]] =
-    provider
-      .resolveStringValue(flagKey, default, clientEvaluationContext ++ context)
-      .map(EvaluationDetails[String](flagKey, _))
-
-  override def getIntValue(flagKey: String, default: Int): F[Int] =
-    getIntValue(flagKey, default, EvaluationContext.empty)
-
-  override def getIntValue(
-      flagKey: String,
-      default: Int,
-      context: EvaluationContext
-  ): F[Int] = getIntValue(flagKey, default, context, EvaluationOptions.Defaults)
-
-  override def getIntValue(
-      flagKey: String,
-      default: Int,
-      context: EvaluationContext,
-      options: EvaluationOptions
-  ): F[Int] =
-    getIntDetails(flagKey, default, context, options)
-      .map(_.value)
-
-  override def getIntDetails(
-      flagKey: String,
-      default: Int
-  ): F[EvaluationDetails[Int]] =
-    getIntDetails(flagKey, default, EvaluationContext.empty)
-
-  override def getIntDetails(
-      flagKey: String,
-      default: Int,
-      context: EvaluationContext
-  ): F[EvaluationDetails[Int]] =
-    getIntDetails(flagKey, default, context, EvaluationOptions.Defaults)
-
-  override def getIntDetails(
-      flagKey: String,
-      default: Int,
-      context: EvaluationContext,
-      options: EvaluationOptions
-  ): F[EvaluationDetails[Int]] =
-    provider
-      .resolveIntValue(
-        flagKey,
-        default,
-        clientEvaluationContext ++ context
-      )
-      .map(EvaluationDetails[Int](flagKey, _))
-
-  override def getDoubleValue(flagKey: String, default: Double): F[Double] =
-    getDoubleValue(flagKey, default, EvaluationContext.empty)
-
-  override def getDoubleValue(
+      default: Double
+  ): F[EvaluationDetails[Double]]
+  def getDoubleDetails(
       flagKey: String,
       default: Double,
       context: EvaluationContext
-  ): F[Double] =
-    getDoubleValue(flagKey, default, context, EvaluationOptions.Defaults)
-
-  override def getDoubleValue(
+  ): F[EvaluationDetails[Double]]
+  def getDoubleDetails(
       flagKey: String,
       default: Double,
       context: EvaluationContext,
       options: EvaluationOptions
-  ): F[Double] =
-    provider
-      .resolveDoubleValue(
-        flagKey,
-        default,
-        clientEvaluationContext ++ context
-      )
-      .map(_.value)
+  ): F[EvaluationDetails[Double]]
 
-  override def getObjectValue[A: ObjectDecoder](
+  def getStructureValue[A: StructureDecoder](
       flagKey: String,
       default: A
-  ): F[A] =
-    getObjectValue[A](flagKey, default, EvaluationContext.empty)
-
-  override def getObjectValue[A: ObjectDecoder](
+  ): F[A]
+  def getStructureValue[A: StructureDecoder](
       flagKey: String,
       default: A,
       context: EvaluationContext
-  ): F[A] =
-    getObjectValue[A](flagKey, default, context, EvaluationOptions.Defaults)
-
-  override def getObjectValue[A: ObjectDecoder](
+  ): F[A]
+  def getStructureValue[A: StructureDecoder](
       flagKey: String,
       default: A,
       context: EvaluationContext,
       options: EvaluationOptions
-  ): F[A] =
-    getObjectValue[A](flagKey, default, clientEvaluationContext ++ context)
+  ): F[A]
+
+  def getStructureDetails[A: StructureDecoder](
+      flagKey: String,
+      default: A
+  ): F[EvaluationDetails[A]]
+  def getStructureDetails[A: StructureDecoder](
+      flagKey: String,
+      default: A,
+      context: EvaluationContext
+  ): F[EvaluationDetails[A]]
+  def getStructureDetails[A: StructureDecoder](
+      flagKey: String,
+      default: A,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[EvaluationDetails[A]]
 }

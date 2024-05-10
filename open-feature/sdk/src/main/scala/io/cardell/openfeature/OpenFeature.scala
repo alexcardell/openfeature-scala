@@ -15,5 +15,5 @@ trait OpenFeature[F[_]] {
 protected[openfeature] class OpenFeatureSdk[F[_]: Monad](provider: Provider[F])
     extends OpenFeature[F] {
   def client: F[FeatureClient[F]] =
-    new OpenFeatureClient[F](provider, EvaluationContext.empty).pure[F].widen
+    new FeatureClientImpl[F](provider, EvaluationContext.empty).pure[F].widen
 }
