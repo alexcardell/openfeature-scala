@@ -66,6 +66,22 @@ trait FeatureClient[F[_]] {
       options: EvaluationOptions
   ): F[String]
 
+  def getStringDetails(
+      flagKey: String,
+      default: String
+  ): F[EvaluationDetails[String]]
+  def getStringDetails(
+      flagKey: String,
+      default: String,
+      context: EvaluationContext
+  ): F[EvaluationDetails[String]]
+  def getStringDetails(
+      flagKey: String,
+      default: String,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[EvaluationDetails[String]]
+
   def getIntValue(flagKey: String, default: Int): F[Int]
   def getIntValue(
       flagKey: String,
@@ -196,13 +212,31 @@ protected final class OpenFeatureClient[F[_]: Monad](
       context: EvaluationContext,
       options: EvaluationOptions
   ): F[String] =
-    provider
-      .resolveStringValue(
-        flagKey,
-        default,
-        clientEvaluationContext ++ context
-      )
+    getStringDetails(flagKey, default, context, EvaluationOptions.Defaults)
       .map(_.value)
+
+  override def getStringDetails(
+      flagKey: String,
+      default: String
+  ): F[EvaluationDetails[String]] =
+    getStringDetails(flagKey, default, EvaluationContext.empty)
+
+  override def getStringDetails(
+      flagKey: String,
+      default: String,
+      context: EvaluationContext
+  ): F[EvaluationDetails[String]] =
+    getStringDetails(flagKey, default, context, EvaluationOptions.Defaults)
+
+  override def getStringDetails(
+      flagKey: String,
+      default: String,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[EvaluationDetails[String]] =
+    provider
+      .resolveStringValue(flagKey, default, clientEvaluationContext ++ context)
+      .map(EvaluationDetails[String](flagKey, _))
 
   override def getIntValue(flagKey: String, default: Int): F[Int] =
     getIntValue(flagKey, default, EvaluationContext.empty)

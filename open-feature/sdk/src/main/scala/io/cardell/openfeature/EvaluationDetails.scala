@@ -23,7 +23,7 @@ object EvaluationDetails {
       flagKey = flagKey,
       value = resolution.value,
       errorCode = resolution.errorCode,
-      errorMessage = errorMessage.errorMessage,
+      errorMessage = resolution.errorMessage,
       reason = resolution.reason,
       variant = resolution.variant,
       metadata = resolution.metadata
