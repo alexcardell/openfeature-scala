@@ -70,6 +70,7 @@ lazy val `flipt-sdk-server-it` =
 
 lazy val `open-feature-sdk` =
   crossProject(JVMPlatform, JSPlatform, NativePlatform)
+    .enablePlugins(NoPublishPlugin)
     .crossType(CrossType.Pure)
     .in(file("open-feature/sdk"))
     .settings(commonDependencies)
