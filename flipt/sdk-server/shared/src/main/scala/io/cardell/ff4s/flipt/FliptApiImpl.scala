@@ -17,19 +17,20 @@
 package io.cardell.ff4s.flipt
 
 import cats.effect.Concurrent
-import cats.syntax.all.*
-import io.cardell.ff4s.flipt.model.AttachmentDecodingError
-import io.cardell.ff4s.flipt.model.BatchEvaluationRequest
-import io.cardell.ff4s.flipt.model.BatchEvaluationResponse
-import io.cardell.ff4s.flipt.model.BooleanEvaluationResponse
-import io.cardell.ff4s.flipt.model.StructuredVariantEvaluationResponse
-import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
+import cats.syntax.all._
 import io.circe.Decoder
 import org.http4s.Method
 import org.http4s.Request
 import org.http4s.Uri
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.client.Client
+
+import io.cardell.ff4s.flipt.model.AttachmentDecodingError
+import io.cardell.ff4s.flipt.model.BatchEvaluationRequest
+import io.cardell.ff4s.flipt.model.BatchEvaluationResponse
+import io.cardell.ff4s.flipt.model.BooleanEvaluationResponse
+import io.cardell.ff4s.flipt.model.StructuredVariantEvaluationResponse
+import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
 
 protected[flipt] class FliptApiImpl[F[_]: Concurrent](
     client: Client[F],
@@ -64,9 +65,7 @@ protected[flipt] class FliptApiImpl[F[_]: Concurrent](
       request: EvaluationRequest
   ): F[
     Either[AttachmentDecodingError, StructuredVariantEvaluationResponse[A]]
-  ] = {
-    evaluateVariant(request).map(StructuredVariantEvaluationResponse[A](_))
-  }
+  ] = evaluateVariant(request).map(StructuredVariantEvaluationResponse[A](_))
 
   override def evaluateBatch(
       request: BatchEvaluationRequest

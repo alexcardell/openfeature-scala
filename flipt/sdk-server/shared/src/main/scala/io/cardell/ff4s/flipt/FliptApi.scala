@@ -17,6 +17,10 @@
 package io.cardell.ff4s.flipt
 
 import cats.effect.Concurrent
+import io.circe.Decoder
+import org.http4s.Uri
+import org.http4s.client.Client
+
 import io.cardell.ff4s.flipt.auth.AuthMiddleware
 import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
 import io.cardell.ff4s.flipt.model.AttachmentDecodingError
@@ -25,14 +29,13 @@ import io.cardell.ff4s.flipt.model.BatchEvaluationResponse
 import io.cardell.ff4s.flipt.model.BooleanEvaluationResponse
 import io.cardell.ff4s.flipt.model.StructuredVariantEvaluationResponse
 import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
-import io.circe.Decoder
-import org.http4s.Uri
-import org.http4s.client.Client
 
 trait FliptApi[F[_]] {
+
   def evaluateBoolean(
       request: EvaluationRequest
   ): F[BooleanEvaluationResponse]
+
   def evaluateVariant(
       request: EvaluationRequest
   ): F[VariantEvaluationResponse]
@@ -45,16 +48,19 @@ trait FliptApi[F[_]] {
   def evaluateStructuredVariant[A: Decoder](
       request: EvaluationRequest
   ): F[Either[AttachmentDecodingError, StructuredVariantEvaluationResponse[A]]]
+
   def evaluateBatch(
       request: BatchEvaluationRequest
   ): F[BatchEvaluationResponse]
+
 }
 
 object FliptApi {
+
   def apply[F[_]: Concurrent](
       client: Client[F],
       uri: Uri,
       strategy: AuthenticationStrategy
-  ): FliptApi[F] =
-    new FliptApiImpl[F](AuthMiddleware(client, strategy), uri)
+  ): FliptApi[F] = new FliptApiImpl[F](AuthMiddleware(client, strategy), uri)
+
 }

@@ -34,6 +34,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        run: brew install sbt
+
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
         with:
@@ -107,6 +111,10 @@ jobs:
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        run: brew install sbt
+
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
         with:
@@ -211,13 +219,17 @@ jobs:
 
   dependency-submission:
     name: Submit Dependencies
-    if: github.event_name != 'pull_request'
+    if: github.event.repository.fork == false && github.event_name != 'pull_request'
     strategy:
       matrix:
         os: [ubuntu-latest]
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        run: brew install sbt
+
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
         with:
@@ -239,7 +251,7 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: rootjs_2.13 rootjs_3 docs_2.13 docs_3 rootjvm_2.13 rootjvm_3 rootnative_2.13 rootnative_3
+          modules-ignore: ff4s-open-feature-provider-flipt-it_2.13 ff4s-open-feature-provider-flipt-it_3 ff4s-open-feature-provider-flipt_native0.4_2.13 ff4s-open-feature-provider-flipt_native0.4_3 ff4s-open-feature-sdk_native0.4_2.13 ff4s-open-feature-sdk_native0.4_3 ff4s-open-feature-provider-flipt_2.13 ff4s-open-feature-provider-flipt_3 ff4s-open-feature-sdk_2.13 ff4s-open-feature-sdk_3 rootjs_2.13 rootjs_3 docs_2.13 docs_3 ff4s-open-feature-provider-flipt_sjs1_2.13 ff4s-open-feature-provider-flipt_sjs1_3 rootjvm_2.13 rootjvm_3 rootnative_2.13 rootnative_3 ff4s-open-feature-sdk_sjs1_2.13 ff4s-open-feature-sdk_sjs1_3
           configs-ignore: test scala-tool scala-doc-tool test-internal
 
   site:
@@ -250,6 +262,10 @@ jobs:
         java: [temurin@11]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Install sbt
+        if: contains(runner.os, 'macos')
+        run: brew install sbt
+
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
         with:
@@ -286,7 +302,7 @@ jobs:
 
       - name: Publish site
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v3.9.3
+        uses: peaceiris/actions-gh-pages@v4.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: site/target/docs/site

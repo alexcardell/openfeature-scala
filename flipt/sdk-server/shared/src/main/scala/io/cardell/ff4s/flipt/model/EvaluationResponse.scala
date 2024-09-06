@@ -23,12 +23,14 @@ import io.circe.generic.semiauto.deriveDecoder
 sealed trait EvaluationResponse
 
 object EvaluationResponse {
+
   implicit def decoder: Decoder[EvaluationResponse] =
     List[Decoder[EvaluationResponse]](
       Decoder[BooleanEvaluationResponse].widen,
       Decoder[VariantEvaluationResponse].widen,
       Decoder[ErrorEvaluationResponse].widen
     ).reduceLeft(_ or _)
+
 }
 
 case class BooleanEvaluationResponse(

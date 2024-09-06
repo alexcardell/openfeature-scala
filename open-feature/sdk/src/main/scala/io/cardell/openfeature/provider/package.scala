@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package io.cardell.ff4s.flipt.model
+package io.cardell.openfeature
 
-import io.circe.Encoder
-import io.circe.generic.semiauto.deriveEncoder
+package object provider {
 
-import io.cardell.ff4s.flipt.EvaluationRequest
+  type FlagMetadata = Map[String, FlagMetadataValue]
 
-case class BatchEvaluationRequest(
-    requestId: Option[String],
-    requests: List[EvaluationRequest],
-    reference: Option[String]
-)
-
-object BatchEvaluationRequest {
-  implicit val d: Encoder[BatchEvaluationRequest] = deriveEncoder
 }

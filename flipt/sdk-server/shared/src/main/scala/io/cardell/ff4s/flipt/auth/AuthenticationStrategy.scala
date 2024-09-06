@@ -20,5 +20,5 @@ sealed trait AuthenticationStrategy
 
 object AuthenticationStrategy {
   case class ClientToken(token: String) extends AuthenticationStrategy
-  case class JWT(token: String) extends AuthenticationStrategy
+  case class JWT(token: String)         extends AuthenticationStrategy
 }

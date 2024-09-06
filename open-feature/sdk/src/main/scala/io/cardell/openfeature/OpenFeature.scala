@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package io.cardell.ff4s.flipt.model
+package io.cardell.openfeature
 
-import io.circe.Encoder
-import io.circe.generic.semiauto.deriveEncoder
+import cats.Monad
+import cats.syntax.all._
 
-import io.cardell.ff4s.flipt.EvaluationRequest
+import io.cardell.openfeature.provider.Provider
 
-case class BatchEvaluationRequest(
-    requestId: Option[String],
-    requests: List[EvaluationRequest],
-    reference: Option[String]
-)
+trait OpenFeature[F[_]] {
 
-object BatchEvaluationRequest {
-  implicit val d: Encoder[BatchEvaluationRequest] = deriveEncoder
+  /** Create a client using the default provider
+    */
+  def client: F[FeatureClient[F]]
+}
+
+protected[openfeature] class OpenFeatureSdk[F[_]: Monad](provider: Provider[F])
+    extends OpenFeature[F] {
+
+  def client: F[FeatureClient[F]] =
+    new FeatureClientImpl[F](provider, EvaluationContext.empty).pure[F].widen
+
 }
