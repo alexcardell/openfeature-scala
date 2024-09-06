@@ -19,7 +19,6 @@ package io.cardell.openfeature
 import cats.Monad
 import cats.syntax.all._
 
-import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.provider.Provider
 
 trait OpenFeature[F[_]] {
