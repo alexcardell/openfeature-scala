@@ -16,8 +16,8 @@
 
 package io.cardell.ff4s.flipt
 
-import io.circe.generic.semiauto.deriveEncoder
 import io.circe.Encoder
+import io.circe.generic.semiauto.deriveEncoder
 
 case class EvaluationRequest(
     namespaceKey: String,

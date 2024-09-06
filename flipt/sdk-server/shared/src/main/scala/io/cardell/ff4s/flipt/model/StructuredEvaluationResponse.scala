@@ -16,13 +16,14 @@
 
 package io.cardell.ff4s.flipt.model
 
-import cats.syntax.all.*
+import cats.syntax.all._
 import io.circe.Decoder
 import io.circe.parser
 
 sealed trait AttachmentDecodingError
+
 object AttachmentDecodingError {
-  case object AttachmentJsonParsingError extends AttachmentDecodingError
+  case object AttachmentJsonParsingError     extends AttachmentDecodingError
   case object AttachmentDeserialisationError extends AttachmentDecodingError
 }
 
@@ -38,14 +39,16 @@ case class StructuredVariantEvaluationResponse[A](
 )
 
 object StructuredVariantEvaluationResponse {
+
   def apply[A: Decoder](
       variant: VariantEvaluationResponse
   ): Either[AttachmentDecodingError, StructuredVariantEvaluationResponse[A]] = {
-    val maybeAttachment = if (variant.`match`) {
-      decodeJsonAttachment(variant.variantAttachment).map(Some(_))
-    } else {
-      Option.empty[A].asRight[AttachmentDecodingError]
-    }
+    val maybeAttachment =
+      if (variant.`match`) {
+        decodeJsonAttachment(variant.variantAttachment).map(Some(_))
+      } else {
+        Option.empty[A].asRight[AttachmentDecodingError]
+      }
 
     maybeAttachment.map { attachment =>
       StructuredVariantEvaluationResponse[A](

@@ -16,9 +16,10 @@
 
 package io.cardell.ff4s.flipt.model
 
-import io.cardell.ff4s.flipt.EvaluationRequest
-import io.circe.generic.semiauto.deriveEncoder
 import io.circe.Encoder
+import io.circe.generic.semiauto.deriveEncoder
+
+import io.cardell.ff4s.flipt.EvaluationRequest
 
 case class BatchEvaluationRequest(
     requestId: Option[String],
