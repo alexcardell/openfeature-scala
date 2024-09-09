@@ -44,6 +44,10 @@ lazy val commonDependencies = Seq(
   )
 )
 
+lazy val integrationTestSettings = Seq(
+  Test / fork := true
+)
+
 lazy val root = tlCrossRootProject.aggregate(projects: _*)
 
 lazy val `flipt-sdk-server` = crossProject(
@@ -70,6 +74,7 @@ lazy val `flipt-sdk-server-it` = crossProject(JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("flipt/sdk-server-it"))
   .settings(commonDependencies)
+  .settings(integrationTestSettings)
   .settings(
     libraryDependencies ++= Seq(
       "com.dimafeng" %% "testcontainers-scala-munit" % "0.41.3" % Test
@@ -115,6 +120,7 @@ lazy val `open-feature-provider-flipt-it` = crossProject(JVMPlatform)
   .in(file("open-feature/provider-flipt-it"))
   .enablePlugins(NoPublishPlugin)
   .settings(commonDependencies)
+  .settings(integrationTestSettings)
   .settings(
     name := "ff4s-open-feature-provider-flipt-it",
     libraryDependencies ++= Seq(
