@@ -56,8 +56,7 @@ class FliptProvider[F[_]: MonadThrow](flipt: FliptApi[F], namespace: String)
       namespaceKey = namespace,
       flagKey = flagKey,
       entityId = context.targetingKey,
-      context = evalContext,
-      reference = None
+      context = evalContext
     )
 
     val resolution = flipt.evaluateBoolean(req).map { evaluation =>
@@ -75,7 +74,7 @@ class FliptProvider[F[_]: MonadThrow](flipt: FliptApi[F], namespace: String)
       value = defaultValue,
       errorCode = Some(ErrorCode.General),
       errorMessage = Some(t.getMessage()),
-      reason = Some(EvaluationReason.Default),
+      reason = Some(EvaluationReason.Error),
       variant = None,
       metadata = None
     )
@@ -86,12 +85,46 @@ class FliptProvider[F[_]: MonadThrow](flipt: FliptApi[F], namespace: String)
     }
   }
 
-  // override def resolveStringValue(
-  //     flagKey: String,
-  //     defaultValue: String,
-  //     context: EvaluationContext
-  // ): F[ResolutionDetails[String]] = ???
-  //
+  override def resolveStringValue(
+      flagKey: String,
+      defaultValue: String,
+      context: EvaluationContext
+  ): F[ResolutionDetails[String]] = {
+    val evalContext = mapContext(context)
+
+    val req = EvaluationRequest(
+      namespaceKey = namespace,
+      flagKey = flagKey,
+      entityId = context.targetingKey,
+      context = evalContext
+    )
+
+    val resolution = flipt.evaluateVariant(req).map { evaluation =>
+      ResolutionDetails[String](
+        value = evaluation.variantAttachment,
+        errorCode = None,
+        errorMessage = None,
+        reason = mapReason(evaluation.reason).some,
+        variant = Some(evaluation.variantKey),
+        metadata = None
+      )
+    }
+
+    def default(t: Throwable) = ResolutionDetails[String](
+      value = defaultValue,
+      errorCode = Some(ErrorCode.General),
+      errorMessage = Some(t.getMessage()),
+      reason = Some(EvaluationReason.Error),
+      variant = None,
+      metadata = None
+    )
+
+    resolution.attempt.map {
+      case Right(value) => value
+      case Left(error)  => default(error)
+    }
+  }
+
   // override def resolveIntValue(
   //     flagKey: String,
   //     defaultValue: Int,

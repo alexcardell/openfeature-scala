@@ -16,4 +16,6 @@
 
 package io.cardell
 
-package object openfeature {}
+package object openfeature {
+  type ContextMap = Map[String, ContextValue]
+}

@@ -38,6 +38,48 @@ object ContextValue {
   case class StringValue(value: String)   extends ContextValue
   case class IntValue(value: Int)         extends ContextValue
   case class DoubleValue(value: Double)   extends ContextValue
+
+  def apply(b: Boolean): ContextValue = BooleanValue(b)
+  def apply(s: String): ContextValue  = StringValue(s)
+  def apply(i: Int): ContextValue     = IntValue(i)
+  def apply(d: Double): ContextValue  = DoubleValue(d)
+
+  def apply[A](a: A)(implicit has: HasContextValue[A]) = has.toContextValue(a)
+}
+
+sealed trait HasContextValue[A] {
+  def toContextValue(a: A): ContextValue
+}
+
+object HasContextValue {
+
+  implicit val bool: HasContextValue[Boolean] =
+    new HasContextValue[Boolean] {
+      def toContextValue(b: Boolean): ContextValue = BooleanValue(b)
+    }
+
+  implicit val string: HasContextValue[String] =
+    new HasContextValue[String] {
+      def toContextValue(s: String): ContextValue = StringValue(s)
+    }
+
+  implicit val int: HasContextValue[Int] =
+    new HasContextValue[Int] {
+      def toContextValue(i: Int): ContextValue = IntValue(i)
+    }
+
+  implicit val double: HasContextValue[Double] =
+    new HasContextValue[Double] {
+      def toContextValue(d: Double): ContextValue = DoubleValue(d)
+    }
+
+}
+
+object ContextMap {
+
+  def apply[A: HasContextValue](context: Map[String, A]): ContextMap = context
+    .map { case (k, v) => (k, ContextValue(v)) }
+
 }
 
 case class EvaluationContext(
@@ -55,4 +97,10 @@ case class EvaluationContext(
 
 object EvaluationContext {
   def empty: EvaluationContext = EvaluationContext(None, Map.empty)
+
+  def apply(context: ContextMap): EvaluationContext = EvaluationContext(
+    targetingKey = None,
+    values = context
+  )
+
 }

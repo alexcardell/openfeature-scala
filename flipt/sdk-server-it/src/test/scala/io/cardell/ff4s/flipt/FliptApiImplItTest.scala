@@ -89,7 +89,7 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
           res <- flipt.evaluateVariant(
             EvaluationRequest(
               "default",
-              "variant-flag-1",
+              "json-variant-flag-1",
               None,
               segmentContext,
               None
@@ -108,7 +108,7 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
           res <- flipt.evaluateVariant(
             EvaluationRequest(
               "default",
-              "variant-flag-1",
+              "json-variant-flag-1",
               None,
               segmentContext,
               None
@@ -134,7 +134,7 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
           res <- flipt.evaluateStructuredVariant[TestVariant](
             EvaluationRequest(
               "default",
-              "variant-flag-1",
+              "json-variant-flag-1",
               None,
               segmentContext,
               None
@@ -156,7 +156,7 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
           res <- flipt.evaluateStructuredVariant[TestVariant](
             EvaluationRequest(
               "default",
-              "variant-flag-1",
+              "json-variant-flag-1",
               None,
               segmentContext,
               None

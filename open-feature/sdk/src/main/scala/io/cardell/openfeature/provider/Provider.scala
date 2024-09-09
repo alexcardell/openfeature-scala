@@ -28,12 +28,12 @@ trait Provider[F[_]] {
       context: EvaluationContext
   ): F[ResolutionDetails[Boolean]]
 
-  // def resolveStringValue(
-  //     flagKey: String,
-  //     defaultValue: String,
-  //     context: EvaluationContext
-  // ): F[ResolutionDetails[String]]
-  //
+  def resolveStringValue(
+      flagKey: String,
+      defaultValue: String,
+      context: EvaluationContext
+  ): F[ResolutionDetails[String]]
+
   // def resolveIntValue(
   //     flagKey: String,
   //     defaultValue: Int,

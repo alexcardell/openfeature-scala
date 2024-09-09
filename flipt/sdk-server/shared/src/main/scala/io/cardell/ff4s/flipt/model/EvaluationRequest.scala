@@ -29,4 +29,19 @@ case class EvaluationRequest(
 
 object EvaluationRequest {
   implicit val d: Encoder[EvaluationRequest] = deriveEncoder
+
+  def apply(
+      namespaceKey: String,
+      flagKey: String,
+      entityId: Option[String] = None,
+      context: Map[String, String] = Map.empty,
+      reference: Option[String] = None
+  ): EvaluationRequest = EvaluationRequest(
+    namespaceKey,
+    flagKey,
+    entityId,
+    context,
+    reference
+  )
+
 }

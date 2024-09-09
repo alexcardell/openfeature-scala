@@ -5,6 +5,7 @@ flags:
   name: boolean-flag-1
   type: BOOLEAN_FLAG_TYPE
   enabled: true
+
 - key: variant-flag-1
   name: variant-flag-1
   type: VARIANT_FLAG_TYPE
@@ -19,6 +20,21 @@ flags:
     distributions:
     - variant: key-1
       rollout: 100
+
+- key: string-variant-flag-1
+  name: string-variant-flag-1
+  type: VARIANT_FLAG_TYPE
+  enabled: true
+  variants:
+  - key: key-1
+    attachment: 
+    - 'string-variant-value'
+  rules:
+  - segment: default-ns-segment-1
+    distributions:
+    - variant: key-1
+      rollout: 100
+
 segments:
 - key: default-ns-segment-1
   name: default-ns-segment-1
