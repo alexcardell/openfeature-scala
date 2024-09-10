@@ -18,15 +18,6 @@ package io.cardell.openfeature
 
 import io.cardell.openfeature.provider.ProviderMetadata
 
-// TODO implement circe
-// trait StructureDecoder[A]
-
-case class EvaluationOptions()
-
-object EvaluationOptions {
-  val Defaults: EvaluationOptions = EvaluationOptions()
-}
-
 trait FeatureClient[F[_]] {
 
   def providerMetadata: ProviderMetadata
@@ -134,35 +125,39 @@ trait FeatureClient[F[_]] {
       options: EvaluationOptions
   ): F[EvaluationDetails[Int]]
 
-  // def getDoubleValue(flagKey: String, default: Double): F[Double]
-  // def getDoubleValue(
-  //     flagKey: String,
-  //     default: Double,
-  //     context: EvaluationContext
-  // ): F[Double]
-  // def getDoubleValue(
-  //     flagKey: String,
-  //     default: Double,
-  //     context: EvaluationContext,
-  //     options: EvaluationOptions
-  // ): F[Double]
-  //
-  // def getDoubleDetails(
-  //     flagKey: String,
-  //     default: Double
-  // ): F[EvaluationDetails[Double]]
-  // def getDoubleDetails(
-  //     flagKey: String,
-  //     default: Double,
-  //     context: EvaluationContext
-  // ): F[EvaluationDetails[Double]]
-  // def getDoubleDetails(
-  //     flagKey: String,
-  //     default: Double,
-  //     context: EvaluationContext,
-  //     options: EvaluationOptions
-  // ): F[EvaluationDetails[Double]]
-  //
+  def getDoubleValue(flagKey: String, default: Double): F[Double]
+
+  def getDoubleValue(
+      flagKey: String,
+      default: Double,
+      context: EvaluationContext
+  ): F[Double]
+
+  def getDoubleValue(
+      flagKey: String,
+      default: Double,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[Double]
+
+  def getDoubleDetails(
+      flagKey: String,
+      default: Double
+  ): F[EvaluationDetails[Double]]
+
+  def getDoubleDetails(
+      flagKey: String,
+      default: Double,
+      context: EvaluationContext
+  ): F[EvaluationDetails[Double]]
+
+  def getDoubleDetails(
+      flagKey: String,
+      default: Double,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[EvaluationDetails[Double]]
+
   // def getStructureValue[A: StructureDecoder](
   //     flagKey: String,
   //     default: A

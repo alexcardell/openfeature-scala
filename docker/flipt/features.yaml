@@ -41,6 +41,17 @@ flags:
     distributions:
     - variant: '13'
       rollout: 100
+- key: double-variant-flag-1
+  name: double-variant-flag-1
+  type: VARIANT_FLAG_TYPE
+  enabled: true
+  variants:
+  - key: '17.1'
+  rules:
+  - segment: default-ns-segment-1
+    distributions:
+    - variant: '17.1'
+      rollout: 100
 segments:
 - key: default-ns-segment-1
   name: default-ns-segment-1
