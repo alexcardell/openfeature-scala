@@ -88,12 +88,26 @@ lazy val `open-feature-sdk` = crossProject(
   .enablePlugins(NoPublishPlugin)
   .settings(commonDependencies)
   .settings(
-    name := "ff4s-open-feature-sdk",
+    name := "ff4s-open-feature-sdk"
+  )
+
+lazy val `open-feature-sdk-circe` = crossProject(
+  JVMPlatform,
+  JSPlatform,
+  NativePlatform
+)
+  .crossType(CrossType.Pure)
+  .in(file("open-feature/sdk-circe"))
+  .enablePlugins(NoPublishPlugin)
+  .settings(commonDependencies)
+  .settings(
+    name := "ff4s-open-feature-sdk-circe",
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core"   % "0.14.7",
       "io.circe" %%% "circe-parser" % "0.14.7"
     )
   )
+  .dependsOn(`open-feature-sdk`)
 
 lazy val `open-feature-provider-flipt` = crossProject(
   JVMPlatform,
@@ -126,7 +140,8 @@ lazy val `open-feature-provider-flipt-it` = crossProject(JVMPlatform)
     )
   )
   .dependsOn(
-    `open-feature-provider-flipt`
+    `open-feature-provider-flipt`,
+    `open-feature-sdk-circe`
   )
 
 lazy val examples = crossProject(JVMPlatform)
