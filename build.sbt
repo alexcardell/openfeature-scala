@@ -57,12 +57,11 @@ lazy val `flipt-sdk-server` = crossProject(
   .settings(
     name := "ff4s-flipt-sdk-server",
     libraryDependencies ++= Seq(
-      "org.http4s" %%% "http4s-client"       % "0.23.26",
-      "org.http4s" %%% "http4s-ember-client" % "0.23.26",
-      "org.http4s" %%% "http4s-circe"        % "0.23.26",
-      "io.circe"   %%% "circe-core"          % "0.14.7",
-      "io.circe"   %%% "circe-parser"        % "0.14.7",
-      "io.circe"   %%% "circe-generic"       % "0.14.7"
+      "org.http4s" %%% "http4s-client" % "0.23.26",
+      "org.http4s" %%% "http4s-circe"  % "0.23.26",
+      "io.circe"   %%% "circe-core"    % "0.14.7",
+      "io.circe"   %%% "circe-parser"  % "0.14.7",
+      "io.circe"   %%% "circe-generic" % "0.14.7"
     )
   )
 
@@ -72,6 +71,7 @@ lazy val `flipt-sdk-server-it` = crossProject(JVMPlatform)
   .settings(commonDependencies)
   .settings(
     libraryDependencies ++= Seq(
+      "org.http4s"  %%% "http4s-ember-client"        % "0.23.26",
       "com.dimafeng" %% "testcontainers-scala-munit" % "0.41.3" % Test
     )
   )
@@ -118,6 +118,7 @@ lazy val `open-feature-provider-flipt-it` = crossProject(JVMPlatform)
   .settings(
     name := "ff4s-open-feature-provider-flipt-it",
     libraryDependencies ++= Seq(
+      "org.http4s"  %%% "http4s-ember-client"        % "0.23.26",
       "com.dimafeng" %% "testcontainers-scala-munit" % "0.41.3" % Test
     )
   )
@@ -136,7 +137,10 @@ lazy val docs = project
       tlSiteHelium.value.site.topNavigationBar(
         homeLink = IconLink.internal(Root / "index.md", HeliumIcon.home)
       )
-    }
+    },
+    libraryDependencies ++= Seq(
+      "org.http4s" %%% "http4s-ember-client" % "0.23.26"
+    )
   )
   .dependsOn(`flipt-sdk-server`.jvm)
 
