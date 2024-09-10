@@ -32,7 +32,8 @@ lazy val projects = Seq(
   `flipt-sdk-server-it`,
   `open-feature-sdk`,
   `open-feature-provider-flipt`,
-  `open-feature-provider-flipt-it`
+  `open-feature-provider-flipt-it`,
+  docs
 )
 
 lazy val commonDependencies = Seq(
@@ -148,6 +149,6 @@ lazy val docs = project
       "org.http4s" %%% "http4s-ember-client" % "0.23.26"
     )
   )
-  .dependsOn(`flipt-sdk-server`.jvm)
+  .dependsOn(`open-feature-provider-flipt`.jvm)
 
 addCommandAlias("fix", "headerCreateAll;scalafixAll;scalafmtAll;scalafmtSbt")
