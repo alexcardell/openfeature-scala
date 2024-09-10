@@ -49,10 +49,12 @@ def provider(flipt: FliptApi[IO])(implicit d: Decoder[SomeVariant]) = {
     featureSdk.client.flatMap { featureClient =>
         for {
             eval <- featureClient.getBooleanValue("boolean-flag", false)
+            _ <- IO.println(s"eval")
             eval2 <- featureClient.getStructureValue[SomeVariant](
                 "structure-flag",
                 SomeVariant("a", 1)
             )
+            _ <- IO.println(s"eval")
         } yield ()
     }
 }
