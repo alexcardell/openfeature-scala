@@ -164,6 +164,9 @@ lazy val docs = project
       "org.http4s" %%% "http4s-ember-client" % "0.23.26"
     )
   )
-  .dependsOn(`openfeature-provider-flipt`.jvm)
+  .dependsOn(
+    `openfeature-provider-flipt`.jvm,
+    `openfeature-sdk-circe`.jvm
+  )
 
 addCommandAlias("fix", "headerCreateAll;scalafixAll;scalafmtAll;scalafmtSbt")

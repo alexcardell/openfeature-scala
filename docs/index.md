@@ -17,6 +17,9 @@ libraryDependencies += "io.cardell" %%% "flipt-sdk-server" % "@VERSION@"
 // or
 libraryDependencies ++= Seq(
     "io.cardell" %%% "openfeature-sdk-server" % "@VERSION@",
+    // for circe json variant types
+    "io.cardell" %%% "openfeature-sdk-circe" % "@VERSION@",
+    // to use flipt as a backend
     "io.cardell" %%% "openfeature-provider-flipt" % "@VERSION@"
 )
 ```
@@ -31,15 +34,26 @@ See `Flipt usage` on how to set up the `FliptApi`. Once done, set up a provider:
 
 ```scala mdoc
 import cats.effect.IO
-import io.cardell.openfeature.OpenFeature
-import io.cardell.flipt.FliptApi
-import io.cardell.openfeature.provider.flipt.FliptProvider
+import io.circe.Decoder
 
-def provider(flipt: FliptApi[IO]) = {
+import io.cardell.flipt.FliptApi
+import io.cardell.openfeature.OpenFeature
+import io.cardell.openfeature.provider.flipt.FliptProvider
+import io.cardell.openfeature.circe._
+
+case class SomeVariant(field: String, field2: Int)
+
+def provider(flipt: FliptApi[IO])(implicit d: Decoder[SomeVariant]) = {
     val featureSdk = OpenFeature[IO](new FliptProvider[IO](flipt, "some-namespace"))
 
     featureSdk.client.flatMap { featureClient =>
-        featureClient.getBooleanValue("boolean-flag", false)
+        for {
+            eval <- featureClient.getBooleanValue("boolean-flag", false)
+            eval2 <- featureClient.getStructureValue[SomeVariant](
+                "structure-flag",
+                SomeVariant("a", 1)
+            )
+        } yield ()
     }
 }
 ```
