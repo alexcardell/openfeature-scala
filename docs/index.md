@@ -2,10 +2,12 @@
 
 ## Features
 
-- ✅ Cross-platform, cross-version Scala feature flagging
-- ✅ [Flipt](https://flipt.io) client
-- 🚧 [OpenFeature](https://openfeature.dev) SDK
-- 🚧 Flipt OpenFeature provider
+- Cross-platform, cross-version Scala feature flagging
+- [Flipt](https://flipt.io) client
+- [OpenFeature](https://openfeature.dev) SDK
+    - Provider Evaluation
+    - 🚧 Hooks
+- Flipt OpenFeature provider
 - LaunchDarkly OpenFeature provider with [Catalyst](https://typelevel.org/catapult)
 
 ## Installing
