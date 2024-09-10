@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.cardell.ff4s.flipt
+package io.cardell.flipt
 
 import io.circe.Encoder
 import io.circe.generic.semiauto.deriveEncoder

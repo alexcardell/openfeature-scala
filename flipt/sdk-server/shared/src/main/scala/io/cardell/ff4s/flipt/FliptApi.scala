@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package io.cardell.ff4s.flipt
+package io.cardell.flipt
 
 import cats.effect.Concurrent
 import io.circe.Decoder
 import org.http4s.Uri
 import org.http4s.client.Client
 
-import io.cardell.ff4s.flipt.auth.AuthMiddleware
-import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
-import io.cardell.ff4s.flipt.model.AttachmentDecodingError
-import io.cardell.ff4s.flipt.model.BatchEvaluationRequest
-import io.cardell.ff4s.flipt.model.BatchEvaluationResponse
-import io.cardell.ff4s.flipt.model.BooleanEvaluationResponse
-import io.cardell.ff4s.flipt.model.StructuredVariantEvaluationResponse
-import io.cardell.ff4s.flipt.model.VariantEvaluationResponse
+import io.cardell.flipt.auth.AuthMiddleware
+import io.cardell.flipt.auth.AuthenticationStrategy
+import io.cardell.flipt.model.AttachmentDecodingError
+import io.cardell.flipt.model.BatchEvaluationRequest
+import io.cardell.flipt.model.BatchEvaluationResponse
+import io.cardell.flipt.model.BooleanEvaluationResponse
+import io.cardell.flipt.model.StructuredVariantEvaluationResponse
+import io.cardell.flipt.model.VariantEvaluationResponse
 
 trait FliptApi[F[_]] {
 

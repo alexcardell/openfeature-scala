@@ -26,7 +26,7 @@ See `Flipt usage` on how to set up the `FliptApi`. Once done, set up a provider:
 ```scala mdoc
 import cats.effect.IO
 import io.cardell.openfeature.OpenFeature
-import io.cardell.ff4s.flipt.FliptApi
+import io.cardell.flipt.FliptApi
 import io.cardell.openfeature.provider.flipt.FliptProvider
 
 def provider(flipt: FliptApi[IO]) = {
@@ -46,9 +46,9 @@ The Flipt client is bare-bones, using it is not recommended, unless as OpenFeatu
 import cats.effect.IO
 import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.Uri
-import io.cardell.ff4s.flipt.FliptApi
-import io.cardell.ff4s.flipt.EvaluationRequest
-import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
+import io.cardell.flipt.FliptApi
+import io.cardell.flipt.EvaluationRequest
+import io.cardell.flipt.auth.AuthenticationStrategy
 
 val url: Uri = Uri.unsafeFromString("https://flipt.example.com")
 val token: String = "token"

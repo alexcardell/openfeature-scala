@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.cardell.ff4s.flipt.auth
+package io.cardell.flipt.auth
 
 import cats.effect.kernel.MonadCancelThrow
 import org.http4s.AuthScheme

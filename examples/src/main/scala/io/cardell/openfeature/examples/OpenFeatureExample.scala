@@ -20,8 +20,8 @@ import cats.effect.IO
 import org.http4s.Uri
 import org.http4s.client.Client
 
-import io.cardell.ff4s.flipt.FliptApi
-import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
+import io.cardell.flipt.FliptApi
+import io.cardell.flipt.auth.AuthenticationStrategy
 import io.cardell.openfeature.OpenFeature
 import io.cardell.openfeature.provider.flipt.FliptProvider
 

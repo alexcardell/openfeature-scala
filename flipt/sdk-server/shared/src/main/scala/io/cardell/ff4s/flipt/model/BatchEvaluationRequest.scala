@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package io.cardell.ff4s.flipt.model
+package io.cardell.flipt.model
 
 import io.circe.Encoder
 import io.circe.generic.semiauto.deriveEncoder
 
-import io.cardell.ff4s.flipt.EvaluationRequest
+import io.cardell.flipt.EvaluationRequest
 
 case class BatchEvaluationRequest(
     requestId: Option[String],

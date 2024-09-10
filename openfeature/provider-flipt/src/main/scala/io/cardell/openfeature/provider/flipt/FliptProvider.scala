@@ -21,9 +21,9 @@ import cats.syntax.all._
 import scala.util.Success
 import scala.util.Try
 
-import io.cardell.ff4s.flipt.EvaluationRequest
-import io.cardell.ff4s.flipt.FliptApi
-import io.cardell.ff4s.flipt.model.{EvaluationReason => FliptReason}
+import io.cardell.flipt.EvaluationRequest
+import io.cardell.flipt.FliptApi
+import io.cardell.flipt.model.{EvaluationReason => FliptReason}
 import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason

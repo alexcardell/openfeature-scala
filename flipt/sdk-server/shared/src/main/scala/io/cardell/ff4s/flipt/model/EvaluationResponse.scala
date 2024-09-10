@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.cardell.ff4s.flipt.model
+package io.cardell.flipt.model
 
 import cats.syntax.functor._
 import io.circe.Decoder
