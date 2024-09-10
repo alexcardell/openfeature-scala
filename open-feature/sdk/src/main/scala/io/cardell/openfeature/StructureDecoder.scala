@@ -16,8 +16,6 @@
 
 package io.cardell.openfeature
 
-trait StructureDecoderError
-
 trait StructureDecoder[A] {
   def decodeStructure(string: String): Either[StructureDecoderError, A]
 }

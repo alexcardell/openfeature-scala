@@ -174,7 +174,7 @@ final class FliptProvider[F[_]: MonadThrow](
   ) = ResolutionDetails[A](
     value = defaultValue,
     errorCode = Some(ErrorCode.ParseError),
-    errorMessage = Some(e.toString()),
+    errorMessage = Some(e.getMessage()),
     reason = Some(EvaluationReason.Error),
     variant = None,
     metadata = None

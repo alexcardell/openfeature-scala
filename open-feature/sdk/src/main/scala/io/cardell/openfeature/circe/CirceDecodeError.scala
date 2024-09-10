@@ -21,5 +21,5 @@ import io.circe.DecodingFailure
 import io.cardell.openfeature.StructureDecoderError
 
 case class CirceDecodeError(
-    circeError: DecodingFailure
+    cause: DecodingFailure
 ) extends StructureDecoderError

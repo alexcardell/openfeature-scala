@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-package io.cardell.openfeature.circe
+package io.cardell.openfeature
 
-import io.circe.ParsingFailure
-
-import io.cardell.openfeature.StructureDecoderError
-
-case class CirceParseError(
-    cause: ParsingFailure
-) extends StructureDecoderError
+trait StructureDecoderError extends Throwable
