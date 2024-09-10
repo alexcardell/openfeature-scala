@@ -39,17 +39,6 @@ final class FliptProvider[F[_]: MonadThrow](
 
   override def metadata: ProviderMetadata = ProviderMetadata(name = "flipt")
 
-  private def mapReason(evalReason: FliptReason): EvaluationReason =
-    evalReason match {
-      case FliptReason.Default      => EvaluationReason.Default
-      case FliptReason.FlagDisabled => EvaluationReason.Disabled
-      case FliptReason.Match        => EvaluationReason.TargetingMatch
-      case FliptReason.Unknown      => EvaluationReason.Unknown
-    }
-
-  private def mapContext(context: EvaluationContext): Map[String, String] =
-    context.values.map { case (k, v) => (k, v.stringValue) }
-
   override def resolveBooleanValue(
       flagKey: String,
       defaultValue: Boolean,
@@ -95,107 +84,21 @@ final class FliptProvider[F[_]: MonadThrow](
       flagKey: String,
       defaultValue: String,
       context: EvaluationContext
-  ): F[ResolutionDetails[String]] = {
-    val evalContext = mapContext(context)
-
-    val req: EvaluationRequest = EvaluationRequest(
-      namespaceKey = namespace,
-      flagKey = flagKey,
-      entityId = context.targetingKey,
-      context = evalContext,
-      reference = None
-    )
-
-    val resolution = flipt.evaluateVariant(req).map { evaluation =>
-      ResolutionDetails[String](
-        value = evaluation.variantKey,
-        errorCode = None,
-        errorMessage = None,
-        reason = mapReason(evaluation.reason).some,
-        variant = Some(evaluation.variantKey),
-        metadata = Some(
-          Map(
-            "variant-attachment" -> FlagMetadataValue
-              .StringValue(evaluation.variantAttachment)
-          )
-        )
-      )
-    }
-
-    def default(t: Throwable) = ResolutionDetails[String](
-      value = defaultValue,
-      errorCode = Some(ErrorCode.General),
-      errorMessage = Some(t.getMessage()),
-      reason = Some(EvaluationReason.Error),
-      variant = None,
-      metadata = None
-    )
-
-    resolution.attempt.map {
-      case Right(value) => value
-      case Left(error)  => default(error)
-    }
-  }
+  ): F[ResolutionDetails[String]] = resolvePrimitive[String](
+    flagKey,
+    defaultValue,
+    context
+  )
 
   override def resolveIntValue(
       flagKey: String,
       defaultValue: Int,
       context: EvaluationContext
-  ): F[ResolutionDetails[Int]] = {
-    val evalContext = mapContext(context)
-
-    val req: EvaluationRequest = EvaluationRequest(
-      namespaceKey = namespace,
-      flagKey = flagKey,
-      entityId = context.targetingKey,
-      context = evalContext,
-      reference = None
-    )
-
-    val stringResolution = flipt.evaluateVariant(req).map { evaluation =>
-      ResolutionDetails[String](
-        value = evaluation.variantKey,
-        errorCode = None,
-        errorMessage = None,
-        reason = mapReason(evaluation.reason).some,
-        variant = Some(evaluation.variantKey),
-        metadata = Some(
-          Map(
-            "variant-attachment" -> FlagMetadataValue
-              .StringValue(evaluation.variantAttachment)
-          )
-        )
-      )
-    }
-
-    def default(t: Throwable) = ResolutionDetails[Int](
-      value = defaultValue,
-      errorCode = Some(ErrorCode.General),
-      errorMessage = Some(t.getMessage()),
-      reason = Some(EvaluationReason.Error),
-      variant = None,
-      metadata = None
-    )
-
-    val resolution =
-      for {
-        res <- stringResolution
-        int <- MonadThrow[F].fromTry(Try(res.value.toInt))
-      } yield ResolutionDetails[Int](
-        value = int,
-        errorCode = None,
-        errorMessage = None,
-        reason = res.reason,
-        variant = res.variant,
-        metadata = res.metadata
-      )
-
-    resolution.attempt.map {
-      case Right(value) => value
-      case Left(error)  => default(error)
-    }
-
-  }
+  ): F[ResolutionDetails[Int]] = resolvePrimitive[Int](
+    flagKey,
+    defaultValue,
+    context
+  )
 
   override def resolveDoubleValue(
       flagKey: String,
@@ -212,6 +115,18 @@ final class FliptProvider[F[_]: MonadThrow](
   //     defaultValue: A,
   //     context: EvaluationContext
   // ): F[ResolutionDetails[A]] = ???
+
+  private def mapReason(evalReason: FliptReason): EvaluationReason =
+    evalReason match {
+      case FliptReason.Default      => EvaluationReason.Default
+      case FliptReason.FlagDisabled => EvaluationReason.Disabled
+      case FliptReason.Match        => EvaluationReason.TargetingMatch
+      case FliptReason.Unknown      => EvaluationReason.Unknown
+    }
+
+  private def mapContext(context: EvaluationContext): Map[String, String] =
+    context.values.map { case (k, v) => (k, v.stringValue) }
+
 
   private def resolvePrimitive[A: ResolveTypeConverter](
       flagKey: String,
@@ -276,11 +191,11 @@ final class FliptProvider[F[_]: MonadThrow](
 
 }
 
-sealed trait ResolveTypeConverter[A] {
+protected sealed trait ResolveTypeConverter[A] {
   def convert(s: String): Try[A]
 }
 
-object ResolveTypeConverter {
+protected object ResolveTypeConverter {
 
   def apply[A](implicit r: ResolveTypeConverter[A]): ResolveTypeConverter[A] =
     implicitly
