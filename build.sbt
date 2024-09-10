@@ -30,9 +30,10 @@ Global / concurrentRestrictions += Tags.limit(Tags.Test, 1)
 lazy val projects = Seq(
   `flipt-sdk-server`,
   `flipt-sdk-server-it`,
-  `open-feature-sdk`,
-  `open-feature-provider-flipt`,
-  `open-feature-provider-flipt-it`,
+  `openfeature-sdk`,
+  `openfeature-provider-flipt`,
+  `openfeature-provider-flipt-it`,
+  examples,
   docs
 )
 
@@ -78,61 +79,61 @@ lazy val `flipt-sdk-server-it` = crossProject(JVMPlatform)
   )
   .dependsOn(`flipt-sdk-server`)
 
-lazy val `open-feature-sdk` = crossProject(
+lazy val `openfeature-sdk` = crossProject(
   JVMPlatform,
   JSPlatform,
   NativePlatform
 )
   .crossType(CrossType.Pure)
-  .in(file("open-feature/sdk"))
+  .in(file("openfeature/sdk"))
   .enablePlugins(NoPublishPlugin)
   .settings(commonDependencies)
   .settings(
-    name := "ff4s-open-feature-sdk"
+    name := "ff4s-openfeature-sdk"
   )
 
-lazy val `open-feature-sdk-circe` = crossProject(
+lazy val `openfeature-sdk-circe` = crossProject(
   JVMPlatform,
   JSPlatform,
   NativePlatform
 )
   .crossType(CrossType.Pure)
-  .in(file("open-feature/sdk-circe"))
+  .in(file("openfeature/sdk-circe"))
   .enablePlugins(NoPublishPlugin)
   .settings(commonDependencies)
   .settings(
-    name := "ff4s-open-feature-sdk-circe",
+    name := "ff4s-openfeature-sdk-circe",
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core"   % "0.14.7",
       "io.circe" %%% "circe-parser" % "0.14.7"
     )
   )
-  .dependsOn(`open-feature-sdk`)
+  .dependsOn(`openfeature-sdk`)
 
-lazy val `open-feature-provider-flipt` = crossProject(
+lazy val `openfeature-provider-flipt` = crossProject(
   JVMPlatform,
   JSPlatform,
   NativePlatform
 )
   .crossType(CrossType.Pure)
-  .in(file("open-feature/provider-flipt"))
+  .in(file("openfeature/provider-flipt"))
   .enablePlugins(NoPublishPlugin)
   .settings(commonDependencies)
   .settings(
-    name := "ff4s-open-feature-provider-flipt"
+    name := "ff4s-openfeature-provider-flipt"
   )
   .dependsOn(
-    `open-feature-sdk`,
+    `openfeature-sdk`,
     `flipt-sdk-server`
   )
 
-lazy val `open-feature-provider-flipt-it` = crossProject(JVMPlatform)
+lazy val `openfeature-provider-flipt-it` = crossProject(JVMPlatform)
   .crossType(CrossType.Pure)
-  .in(file("open-feature/provider-flipt-it"))
+  .in(file("openfeature/provider-flipt-it"))
   .enablePlugins(NoPublishPlugin)
   .settings(commonDependencies)
   .settings(
-    name := "ff4s-open-feature-provider-flipt-it",
+    name := "ff4s-openfeature-provider-flipt-it",
     libraryDependencies ++= Seq(
       "org.http4s"  %%% "http4s-ember-client"        % "0.23.26" % Test,
       "com.dimafeng" %% "testcontainers-scala-munit" % "0.41.3"  % Test,
@@ -140,15 +141,15 @@ lazy val `open-feature-provider-flipt-it` = crossProject(JVMPlatform)
     )
   )
   .dependsOn(
-    `open-feature-provider-flipt`,
-    `open-feature-sdk-circe`
+    `openfeature-provider-flipt`,
+    `openfeature-sdk-circe`
   )
 
 lazy val examples = crossProject(JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("examples"))
   .enablePlugins(NoPublishPlugin)
-  .dependsOn(`open-feature-provider-flipt`)
+  .dependsOn(`openfeature-provider-flipt`)
 
 lazy val docs = project
   .in(file("site"))
@@ -166,6 +167,6 @@ lazy val docs = project
       "org.http4s" %%% "http4s-ember-client" % "0.23.26"
     )
   )
-  .dependsOn(`open-feature-provider-flipt`.jvm)
+  .dependsOn(`openfeature-provider-flipt`.jvm)
 
 addCommandAlias("fix", "headerCreateAll;scalafixAll;scalafmtAll;scalafmtSbt")

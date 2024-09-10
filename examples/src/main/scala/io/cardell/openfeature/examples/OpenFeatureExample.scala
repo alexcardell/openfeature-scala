@@ -1,6 +1,5 @@
 package io.cardell.openfeature.examples
 
-import io.cardell.ff4s.flipt.FliptApiImpl
 import cats.effect.IO
 import org.http4s.client.Client
 import io.cardell.ff4s.flipt.FliptApi
