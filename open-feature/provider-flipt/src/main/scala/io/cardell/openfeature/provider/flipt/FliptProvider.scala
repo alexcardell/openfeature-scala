@@ -127,7 +127,6 @@ final class FliptProvider[F[_]: MonadThrow](
   private def mapContext(context: EvaluationContext): Map[String, String] =
     context.values.map { case (k, v) => (k, v.stringValue) }
 
-
   private def resolvePrimitive[A: ResolveTypeConverter](
       flagKey: String,
       defaultValue: A,
