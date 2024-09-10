@@ -16,7 +16,7 @@
 libraryDependencies += "io.cardell" %%% "flipt-sdk-server" % "@VERSION@"
 // or
 libraryDependencies ++= Seq(
-    "io.cardell" %%% "openfeature-sdk-server" % "@VERSION@",
+    "io.cardell" %%% "openfeature-sdk" % "@VERSION@",
     // for circe json variant types
     "io.cardell" %%% "openfeature-sdk-circe" % "@VERSION@",
     // to use flipt as a backend
