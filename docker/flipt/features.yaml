@@ -30,6 +30,17 @@ flags:
     distributions:
     - variant: string-variant-1
       rollout: 100
+- key: int-variant-flag-1
+  name: int-variant-flag-1
+  type: VARIANT_FLAG_TYPE
+  enabled: true
+  variants:
+  - key: '13'
+  rules:
+  - segment: default-ns-segment-1
+    distributions:
+    - variant: '13'
+      rollout: 100
 segments:
 - key: default-ns-segment-1
   name: default-ns-segment-1
