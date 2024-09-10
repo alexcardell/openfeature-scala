@@ -28,10 +28,16 @@ trait OpenFeature[F[_]] {
   def client: F[FeatureClient[F]]
 }
 
-protected[openfeature] class OpenFeatureSdk[F[_]: Monad](provider: Provider[F])
-    extends OpenFeature[F] {
+object OpenFeature {
 
-  def client: F[FeatureClient[F]] =
-    new FeatureClientImpl[F](provider, EvaluationContext.empty).pure[F].widen
+  def apply[F[_]: Monad](provider: Provider[F]): OpenFeature[F] =
+    new OpenFeature[F] {
+
+      def client: F[FeatureClient[F]] =
+        new FeatureClientImpl[F](provider, EvaluationContext.empty)
+          .pure[F]
+          .widen[FeatureClient[F]]
+
+    }
 
 }
