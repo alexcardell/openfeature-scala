@@ -52,6 +52,7 @@ flags:
     distributions:
     - variant: '17.1'
       rollout: 100
+
 segments:
 - key: default-ns-segment-1
   name: default-ns-segment-1

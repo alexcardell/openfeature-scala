@@ -17,7 +17,7 @@
 package io.cardell.openfeature.provider
 
 import io.cardell.openfeature.EvaluationContext
-// import io.cardell.openfeature.StructureDecoder
+import io.cardell.openfeature.StructureDecoder
 
 trait Provider[F[_]] {
   def metadata: ProviderMetadata
@@ -46,9 +46,10 @@ trait Provider[F[_]] {
       context: EvaluationContext
   ): F[ResolutionDetails[Double]]
 
-  // def resolveStructureValue[A: StructureDecoder](
-  //     flagKey: String,
-  //     defaultValue: A,
-  //     context: EvaluationContext
-  // ): F[ResolutionDetails[A]]
+  def resolveStructureValue[A: StructureDecoder](
+      flagKey: String,
+      defaultValue: A,
+      context: EvaluationContext
+  ): F[ResolutionDetails[A]]
+
 }

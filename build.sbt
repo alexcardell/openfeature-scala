@@ -90,7 +90,8 @@ lazy val `open-feature-sdk` = crossProject(
   .settings(
     name := "ff4s-open-feature-sdk",
     libraryDependencies ++= Seq(
-      "io.circe" %%% "circe-generic" % "0.14.7"
+      "io.circe" %%% "circe-core"   % "0.14.7",
+      "io.circe" %%% "circe-parser" % "0.14.7"
     )
   )
 
@@ -119,8 +120,9 @@ lazy val `open-feature-provider-flipt-it` = crossProject(JVMPlatform)
   .settings(
     name := "ff4s-open-feature-provider-flipt-it",
     libraryDependencies ++= Seq(
-      "org.http4s"  %%% "http4s-ember-client"        % "0.23.26",
-      "com.dimafeng" %% "testcontainers-scala-munit" % "0.41.3" % Test
+      "org.http4s"  %%% "http4s-ember-client"        % "0.23.26" % Test,
+      "com.dimafeng" %% "testcontainers-scala-munit" % "0.41.3"  % Test,
+      "io.circe"    %%% "circe-generic"              % "0.14.7"  % Test
     )
   )
   .dependsOn(

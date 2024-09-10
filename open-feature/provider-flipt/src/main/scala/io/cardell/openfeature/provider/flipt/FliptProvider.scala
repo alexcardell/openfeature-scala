@@ -27,6 +27,8 @@ import io.cardell.ff4s.flipt.model.{EvaluationReason => FliptReason}
 import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
+import io.cardell.openfeature.StructureDecoder
+import io.cardell.openfeature.StructureDecoderError
 import io.cardell.openfeature.provider.FlagMetadataValue
 import io.cardell.openfeature.provider.Provider
 import io.cardell.openfeature.provider.ProviderMetadata
@@ -65,18 +67,9 @@ final class FliptProvider[F[_]: MonadThrow](
       )
     }
 
-    def default(t: Throwable) = ResolutionDetails[Boolean](
-      value = defaultValue,
-      errorCode = Some(ErrorCode.General),
-      errorMessage = Some(t.getMessage()),
-      reason = Some(EvaluationReason.Error),
-      variant = None,
-      metadata = None
-    )
-
     resolution.attempt.map {
       case Right(value) => value
-      case Left(error)  => default(error)
+      case Left(error)  => default(error, defaultValue)
     }
   }
 
@@ -84,7 +77,7 @@ final class FliptProvider[F[_]: MonadThrow](
       flagKey: String,
       defaultValue: String,
       context: EvaluationContext
-  ): F[ResolutionDetails[String]] = resolvePrimitive[String](
+  ): F[ResolutionDetails[String]] = resolve[String](
     flagKey,
     defaultValue,
     context
@@ -94,7 +87,7 @@ final class FliptProvider[F[_]: MonadThrow](
       flagKey: String,
       defaultValue: Int,
       context: EvaluationContext
-  ): F[ResolutionDetails[Int]] = resolvePrimitive[Int](
+  ): F[ResolutionDetails[Int]] = resolve[Int](
     flagKey,
     defaultValue,
     context
@@ -104,17 +97,56 @@ final class FliptProvider[F[_]: MonadThrow](
       flagKey: String,
       defaultValue: Double,
       context: EvaluationContext
-  ): F[ResolutionDetails[Double]] = resolvePrimitive[Double](
+  ): F[ResolutionDetails[Double]] = resolve[Double](
     flagKey,
     defaultValue,
     context
   )
 
-  // override def resolveStructureValue[A: StructureDecoder](
-  //     flagKey: String,
-  //     defaultValue: A,
-  //     context: EvaluationContext
-  // ): F[ResolutionDetails[A]] = ???
+  override def resolveStructureValue[A: StructureDecoder](
+      flagKey: String,
+      defaultValue: A,
+      context: EvaluationContext
+  ): F[ResolutionDetails[A]] = {
+    val evalContext = mapContext(context)
+
+    val req: EvaluationRequest = EvaluationRequest(
+      namespaceKey = namespace,
+      flagKey = flagKey,
+      entityId = context.targetingKey,
+      context = evalContext,
+      reference = None
+    )
+
+    val resolution = flipt.evaluateVariant(req).map { evaluation =>
+      val decodedAttachment = StructureDecoder[A]
+        .decodeStructure(evaluation.variantAttachment)
+
+      decodedAttachment match {
+        case Left(error) => decodeDefault[A](error, defaultValue)
+        case Right(decoded) =>
+          ResolutionDetails[A](
+            value = decoded,
+            errorCode = None,
+            errorMessage = None,
+            reason = mapReason(evaluation.reason).some,
+            variant = Some(evaluation.variantKey),
+            metadata = Some(
+              Map(
+                "variant-attachment" -> FlagMetadataValue
+                  .StringValue(evaluation.variantAttachment)
+              )
+            )
+          )
+      }
+
+    }
+
+    resolution.attempt.map {
+      case Right(value) => value
+      case Left(error)  => default(error, defaultValue)
+    }
+  }
 
   private def mapReason(evalReason: FliptReason): EvaluationReason =
     evalReason match {
@@ -127,7 +159,28 @@ final class FliptProvider[F[_]: MonadThrow](
   private def mapContext(context: EvaluationContext): Map[String, String] =
     context.values.map { case (k, v) => (k, v.stringValue) }
 
-  private def resolvePrimitive[A: ResolveTypeConverter](
+  def default[A](t: Throwable, defaultValue: A) = ResolutionDetails[A](
+    value = defaultValue,
+    errorCode = Some(ErrorCode.General),
+    errorMessage = Some(t.getMessage()),
+    reason = Some(EvaluationReason.Error),
+    variant = None,
+    metadata = None
+  )
+
+  def decodeDefault[A](
+      e: StructureDecoderError,
+      defaultValue: A
+  ) = ResolutionDetails[A](
+    value = defaultValue,
+    errorCode = Some(ErrorCode.ParseError),
+    errorMessage = Some(e.toString()),
+    reason = Some(EvaluationReason.Error),
+    variant = None,
+    metadata = None
+  )
+
+  private def resolve[A: ResolveDecoder](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
@@ -158,20 +211,11 @@ final class FliptProvider[F[_]: MonadThrow](
       )
     }
 
-    def default(t: Throwable) = ResolutionDetails[A](
-      value = defaultValue,
-      errorCode = Some(ErrorCode.General),
-      errorMessage = Some(t.getMessage()),
-      reason = Some(EvaluationReason.Error),
-      variant = None,
-      metadata = None
-    )
-
     val resolution =
       for {
         res <- stringResolution
         casted <- MonadThrow[F].fromTry(
-          ResolveTypeConverter[A].convert(res.value)
+          ResolveDecoder[A].decode(res.value)
         )
       } yield ResolutionDetails[A](
         value = casted,
@@ -184,34 +228,33 @@ final class FliptProvider[F[_]: MonadThrow](
 
     resolution.attempt.map {
       case Right(value) => value
-      case Left(error)  => default(error)
+      case Left(error)  => default(error, defaultValue)
     }
   }
 
 }
 
-protected sealed trait ResolveTypeConverter[A] {
-  def convert(s: String): Try[A]
+protected sealed trait ResolveDecoder[A] {
+  def decode(s: String): Try[A]
 }
 
-protected object ResolveTypeConverter {
+protected object ResolveDecoder {
 
-  def apply[A](implicit r: ResolveTypeConverter[A]): ResolveTypeConverter[A] =
-    implicitly
+  def apply[A](implicit r: ResolveDecoder[A]): ResolveDecoder[A] = implicitly
 
-  implicit val string: ResolveTypeConverter[String] =
-    new ResolveTypeConverter[String] {
-      def convert(s: String): Try[String] = Success(s)
+  implicit val string: ResolveDecoder[String] =
+    new ResolveDecoder[String] {
+      def decode(s: String): Try[String] = Success(s)
     }
 
-  implicit val int: ResolveTypeConverter[Int] =
-    new ResolveTypeConverter[Int] {
-      def convert(s: String): Try[Int] = Try(s.toInt)
+  implicit val int: ResolveDecoder[Int] =
+    new ResolveDecoder[Int] {
+      def decode(s: String): Try[Int] = Try(s.toInt)
     }
 
-  implicit val double: ResolveTypeConverter[Double] =
-    new ResolveTypeConverter[Double] {
-      def convert(s: String): Try[Double] = Try(s.toDouble)
+  implicit val double: ResolveDecoder[Double] =
+    new ResolveDecoder[Double] {
+      def decode(s: String): Try[Double] = Try(s.toDouble)
     }
 
 }

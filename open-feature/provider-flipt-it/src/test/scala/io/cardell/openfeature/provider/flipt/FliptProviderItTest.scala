@@ -32,6 +32,7 @@ import io.cardell.ff4s.flipt.FliptApi
 import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
 import io.cardell.openfeature.ContextValue
 import io.cardell.openfeature.EvaluationContext
+import io.cardell.openfeature.circe._
 
 // see docker-compose features.yaml for flag test data
 class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
@@ -75,6 +76,8 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     "test-property" -> ContextValue.StringValue("matched-property-value")
   )
 
+  val evaluationContext = EvaluationContext(None, segmentContext)
+
   test("can fetch boolean flag") {
     val expected = true
 
@@ -116,7 +119,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
           res <- flipt.resolveStringValue(
             "string-variant-flag-1",
             "default-string",
-            EvaluationContext(None, segmentContext)
+            evaluationContext
           )
         } yield assertEquals(res.value, expected)
       }
@@ -148,7 +151,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
           res <- flipt.resolveIntValue(
             "int-variant-flag-1",
             99,
-            EvaluationContext(None, segmentContext)
+            evaluationContext
           )
         } yield assertEquals(res.value, expected)
       }
@@ -164,59 +167,27 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
           res <- flipt.resolveDoubleValue(
             "double-variant-flag-1",
             99.9,
-            EvaluationContext(None, segmentContext)
+            evaluationContext
           )
         } yield assertEquals(res.value, expected)
       }
     }
   }
 
-  // case class TestVariant(field: String, intField: Int)
-  // object TestVariant {
-  //   implicit val decoder: Decoder[TestVariant] = deriveDecoder
-  // }
-  //
-  // test("can deserialise variant match") {
-  //   withContainers { containers =>
-  //     api(containers).use { flipt =>
-  //       val segmentContext = Map("test-property" -> "matched-property-value")
-  //
-  //       for {
-  //         res <- flipt.evaluateStructuredVariant[TestVariant](
-  //           EvaluationRequest(
-  //             "default",
-  //             "variant-flag-1",
-  //             None,
-  //             segmentContext,
-  //             None
-  //           )
-  //         )
-  //         _ <- IO.println(res)
-  //         result = res.map(_.variantAttachment)
-  //       } yield assertEquals(result, Right(Some(TestVariant("string", 33))))
-  //     }
-  //   }
-  // }
-  //
-  // test("does not attempt variant deserialisation without a match") {
-  //   withContainers { containers =>
-  //     api(containers).use { flipt =>
-  //       val segmentContext = Map("test-property" -> "unmatched-property-value")
-  //
-  //       for {
-  //         res <- flipt.evaluateStructuredVariant[TestVariant](
-  //           EvaluationRequest(
-  //             "default",
-  //             "variant-flag-1",
-  //             None,
-  //             segmentContext,
-  //             None
-  //           )
-  //         )
-  //         _ <- IO.println(res)
-  //         result = res.map(_.variantAttachment)
-  //       } yield assertEquals(result, Right(None))
-  //     }
-  //   }
-  // }
+  test("can deserialise variant match") {
+    val expected = TestVariant("string", 33)
+
+    withContainers { containers =>
+      api(containers).use { flipt =>
+        for {
+          res <- flipt.resolveStructureValue[TestVariant](
+            "variant-flag-1",
+            TestVariant("a", 0),
+            evaluationContext
+          )
+        } yield assertEquals(res.value, expected)
+      }
+    }
+  }
+
 }
