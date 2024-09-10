@@ -75,7 +75,7 @@ class FliptProvider[F[_]: MonadThrow](flipt: FliptApi[F], namespace: String)
       value = defaultValue,
       errorCode = Some(ErrorCode.General),
       errorMessage = Some(t.getMessage()),
-      reason = Some(EvaluationReason.Default),
+      reason = Some(EvaluationReason.Error),
       variant = None,
       metadata = None
     )
