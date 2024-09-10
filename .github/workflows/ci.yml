@@ -88,11 +88,11 @@ jobs:
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-        run: mkdir -p flipt/sdk-server/native/target flipt/sdk-server/js/target flipt/sdk-server-it/.jvm/target flipt/sdk-server/jvm/target project/target
+        run: mkdir -p openfeature/provider-flipt/.jvm/target flipt/sdk-server/native/target flipt/sdk-server/js/target flipt/sdk-server-it/.jvm/target openfeature/sdk-circe/.native/target openfeature/sdk-circe/.jvm/target openfeature/provider-flipt/.native/target openfeature/sdk-circe/.js/target openfeature/sdk/.native/target openfeature/provider-flipt/.js/target openfeature/sdk/.jvm/target openfeature/sdk/.js/target flipt/sdk-server/jvm/target project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-        run: tar cf targets.tar flipt/sdk-server/native/target flipt/sdk-server/js/target flipt/sdk-server-it/.jvm/target flipt/sdk-server/jvm/target project/target
+        run: tar cf targets.tar openfeature/provider-flipt/.jvm/target flipt/sdk-server/native/target flipt/sdk-server/js/target flipt/sdk-server-it/.jvm/target openfeature/sdk-circe/.native/target openfeature/sdk-circe/.jvm/target openfeature/provider-flipt/.native/target openfeature/sdk-circe/.js/target openfeature/sdk/.native/target openfeature/provider-flipt/.js/target openfeature/sdk/.jvm/target openfeature/sdk/.js/target flipt/sdk-server/jvm/target project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
@@ -251,7 +251,7 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: ff4s-open-feature-provider-flipt-it_2.13 ff4s-open-feature-provider-flipt-it_3 ff4s-open-feature-sdk-circe_native0.4_2.13 ff4s-open-feature-sdk-circe_native0.4_3 ff4s-open-feature-provider-flipt_native0.4_2.13 ff4s-open-feature-provider-flipt_native0.4_3 ff4s-open-feature-sdk-circe_2.13 ff4s-open-feature-sdk-circe_3 ff4s-open-feature-sdk-circe_sjs1_2.13 ff4s-open-feature-sdk-circe_sjs1_3 ff4s-open-feature-sdk_native0.4_2.13 ff4s-open-feature-sdk_native0.4_3 ff4s-open-feature-provider-flipt_2.13 ff4s-open-feature-provider-flipt_3 ff4s-open-feature-sdk_2.13 ff4s-open-feature-sdk_3 rootjs_2.13 rootjs_3 docs_2.13 docs_3 ff4s-open-feature-provider-flipt_sjs1_2.13 ff4s-open-feature-provider-flipt_sjs1_3 rootjvm_2.13 rootjvm_3 rootnative_2.13 rootnative_3 examples_2.13 examples_3 ff4s-open-feature-sdk_sjs1_2.13 ff4s-open-feature-sdk_sjs1_3
+          modules-ignore: rootjs_2.13 rootjs_3 docs_2.13 docs_3 openfeature-provider-flipt-it_2.13 openfeature-provider-flipt-it_3 rootjvm_2.13 rootjvm_3 rootnative_2.13 rootnative_3 examples_2.13 examples_3
           configs-ignore: test scala-tool scala-doc-tool test-internal
 
   site:
