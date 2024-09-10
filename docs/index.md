@@ -11,7 +11,8 @@
 ## Installing
 
 ```scala
-libraryDependencies += "io.cardell" %%% "ff4s-flipt-server-sdk" % "@VERSION@"
+libraryDependencies += "io.cardell" %%% "flipt-server-sdk" % "@VERSION@"
+libraryDependencies += "io.cardell" %%% "openfeature-sdk-server" % "@VERSION@"
 ```
 
 ## OpenFeature Usage
