@@ -79,9 +79,10 @@
   <p class="header"><a href="#">ff4s - Feature Flags For Scala</a></p>
 
   <ul class="nav-list">
-    <li class="level1 nav-leaf"><a href="#goals">Goals</a></li>
+    <li class="level1 nav-leaf"><a href="#features">Features</a></li>
     <li class="level1 nav-leaf"><a href="#installing">Installing</a></li>
-    <li class="level1 nav-leaf"><a href="#usage">Usage</a></li>
+    <li class="level1 nav-leaf"><a href="#openfeature-usage">OpenFeature Usage</a></li>
+    <li class="level1 nav-leaf"><a href="#flipt-usage">Flipt Usage</a></li>
   </ul>
 
   <p class="footer"></p>
@@ -92,20 +93,38 @@
 
         <h1 id="ff4s-feature-flags-for-scala" class="title">ff4s - Feature Flags For Scala</h1>
         
-        <h2 id="goals" class="section"><a class="anchor-link left" href="#goals"><i class="icofont-laika link">&#xef71;</i></a>Goals</h2>
+        <h2 id="features" class="section"><a class="anchor-link left" href="#features"><i class="icofont-laika link">&#xef71;</i></a>Features</h2>
         <ul>
-          <li>Cross-platform, cross-version Scala feature flagging</li>
-          <li>Implementation of a Scala <a href="https://flipt.io">Flipt</a> client</li>
-          <li>Implementation of a Scala <a href="https://openfeature.dev">OpenFeature</a> SDK</li>
-          <li>Implementation of a Scala Flipt OpenFeature provider</li>
-          <li>Implementation of a Scala LaunchDarkly OpenFeature provider, e.g. with
-          <a href="https://typelevel.org/catapult">Catalyst</a></li>
+          <li>✅ Cross-platform, cross-version Scala feature flagging</li>
+          <li>✅ <a href="https://flipt.io">Flipt</a> client</li>
+          <li>🚧 <a href="https://openfeature.dev">OpenFeature</a> SDK</li>
+          <li>🚧 Flipt OpenFeature provider</li>
+          <li>LaunchDarkly OpenFeature provider with <a href="https://typelevel.org/catapult">Catalyst</a></li>
         </ul>
         
         <h2 id="installing" class="section"><a class="anchor-link left" href="#installing"><i class="icofont-laika link">&#xef71;</i></a>Installing</h2>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;ff4s-flipt-server-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.1.2&quot;</span></code></pre>
         
-        <h2 id="usage" class="section"><a class="anchor-link left" href="#usage"><i class="icofont-laika link">&#xef71;</i></a>Usage</h2>
+        <h2 id="openfeature-usage" class="section"><a class="anchor-link left" href="#openfeature-usage"><i class="icofont-laika link">&#xef71;</i></a>OpenFeature Usage</h2>
+        <p>The OpenFeature SDK adds features like handling default values in case of errors.
+        Eventually the SDK will cover the full range of the <a href="https://openfeature.dev">openfeature</a>
+        specification, like hooks, events, static vs dynamic context.</p>
+        <p>See <code>Flipt usage</code> on how to set up the <code>FliptApi</code>. Once done, set up a provider:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="type-name">OpenFeature</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">ff4s</span><span>.</span><span class="identifier">flipt</span><span>.</span><span class="type-name">FliptApi</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="identifier">provider</span><span>.</span><span class="identifier">flipt</span><span>.</span><span class="type-name">FliptProvider</span><span>
+
+</span><span class="keyword">def</span><span> </span><span class="declaration-name">provider</span><span>(</span><span class="identifier">flipt</span><span>: </span><span class="type-name">FliptApi</span><span>[</span><span class="type-name">IO</span><span>]) = {
+    </span><span class="keyword">val</span><span> </span><span class="identifier">featureSdk</span><span> = </span><span class="type-name">OpenFeature</span><span>[</span><span class="type-name">IO</span><span>](</span><span class="keyword">new</span><span> </span><span class="type-name">FliptProvider</span><span>[</span><span class="type-name">IO</span><span>](</span><span class="identifier">flipt</span><span>, </span><span class="string-literal">&quot;some-namespace&quot;</span><span>))
+
+    </span><span class="identifier">featureSdk</span><span>.</span><span class="identifier">client</span><span>.</span><span class="identifier">flatMap</span><span> { </span><span class="identifier">featureClient</span><span> =&gt;
+        </span><span class="identifier">featureClient</span><span>.</span><span class="identifier">getBooleanValue</span><span>(</span><span class="string-literal">&quot;boolean-flag&quot;</span><span>, </span><span class="boolean-literal">false</span><span>)
+    }
+}</span></code></pre>
+        
+        <h2 id="flipt-usage" class="section"><a class="anchor-link left" href="#flipt-usage"><i class="icofont-laika link">&#xef71;</i></a>Flipt Usage</h2>
+        <p>The Flipt client is bare-bones, using it is not recommended, unless as OpenFeature SDK Provider.</p>
         <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
 </span><span class="keyword">import</span><span> </span><span class="identifier">org</span><span>.</span><span class="identifier">http4s</span><span>.</span><span class="identifier">ember</span><span>.</span><span class="identifier">client</span><span>.</span><span class="type-name">EmberClientBuilder</span><span>
 </span><span class="keyword">import</span><span> </span><span class="identifier">org</span><span>.</span><span class="identifier">http4s</span><span>.</span><span class="type-name">Uri</span><span>
@@ -139,9 +158,9 @@
 </span><span class="comment">// resource: cats.effect.kernel.Resource[IO, FliptApi[IO]] = Bind(
 //   source = Bind(
 //     source = Eval(fa = Pure(value = ())),
-//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$11015/0x0000000802f4f040@e7d0740
+//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$12273/0x0000000802344840@34e771c7
 //   ),
-//   fs = cats.effect.kernel.Resource$$Lambda$11016/0x0000000802f4e040@31e29bc1
+//   fs = cats.effect.kernel.Resource$$Lambda$12274/0x0000000802343040@1bad45b0
 // )
 </span><span>
 </span><span class="identifier">resource</span><span>.</span><span class="identifier">use</span><span> { </span><span class="identifier">flipt</span><span> =&gt; 
@@ -159,7 +178,7 @@
 }
 </span><span class="comment">// res0: IO[Boolean] = FlatMap(
 //   ioe = Pure(value = ()),
-//   f = cats.effect.kernel.Resource$$Lambda$11018/0x0000000802f4c840@50b1a5d6,
+//   f = cats.effect.kernel.Resource$$Lambda$12276/0x0000000802340840@f378eae,
 //   event = cats.effect.tracing.TracingEvent$StackTrace
 // )</span></code></pre>
 
