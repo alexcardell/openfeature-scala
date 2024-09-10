@@ -31,6 +31,7 @@ lazy val projects = Seq(
   `flipt-sdk-server`,
   `flipt-sdk-server-it`,
   `openfeature-sdk`,
+  `openfeature-sdk-circe`,
   `openfeature-provider-flipt`,
   `openfeature-provider-flipt-it`,
   examples,
