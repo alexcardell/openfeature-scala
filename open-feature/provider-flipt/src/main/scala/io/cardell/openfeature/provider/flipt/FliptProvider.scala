@@ -30,7 +30,7 @@ import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
 import io.cardell.openfeature.provider.FlagMetadataValue
 
-class FliptProvider[F[_]: MonadThrow](flipt: FliptApi[F], namespace: String)
+final class FliptProvider[F[_]: MonadThrow](flipt: FliptApi[F], namespace: String)
     extends Provider[F] {
 
   override def metadata: ProviderMetadata = ProviderMetadata(name = "flipt")

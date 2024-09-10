@@ -126,6 +126,12 @@ lazy val `open-feature-provider-flipt-it` = crossProject(JVMPlatform)
     `open-feature-provider-flipt`
   )
 
+lazy val examples = crossProject(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("examples"))
+  .enablePlugins(NoPublishPlugin)
+  .dependsOn(`open-feature-provider-flipt`)
+
 lazy val docs = project
   .in(file("site"))
   .enablePlugins(TypelevelSitePlugin)
