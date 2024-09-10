@@ -1,6 +1,6 @@
 services:
   flipt:
-    image: flipt/flipt:v1.49.0
+    image: flipt/flipt:v1.49.2
     ports:
       - "8080:8080"
     environment:

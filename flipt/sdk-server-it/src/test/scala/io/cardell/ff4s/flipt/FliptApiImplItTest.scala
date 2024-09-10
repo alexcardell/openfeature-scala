@@ -31,27 +31,34 @@ import org.http4s.ember.client.EmberClientBuilder
 import org.testcontainers.containers.wait.strategy.Wait
 
 import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
+import com.dimafeng.testcontainers.GenericContainer
+import org.testcontainers.containers.BindMode
 
 class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
 
-  override val containerDef: ContainerDef = DockerComposeContainer.Def(
-    new File("docker-compose.yaml"),
-    exposedServices = Seq(
-      ExposedService("flipt", 8080, Wait.forLogMessage("^UI: http.*", 1))
+  override val containerDef: ContainerDef = GenericContainer.Def(
+    "flipt/flipt:v1.49.2",
+    Seq(8080),
+    env = Map(
+      "FLIPT_STORAGE_TYPE"       -> "local",
+      "FLIPT_STORAGE_LOCAL_PATH" -> "/config"
     ),
-    tailChildContainers = true
+    fileSystemBind = Seq(
+      GenericContainer.FileSystemBind(
+        "./docker/flipt/features.yaml",
+        "/config/features.yaml",
+        BindMode.READ_ONLY
+      )
+    ),
+    waitStrategy = Wait.forLogMessage("^UI: http.*", 1)
   )
 
   def api(containers: Containers): Resource[IO, FliptApi[IO]] = {
-    val flipt =
-      containers
-        .asInstanceOf[DockerComposeContainer]
-        .getContainerByServiceName("flipt")
-        .get
+    val flipt = containers.asInstanceOf[GenericContainer]
 
     val url = Uri
       .fromString(
-        s"http://${flipt.getHost()}:${flipt.getMappedPort(8080)}"
+        s"http://${flipt.host}:${flipt.mappedPort(8080)}"
       )
       .getOrElse(throw new Exception("invalid url"))
 

@@ -32,29 +32,41 @@ import io.cardell.ff4s.flipt.FliptApi
 import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.ContextMap
+import com.dimafeng.testcontainers.Container
+import com.dimafeng.testcontainers.GenericContainer
+import org.testcontainers.containers.BindMode
+import com.dimafeng.testcontainers.SingleContainer
+import io.cardell.openfeature.ContextValue
 
 class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
 
-  override val containerDef: ContainerDef = DockerComposeContainer.Def(
-    new File("docker-compose.yaml"),
-    exposedServices = Seq(
-      ExposedService("flipt", 8080, Wait.forLogMessage("^UI: http.*", 1))
+  override val containerDef: ContainerDef = GenericContainer.Def(
+    "flipt/flipt:v1.49.2",
+    Seq(8080),
+    env = Map(
+      "FLIPT_STORAGE_TYPE"       -> "local",
+      "FLIPT_STORAGE_LOCAL_PATH" -> "/config"
     ),
-    tailChildContainers = true
+    fileSystemBind = Seq(
+      GenericContainer.FileSystemBind(
+        "./docker/flipt/features.yaml",
+        "/config/features.yaml",
+        BindMode.READ_ONLY
+      )
+    ),
+    waitStrategy = Wait.forLogMessage("^UI: http.*", 1)
   )
 
   def api(containers: Containers): Resource[IO, FliptProvider[IO]] = {
-    val flipt =
-      containers
-        .asInstanceOf[DockerComposeContainer]
-        .getContainerByServiceName("flipt")
-        .get
+    val flipt = containers.asInstanceOf[GenericContainer]
 
     val url = Uri
       .fromString(
-        s"http://${flipt.getHost()}:${flipt.getMappedPort(8080)}"
+        s"http://${flipt.host}:${flipt.mappedPort(8080)}"
       )
       .getOrElse(throw new Exception("invalid url"))
+
+    println(s"got flipt url ${url}")
 
     EmberClientBuilder
       .default[IO]
@@ -74,11 +86,13 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     withContainers { containers =>
       api(containers).use { flipt =>
         for {
+          _ <- IO.println("fetching 1")
           res <- flipt.resolveBooleanValue(
             "boolean-flag-1",
             false,
             EvaluationContext.empty
           )
+          _ <- IO.println("fetched 1")
         } yield assertEquals(res.value, true)
       }
     }
@@ -88,11 +102,13 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     withContainers { containers =>
       api(containers).use { flipt =>
         for {
+          _ <- IO.println("fetching 2")
           res <- flipt.resolveBooleanValue(
             "no-flag",
             false,
             EvaluationContext.empty
           )
+          _ <- IO.println("fetched 2")
         } yield assertEquals(res.value, false)
       }
     }
@@ -101,14 +117,18 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
   test("receives variant match when in segment rule") {
     withContainers { containers =>
       api(containers).use { flipt =>
-        val segmentContext = Map("test-property" -> "matched-property-value")
+        val segmentContext = Map(
+          "test-property" -> ContextValue.StringValue("matched-property-value")
+        )
 
         for {
+          _ <- IO.println("fetching 3")
           res <- flipt.resolveStringValue(
             "string-variant-flag-1",
             "default",
-            EvaluationContext(ContextMap(segmentContext))
+            EvaluationContext(None, segmentContext)
           )
+          _ <- IO.println("fetched 3")
         } yield assertEquals(res.value, "string-variant-value")
       }
     }

@@ -25,7 +25,7 @@ ThisBuild / scalaVersion       := Scala213 // the default Scala
 
 // hack until integration tests can run in parallel
 // ThisBuild / Test / parallelExecution  := false
-Global / concurrentRestrictions += Tags.limit(Tags.Test, 1)
+// Global / concurrentRestrictions += Tags.limit(Tags.Test, 1)
 
 lazy val projects = Seq(
   `flipt-sdk-server`,
