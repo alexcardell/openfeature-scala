@@ -33,6 +33,7 @@ import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
 import io.cardell.openfeature.ContextValue
 import io.cardell.openfeature.EvaluationContext
 
+// see docker-compose features.yaml for flag test data
 class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
 
   override val containerDef: ContainerDef = DockerComposeContainer.Def(
@@ -70,7 +71,13 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
       }
   }
 
+  val segmentContext = Map(
+    "test-property" -> ContextValue.StringValue("matched-property-value")
+  )
+
   test("can fetch boolean flag") {
+    val expected = true
+
     withContainers { containers =>
       api(containers).use { flipt =>
         for {
@@ -79,12 +86,14 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
             false,
             EvaluationContext.empty
           )
-        } yield assertEquals(res.value, true)
+        } yield assertEquals(res.value, expected)
       }
     }
   }
 
   test("uses default when boolean flag missing") {
+    val expected = false
+
     withContainers { containers =>
       api(containers).use { flipt =>
         for {
@@ -93,25 +102,39 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
             false,
             EvaluationContext.empty
           )
-        } yield assertEquals(res.value, false)
+        } yield assertEquals(res.value, expected)
       }
     }
   }
 
   test("can resolve string value for flipt variant flag") {
+    val expected = "string-variant-1"
+
     withContainers { containers =>
       api(containers).use { flipt =>
-        val segmentContext = Map(
-          "test-property" -> ContextValue.StringValue("matched-property-value")
-        )
-
         for {
           res <- flipt.resolveStringValue(
             "string-variant-flag-1",
             "default-string",
             EvaluationContext(None, segmentContext)
           )
-        } yield assertEquals(res.value, "string-variant-1")
+        } yield assertEquals(res.value, expected)
+      }
+    }
+  }
+
+  test("uses default when string flag missing") {
+    val expected = "some-string"
+
+    withContainers { containers =>
+      api(containers).use { flipt =>
+        for {
+          res <- flipt.resolveStringValue(
+            "no-flag",
+            expected,
+            EvaluationContext.empty
+          )
+        } yield assertEquals(res.value, expected)
       }
     }
   }
@@ -121,14 +144,26 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
 
     withContainers { containers =>
       api(containers).use { flipt =>
-        val segmentContext = Map(
-          "test-property" -> ContextValue.StringValue("matched-property-value")
-        )
-
         for {
           res <- flipt.resolveIntValue(
             "int-variant-flag-1",
             99,
+            EvaluationContext(None, segmentContext)
+          )
+        } yield assertEquals(res.value, expected)
+      }
+    }
+  }
+
+  test("can resolve double value for flipt variant flag") {
+    val expected = 17.1
+
+    withContainers { containers =>
+      api(containers).use { flipt =>
+        for {
+          res <- flipt.resolveDoubleValue(
+            "double-variant-flag-1",
+            99.9,
             EvaluationContext(None, segmentContext)
           )
         } yield assertEquals(res.value, expected)

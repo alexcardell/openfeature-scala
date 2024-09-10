@@ -40,12 +40,12 @@ trait Provider[F[_]] {
       context: EvaluationContext
   ): F[ResolutionDetails[Int]]
 
-  // def resolveDoubleValue(
-  //     flagKey: String,
-  //     defaultValue: Double,
-  //     context: EvaluationContext
-  // ): F[ResolutionDetails[Double]]
-  //
+  def resolveDoubleValue(
+      flagKey: String,
+      defaultValue: Double,
+      context: EvaluationContext
+  ): F[ResolutionDetails[Double]]
+
   // def resolveStructureValue[A: StructureDecoder](
   //     flagKey: String,
   //     defaultValue: A,

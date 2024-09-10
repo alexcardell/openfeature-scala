@@ -119,8 +119,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
     default,
     context,
     EvaluationOptions.Defaults
-  )
-    .map(_.value)
+  ).map(_.value)
 
   override def getStringDetails(
       flagKey: String,
@@ -197,53 +196,59 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
       context: EvaluationContext,
       options: EvaluationOptions
   ): F[EvaluationDetails[Int]] = provider
-    .resolveIntValue(
-      flagKey,
-      default,
-      clientEvaluationContext ++ context
-    )
+    .resolveIntValue(flagKey, default, clientEvaluationContext ++ context)
     .map(EvaluationDetails[Int](flagKey, _))
 
-  // override def getDoubleValue(flagKey: String, default: Double): F[Double] =
-  //   getDoubleValue(flagKey, default, EvaluationContext.empty)
-  //
-  // override def getDoubleValue(
-  //     flagKey: String,
-  //     default: Double,
-  //     context: EvaluationContext
-  // ): F[Double] =
-  //   getDoubleValue(flagKey, default, context, EvaluationOptions.Defaults)
-  //
-  // override def getDoubleValue(
-  //     flagKey: String,
-  //     default: Double,
-  //     context: EvaluationContext,
-  //     options: EvaluationOptions
-  // ): F[Double] =
-  //   provider
-  //     .resolveDoubleValue(
-  //       flagKey,
-  //       default,
-  //       clientEvaluationContext ++ context
-  //     )
-  //     .map(_.value)
-  //
-  // override def getDoubleDetails(
-  //     flagKey: String,
-  //     default: Double
-  // ): F[EvaluationDetails[Double]] = ???
-  // override def getDoubleDetails(
-  //     flagKey: String,
-  //     default: Double,
-  //     context: EvaluationContext
-  // ): F[EvaluationDetails[Double]] = ???
-  // override def getDoubleDetails(
-  //     flagKey: String,
-  //     default: Double,
-  //     context: EvaluationContext,
-  //     options: EvaluationOptions
-  // ): F[EvaluationDetails[Double]] = ???
-  //
+  override def getDoubleValue(flagKey: String, default: Double): F[Double] =
+    getDoubleValue(flagKey, default, EvaluationContext.empty)
+
+  override def getDoubleValue(
+      flagKey: String,
+      default: Double,
+      context: EvaluationContext
+  ): F[Double] = getDoubleValue(
+    flagKey,
+    default,
+    context,
+    EvaluationOptions.Defaults
+  )
+
+  override def getDoubleValue(
+      flagKey: String,
+      default: Double,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[Double] = getDoubleDetails(flagKey, default, context).map(_.value)
+
+  override def getDoubleDetails(
+      flagKey: String,
+      default: Double
+  ): F[EvaluationDetails[Double]] = getDoubleDetails(
+    flagKey,
+    default,
+    EvaluationContext.empty
+  )
+
+  override def getDoubleDetails(
+      flagKey: String,
+      default: Double,
+      context: EvaluationContext
+  ): F[EvaluationDetails[Double]] = getDoubleDetails(
+    flagKey,
+    default,
+    context,
+    EvaluationOptions.Defaults
+  )
+
+  override def getDoubleDetails(
+      flagKey: String,
+      default: Double,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[EvaluationDetails[Double]] = provider
+    .resolveDoubleValue(flagKey, default, clientEvaluationContext ++ context)
+    .map(EvaluationDetails[Double](flagKey, _))
+
   // override def getStructureValue[A: StructureDecoder](
   //     flagKey: String,
   //     default: A
