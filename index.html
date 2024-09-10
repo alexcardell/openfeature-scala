@@ -103,7 +103,7 @@
         </ul>
         
         <h2 id="installing" class="section"><a class="anchor-link left" href="#installing"><i class="icofont-laika link">&#xef71;</i></a>Installing</h2>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;ff4s-flipt-server-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.1.1&quot;</span></code></pre>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;ff4s-flipt-server-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.1.2&quot;</span></code></pre>
         
         <h2 id="usage" class="section"><a class="anchor-link left" href="#usage"><i class="icofont-laika link">&#xef71;</i></a>Usage</h2>
         <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
@@ -139,9 +139,9 @@
 </span><span class="comment">// resource: cats.effect.kernel.Resource[IO, FliptApi[IO]] = Bind(
 //   source = Bind(
 //     source = Eval(fa = Pure(value = ())),
-//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$10990/0x0000000802f4f040@cdb0d42
+//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$11015/0x0000000802f4f040@e7d0740
 //   ),
-//   fs = cats.effect.kernel.Resource$$Lambda$10991/0x0000000802f4e040@6520a3bb
+//   fs = cats.effect.kernel.Resource$$Lambda$11016/0x0000000802f4e040@31e29bc1
 // )
 </span><span>
 </span><span class="identifier">resource</span><span>.</span><span class="identifier">use</span><span> { </span><span class="identifier">flipt</span><span> =&gt; 
@@ -159,7 +159,7 @@
 }
 </span><span class="comment">// res0: IO[Boolean] = FlatMap(
 //   ioe = Pure(value = ()),
-//   f = cats.effect.kernel.Resource$$Lambda$10993/0x0000000802f4c840@69735249,
+//   f = cats.effect.kernel.Resource$$Lambda$11018/0x0000000802f4c840@50b1a5d6,
 //   event = cats.effect.tracing.TracingEvent$StackTrace
 // )</span></code></pre>
 
