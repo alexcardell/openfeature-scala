@@ -151,51 +151,59 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
     .resolveStringValue(flagKey, default, clientEvaluationContext ++ context)
     .map(EvaluationDetails[String](flagKey, _))
 
-  // override def getIntValue(flagKey: String, default: Int): F[Int] =
-  //   getIntValue(flagKey, default, EvaluationContext.empty)
-  //
-  // override def getIntValue(
-  //     flagKey: String,
-  //     default: Int,
-  //     context: EvaluationContext
-  // ): F[Int] = getIntValue(flagKey, default, context, EvaluationOptions.Defaults)
-  //
-  // override def getIntValue(
-  //     flagKey: String,
-  //     default: Int,
-  //     context: EvaluationContext,
-  //     options: EvaluationOptions
-  // ): F[Int] =
-  //   getIntDetails(flagKey, default, context, options)
-  //     .map(_.value)
-  //
-  // override def getIntDetails(
-  //     flagKey: String,
-  //     default: Int
-  // ): F[EvaluationDetails[Int]] =
-  //   getIntDetails(flagKey, default, EvaluationContext.empty)
-  //
-  // override def getIntDetails(
-  //     flagKey: String,
-  //     default: Int,
-  //     context: EvaluationContext
-  // ): F[EvaluationDetails[Int]] =
-  //   getIntDetails(flagKey, default, context, EvaluationOptions.Defaults)
-  //
-  // override def getIntDetails(
-  //     flagKey: String,
-  //     default: Int,
-  //     context: EvaluationContext,
-  //     options: EvaluationOptions
-  // ): F[EvaluationDetails[Int]] =
-  //   provider
-  //     .resolveIntValue(
-  //       flagKey,
-  //       default,
-  //       clientEvaluationContext ++ context
-  //     )
-  //     .map(EvaluationDetails[Int](flagKey, _))
-  //
+  override def getIntValue(flagKey: String, default: Int): F[Int] = getIntValue(
+    flagKey,
+    default,
+    EvaluationContext.empty
+  )
+
+  override def getIntValue(
+      flagKey: String,
+      default: Int,
+      context: EvaluationContext
+  ): F[Int] = getIntValue(flagKey, default, context, EvaluationOptions.Defaults)
+
+  override def getIntValue(
+      flagKey: String,
+      default: Int,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[Int] = getIntDetails(flagKey, default, context, options)
+    .map(_.value)
+
+  override def getIntDetails(
+      flagKey: String,
+      default: Int
+  ): F[EvaluationDetails[Int]] = getIntDetails(
+    flagKey,
+    default,
+    EvaluationContext.empty
+  )
+
+  override def getIntDetails(
+      flagKey: String,
+      default: Int,
+      context: EvaluationContext
+  ): F[EvaluationDetails[Int]] = getIntDetails(
+    flagKey,
+    default,
+    context,
+    EvaluationOptions.Defaults
+  )
+
+  override def getIntDetails(
+      flagKey: String,
+      default: Int,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[EvaluationDetails[Int]] = provider
+    .resolveIntValue(
+      flagKey,
+      default,
+      clientEvaluationContext ++ context
+    )
+    .map(EvaluationDetails[Int](flagKey, _))
+
   // override def getDoubleValue(flagKey: String, default: Double): F[Double] =
   //   getDoubleValue(flagKey, default, EvaluationContext.empty)
   //

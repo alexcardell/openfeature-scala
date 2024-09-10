@@ -29,6 +29,7 @@ import io.cardell.openfeature.provider.Provider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
 import io.cardell.openfeature.provider.FlagMetadataValue
+import scala.util.Try
 
 final class FliptProvider[F[_]: MonadThrow](
     flipt: FliptApi[F],
@@ -135,12 +136,66 @@ final class FliptProvider[F[_]: MonadThrow](
     }
   }
 
-  // override def resolveIntValue(
-  //     flagKey: String,
-  //     defaultValue: Int,
-  //     context: EvaluationContext
-  // ): F[ResolutionDetails[Int]] = ???
-  //
+  override def resolveIntValue(
+      flagKey: String,
+      defaultValue: Int,
+      context: EvaluationContext
+  ): F[ResolutionDetails[Int]] = {
+    val evalContext = mapContext(context)
+
+    val req: EvaluationRequest = EvaluationRequest(
+      namespaceKey = namespace,
+      flagKey = flagKey,
+      entityId = context.targetingKey,
+      context = evalContext,
+      reference = None
+    )
+
+    val stringResolution = flipt.evaluateVariant(req).map { evaluation =>
+      ResolutionDetails[String](
+        value = evaluation.variantKey,
+        errorCode = None,
+        errorMessage = None,
+        reason = mapReason(evaluation.reason).some,
+        variant = Some(evaluation.variantKey),
+        metadata = Some(
+          Map(
+            "variant-attachment" -> FlagMetadataValue
+              .StringValue(evaluation.variantAttachment)
+          )
+        )
+      )
+    }
+
+    def default(t: Throwable) = ResolutionDetails[Int](
+      value = defaultValue,
+      errorCode = Some(ErrorCode.General),
+      errorMessage = Some(t.getMessage()),
+      reason = Some(EvaluationReason.Error),
+      variant = None,
+      metadata = None
+    )
+
+    val resolution =
+      for {
+        res <- stringResolution
+        int <- MonadThrow[F].fromTry(Try(res.value.toInt))
+      } yield ResolutionDetails[Int](
+        value = int,
+        errorCode = None,
+        errorMessage = None,
+        reason = res.reason,
+        variant = res.variant,
+        metadata = res.metadata
+      )
+
+    resolution.attempt.map {
+      case Right(value) => value
+      case Left(error)  => default(error)
+    }
+
+  }
+
   // override def resolveDoubleValue(
   //     flagKey: String,
   //     defaultValue: Double,

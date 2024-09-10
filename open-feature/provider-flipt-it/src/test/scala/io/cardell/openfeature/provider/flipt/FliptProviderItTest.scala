@@ -98,7 +98,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     }
   }
 
-  test("receives variant match when in segment rule") {
+  test("can resolve string value for flipt variant flag") {
     withContainers { containers =>
       api(containers).use { flipt =>
         val segmentContext = Map(
@@ -116,25 +116,26 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     }
   }
 
-  // test("receives no variant match when not in segment rule") {
-  //   withContainers { containers =>
-  //     api(containers).use { flipt =>
-  //       val segmentContext = Map("test-property" -> "unmatched-property-value")
-  //       for {
-  //         res <- flipt.evaluateVariant(
-  //           EvaluationRequest(
-  //             "default",
-  //             "variant-flag-1",
-  //             None,
-  //             segmentContext,
-  //             None
-  //           )
-  //         )
-  //       } yield assertEquals(res.`match`, false)
-  //     }
-  //   }
-  // }
-  //
+  test("can resolve int value for flipt variant flag") {
+    val expected = 13
+
+    withContainers { containers =>
+      api(containers).use { flipt =>
+        val segmentContext = Map(
+          "test-property" -> ContextValue.StringValue("matched-property-value")
+        )
+
+        for {
+          res <- flipt.resolveIntValue(
+            "int-variant-flag-1",
+            99,
+            EvaluationContext(None, segmentContext)
+          )
+        } yield assertEquals(res.value, expected)
+      }
+    }
+  }
+
   // case class TestVariant(field: String, intField: Int)
   // object TestVariant {
   //   implicit val decoder: Decoder[TestVariant] = deriveDecoder
