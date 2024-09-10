@@ -31,6 +31,7 @@ import org.testcontainers.containers.wait.strategy.Wait
 import io.cardell.ff4s.flipt.FliptApi
 import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
 import io.cardell.openfeature.EvaluationContext
+import io.cardell.openfeature.ContextValue
 
 class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
 
@@ -83,39 +84,38 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     }
   }
 
-  // test("uses default when boolean flag missing") {
-  //   withContainers { containers =>
-  //     api(containers).use { flipt =>
-  //       for {
-  //         res <- flipt.resolveBooleanValue(
-  //           "no-flag",
-  //           false,
-  //           EvaluationContext.empty
-  //         )
-  //       } yield assertEquals(res.value, false)
-  //     }
-  //   }
-  // }
+  test("uses default when boolean flag missing") {
+    withContainers { containers =>
+      api(containers).use { flipt =>
+        for {
+          res <- flipt.resolveBooleanValue(
+            "no-flag",
+            false,
+            EvaluationContext.empty
+          )
+        } yield assertEquals(res.value, false)
+      }
+    }
+  }
 
-  // test("receives variant match when in segment rule") {
-  //   withContainers { containers =>
-  //     api(containers).use { flipt =>
-  //       val segmentContext = Map("test-property" -> "matched-property-value")
-  //       for {
-  //         res <- flipt.evaluateVariant(
-  //           EvaluationRequest(
-  //             "default",
-  //             "variant-flag-1",
-  //             None,
-  //             segmentContext,
-  //             None
-  //           )
-  //         )
-  //       } yield assertEquals(res.`match`, true)
-  //     }
-  //   }
-  // }
-  //
+  test("receives variant match when in segment rule") {
+    withContainers { containers =>
+      api(containers).use { flipt =>
+        val segmentContext = Map(
+          "test-property" -> ContextValue.StringValue("matched-property-value")
+        )
+
+        for {
+          res <- flipt.resolveStringValue(
+            "string-variant-flag-1",
+            "default-string",
+            EvaluationContext(None, segmentContext)
+          )
+        } yield assertEquals(res.value, "string-variant-1")
+      }
+    }
+  }
+
   // test("receives no variant match when not in segment rule") {
   //   withContainers { containers =>
   //     api(containers).use { flipt =>

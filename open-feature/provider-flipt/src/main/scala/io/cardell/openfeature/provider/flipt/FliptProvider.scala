@@ -28,6 +28,7 @@ import io.cardell.openfeature.EvaluationReason
 import io.cardell.openfeature.provider.Provider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
+import io.cardell.openfeature.provider.FlagMetadataValue
 
 class FliptProvider[F[_]: MonadThrow](flipt: FliptApi[F], namespace: String)
     extends Provider[F] {
@@ -86,12 +87,52 @@ class FliptProvider[F[_]: MonadThrow](flipt: FliptApi[F], namespace: String)
     }
   }
 
-  // override def resolveStringValue(
-  //     flagKey: String,
-  //     defaultValue: String,
-  //     context: EvaluationContext
-  // ): F[ResolutionDetails[String]] = ???
-  //
+  override def resolveStringValue(
+      flagKey: String,
+      defaultValue: String,
+      context: EvaluationContext
+  ): F[ResolutionDetails[String]] = {
+    val evalContext = mapContext(context)
+
+    val req: EvaluationRequest = EvaluationRequest(
+      namespaceKey = namespace,
+      flagKey = flagKey,
+      entityId = context.targetingKey,
+      context = evalContext,
+      reference = None
+    )
+
+    val resolution = flipt.evaluateVariant(req).map { evaluation =>
+      ResolutionDetails[String](
+        value = evaluation.variantKey,
+        errorCode = None,
+        errorMessage = None,
+        reason = mapReason(evaluation.reason).some,
+        variant = Some(evaluation.variantKey),
+        metadata = Some(
+          Map(
+            "variant-attachment" -> FlagMetadataValue
+              .StringValue(evaluation.variantAttachment)
+          )
+        )
+      )
+    }
+
+    def default(t: Throwable) = ResolutionDetails[String](
+      value = defaultValue,
+      errorCode = Some(ErrorCode.General),
+      errorMessage = Some(t.getMessage()),
+      reason = Some(EvaluationReason.Error),
+      variant = None,
+      metadata = None
+    )
+
+    resolution.attempt.map {
+      case Right(value) => value
+      case Left(error)  => default(error)
+    }
+  }
+
   // override def resolveIntValue(
   //     flagKey: String,
   //     defaultValue: Int,

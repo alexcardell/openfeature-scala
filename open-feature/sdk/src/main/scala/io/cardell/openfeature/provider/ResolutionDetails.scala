@@ -22,10 +22,10 @@ import io.cardell.openfeature.EvaluationReason
 sealed trait FlagMetadataValue
 
 object FlagMetadataValue {
-  case class Boolean(value: Boolean) extends FlagMetadataValue
-  case class String(value: String)   extends FlagMetadataValue
-  case class Int(value: String)      extends FlagMetadataValue
-  case class Double(value: Double)   extends FlagMetadataValue
+  case class BooleanValue(value: Boolean) extends FlagMetadataValue
+  case class StringValue(value: String)   extends FlagMetadataValue
+  case class IntValue(value: String)      extends FlagMetadataValue
+  case class DoubleValue(value: Double)   extends FlagMetadataValue
   // TODO circe unwrapped codecs
 }
 
