@@ -18,6 +18,7 @@ package io.cardell.openfeature.provider.flipt
 
 import cats.MonadThrow
 import cats.syntax.all._
+import scala.util.Try
 
 import io.cardell.ff4s.flipt.EvaluationRequest
 import io.cardell.ff4s.flipt.FliptApi
@@ -25,11 +26,10 @@ import io.cardell.ff4s.flipt.model.{EvaluationReason => FliptReason}
 import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
+import io.cardell.openfeature.provider.FlagMetadataValue
 import io.cardell.openfeature.provider.Provider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
-import io.cardell.openfeature.provider.FlagMetadataValue
-import scala.util.Try
 
 final class FliptProvider[F[_]: MonadThrow](
     flipt: FliptApi[F],

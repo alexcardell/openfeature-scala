@@ -30,8 +30,8 @@ import org.testcontainers.containers.wait.strategy.Wait
 
 import io.cardell.ff4s.flipt.FliptApi
 import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
-import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.ContextValue
+import io.cardell.openfeature.EvaluationContext
 
 class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
 

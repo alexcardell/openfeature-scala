@@ -18,15 +18,6 @@ package io.cardell.openfeature
 
 import io.cardell.openfeature.provider.ProviderMetadata
 
-// TODO implement circe
-// trait StructureDecoder[A]
-
-case class EvaluationOptions()
-
-object EvaluationOptions {
-  val Defaults: EvaluationOptions = EvaluationOptions()
-}
-
 trait FeatureClient[F[_]] {
 
   def providerMetadata: ProviderMetadata
