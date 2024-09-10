@@ -249,56 +249,61 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
     .resolveDoubleValue(flagKey, default, clientEvaluationContext ++ context)
     .map(EvaluationDetails[Double](flagKey, _))
 
-  // override def getStructureValue[A: StructureDecoder](
-  //     flagKey: String,
-  //     default: A
-  // ): F[A] =
-  //   getStructureValue[A](flagKey, default, EvaluationContext.empty)
-  //
-  // override def getStructureValue[A: StructureDecoder](
-  //     flagKey: String,
-  //     default: A,
-  //     context: EvaluationContext
-  // ): F[A] =
-  //   getStructureValue[A](flagKey, default, context, EvaluationOptions.Defaults)
-  //
-  // override def getStructureValue[A: StructureDecoder](
-  //     flagKey: String,
-  //     default: A,
-  //     context: EvaluationContext,
-  //     options: EvaluationOptions
-  // ): F[A] =
-  //   getStructureDetails[A](flagKey, default, context)
-  //     .map(_.value)
-  //
-  // override def getStructureDetails[A: StructureDecoder](
-  //     flagKey: String,
-  //     default: A
-  // ): F[EvaluationDetails[A]] =
-  //   getStructureDetails[A](flagKey, default, EvaluationContext.empty)
-  // override def getStructureDetails[A: StructureDecoder](
-  //     flagKey: String,
-  //     default: A,
-  //     context: EvaluationContext
-  // ): F[EvaluationDetails[A]] =
-  //   getStructureDetails[A](
-  //     flagKey,
-  //     default,
-  //     context,
-  //     EvaluationOptions.Defaults
-  //   )
-  //
-  // override def getStructureDetails[A: StructureDecoder](
-  //     flagKey: String,
-  //     default: A,
-  //     context: EvaluationContext,
-  //     options: EvaluationOptions
-  // ): F[EvaluationDetails[A]] =
-  //   provider
-  //     .resolveStructureValue[A](
-  //       flagKey,
-  //       default,
-  //       clientEvaluationContext ++ context
-  //     )
-  //     .map(EvaluationDetails(flagKey, _))
+  override def getStructureValue[A: StructureDecoder](
+      flagKey: String,
+      default: A
+  ): F[A] = getStructureValue[A](flagKey, default, EvaluationContext.empty)
+
+  override def getStructureValue[A: StructureDecoder](
+      flagKey: String,
+      default: A,
+      context: EvaluationContext
+  ): F[A] = getStructureValue[A](
+    flagKey,
+    default,
+    context,
+    EvaluationOptions.Defaults
+  )
+
+  override def getStructureValue[A: StructureDecoder](
+      flagKey: String,
+      default: A,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[A] = getStructureDetails[A](flagKey, default, context)
+    .map(_.value)
+
+  override def getStructureDetails[A: StructureDecoder](
+      flagKey: String,
+      default: A
+  ): F[EvaluationDetails[A]] = getStructureDetails[A](
+    flagKey,
+    default,
+    EvaluationContext.empty
+  )
+
+  override def getStructureDetails[A: StructureDecoder](
+      flagKey: String,
+      default: A,
+      context: EvaluationContext
+  ): F[EvaluationDetails[A]] = getStructureDetails[A](
+    flagKey,
+    default,
+    context,
+    EvaluationOptions.Defaults
+  )
+
+  override def getStructureDetails[A: StructureDecoder](
+      flagKey: String,
+      default: A,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[EvaluationDetails[A]] = provider
+    .resolveStructureValue[A](
+      flagKey,
+      default,
+      clientEvaluationContext ++ context
+    )
+    .map(EvaluationDetails(flagKey, _))
+
 }
