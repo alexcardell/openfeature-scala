@@ -19,24 +19,18 @@ package io.cardell.openfeature.provider.flipt
 import cats.effect.IO
 import cats.effect.kernel.Resource
 import com.dimafeng.testcontainers.ContainerDef
-import com.dimafeng.testcontainers.DockerComposeContainer
-import com.dimafeng.testcontainers.ExposedService
+import com.dimafeng.testcontainers.GenericContainer
 import com.dimafeng.testcontainers.munit.TestContainerForAll
-import java.io.File
 import munit.CatsEffectSuite
 import org.http4s.Uri
 import org.http4s.ember.client.EmberClientBuilder
+import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.wait.strategy.Wait
 
 import io.cardell.ff4s.flipt.FliptApi
 import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
-import io.cardell.openfeature.EvaluationContext
-import io.cardell.openfeature.ContextMap
-import com.dimafeng.testcontainers.Container
-import com.dimafeng.testcontainers.GenericContainer
-import org.testcontainers.containers.BindMode
-import com.dimafeng.testcontainers.SingleContainer
 import io.cardell.openfeature.ContextValue
+import io.cardell.openfeature.EvaluationContext
 
 class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
 

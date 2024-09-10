@@ -19,20 +19,17 @@ package io.cardell.ff4s.flipt
 import cats.effect.IO
 import cats.effect.kernel.Resource
 import com.dimafeng.testcontainers.ContainerDef
-import com.dimafeng.testcontainers.DockerComposeContainer
-import com.dimafeng.testcontainers.ExposedService
+import com.dimafeng.testcontainers.GenericContainer
 import com.dimafeng.testcontainers.munit.TestContainerForAll
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
-import java.io.File
 import munit.CatsEffectSuite
 import org.http4s.Uri
 import org.http4s.ember.client.EmberClientBuilder
+import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.wait.strategy.Wait
 
 import io.cardell.ff4s.flipt.auth.AuthenticationStrategy
-import com.dimafeng.testcontainers.GenericContainer
-import org.testcontainers.containers.BindMode
 
 class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
 
