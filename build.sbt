@@ -86,7 +86,6 @@ lazy val `openfeature-sdk` = crossProject(
 )
   .crossType(CrossType.Pure)
   .in(file("openfeature/sdk"))
-  .enablePlugins(NoPublishPlugin)
   .settings(commonDependencies)
   .settings(
     name := "ff4s-openfeature-sdk"
@@ -99,7 +98,6 @@ lazy val `openfeature-sdk-circe` = crossProject(
 )
   .crossType(CrossType.Pure)
   .in(file("openfeature/sdk-circe"))
-  .enablePlugins(NoPublishPlugin)
   .settings(commonDependencies)
   .settings(
     name := "ff4s-openfeature-sdk-circe",
@@ -117,7 +115,6 @@ lazy val `openfeature-provider-flipt` = crossProject(
 )
   .crossType(CrossType.Pure)
   .in(file("openfeature/provider-flipt"))
-  .enablePlugins(NoPublishPlugin)
   .settings(commonDependencies)
   .settings(
     name := "ff4s-openfeature-provider-flipt"
