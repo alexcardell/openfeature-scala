@@ -71,34 +71,38 @@ trait FeatureClient[F[_]] {
       options: EvaluationOptions
   ): F[EvaluationDetails[Boolean]]
 
-  // def getStringValue(flagKey: String, default: String): F[String]
-  // def getStringValue(
-  //     flagKey: String,
-  //     default: String,
-  //     context: EvaluationContext
-  // ): F[String]
-  // def getStringValue(
-  //     flagKey: String,
-  //     default: String,
-  //     context: EvaluationContext,
-  //     options: EvaluationOptions
-  // ): F[String]
-  //
-  // def getStringDetails(
-  //     flagKey: String,
-  //     default: String
-  // ): F[EvaluationDetails[String]]
-  // def getStringDetails(
-  //     flagKey: String,
-  //     default: String,
-  //     context: EvaluationContext
-  // ): F[EvaluationDetails[String]]
-  // def getStringDetails(
-  //     flagKey: String,
-  //     default: String,
-  //     context: EvaluationContext,
-  //     options: EvaluationOptions
-  // ): F[EvaluationDetails[String]]
+  def getStringValue(flagKey: String, default: String): F[String]
+
+  def getStringValue(
+      flagKey: String,
+      default: String,
+      context: EvaluationContext
+  ): F[String]
+
+  def getStringValue(
+      flagKey: String,
+      default: String,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[String]
+
+  def getStringDetails(
+      flagKey: String,
+      default: String
+  ): F[EvaluationDetails[String]]
+
+  def getStringDetails(
+      flagKey: String,
+      default: String,
+      context: EvaluationContext
+  ): F[EvaluationDetails[String]]
+
+  def getStringDetails(
+      flagKey: String,
+      default: String,
+      context: EvaluationContext,
+      options: EvaluationOptions
+  ): F[EvaluationDetails[String]]
   //
   // def getIntValue(flagKey: String, default: Int): F[Int]
   // def getIntValue(
@@ -186,4 +190,5 @@ trait FeatureClient[F[_]] {
   //     context: EvaluationContext,
   //     options: EvaluationOptions
   // ): F[EvaluationDetails[A]]
+
 }
