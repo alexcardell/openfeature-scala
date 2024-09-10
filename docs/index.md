@@ -1,13 +1,12 @@
 # ff4s - Feature Flags For Scala
 
-## Goals
+## Features
 
-- Cross-platform, cross-version Scala feature flagging
-- Implementation of a Scala [Flipt](https://flipt.io) client
-- Implementation of a Scala [OpenFeature](https://openfeature.dev) SDK
-- Implementation of a Scala Flipt OpenFeature provider
-- Implementation of a Scala LaunchDarkly OpenFeature provider, e.g. with
-  [Catalyst](https://typelevel.org/catapult)
+- [x] Cross-platform, cross-version Scala feature flagging
+- [x] [Flipt](https://flipt.io) client
+- [ ] :construction: [OpenFeature](https://openfeature.dev) SDK
+- [ ] :construction: Flipt OpenFeature provider
+- [ ] LaunchDarkly OpenFeature provider with [Catalyst](https://typelevel.org/catapult)
 
 ## Installing
 
@@ -15,7 +14,32 @@
 libraryDependencies += "io.cardell" %%% "ff4s-flipt-server-sdk" % "@VERSION@"
 ```
 
-## Usage
+## OpenFeature Usage
+
+The OpenFeature SDK adds features like handling default values in case of errors.
+Eventually the SDK will cover the full range of the [openfeature](https://openfeature.dev)
+specification, like hooks, events, static vs dynamic context.
+
+See `Flipt usage` on how to set up the `FliptApi`. Once done, set up a provider:
+
+```scala mdoc
+import cats.effect.IO
+import io.cardell.openfeature.OpenFeature
+import io.cardell.ff4s.flipt.FliptApi
+import io.cardell.openfeature.provider.flipt.FliptProvider
+
+def provider(flipt: FliptApi[IO]) = {
+    val featureSdk = OpenFeature[IO](new FliptProvider[IO](flipt, "some-namespace"))
+
+    featureSdk.client.flatMap { featureClient =>
+        featureClient.getBooleanValue("boolean-flag", false)
+    }
+}
+```
+
+## Flipt Usage
+
+The Flipt client is bare-bones, using it is not recommended, unless as OpenFeature SDK Provider.
 
 ```scala mdoc
 import cats.effect.IO
@@ -49,3 +73,4 @@ resource.use { flipt =>
     } yield res.enabled
 }
 ```
+
