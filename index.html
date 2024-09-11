@@ -109,14 +109,14 @@
         </ul>
         
         <h2 id="installing" class="section"><a class="anchor-link left" href="#installing"><i class="icofont-laika link">&#xef71;</i></a>Installing</h2>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;flipt-sdk-server&quot;</span><span> % </span><span class="string-literal">&quot;0.1.2&quot;</span><span>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;flipt-sdk-server&quot;</span><span> % </span><span class="string-literal">&quot;0.2.1&quot;</span><span>
 </span><span class="comment">// or
 </span><span class="identifier">libraryDependencies</span><span> ++= </span><span class="type-name">Seq</span><span>(
-    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.1.2&quot;</span><span>,
+    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.2.1&quot;</span><span>,
     </span><span class="comment">// for circe json variant types
-</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk-circe&quot;</span><span> % </span><span class="string-literal">&quot;0.1.2&quot;</span><span>,
+</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk-circe&quot;</span><span> % </span><span class="string-literal">&quot;0.2.1&quot;</span><span>,
     </span><span class="comment">// to use flipt as a backend
-</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-provider-flipt&quot;</span><span> % </span><span class="string-literal">&quot;0.1.2&quot;</span><span>
+</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-provider-flipt&quot;</span><span> % </span><span class="string-literal">&quot;0.2.1&quot;</span><span>
 )</span></code></pre>
         
         <h2 id="openfeature-usage" class="section"><a class="anchor-link left" href="#openfeature-usage"><i class="icofont-laika link">&#xef71;</i></a>OpenFeature Usage</h2>
@@ -185,9 +185,9 @@
 </span><span class="comment">// resource: cats.effect.kernel.Resource[IO, FliptApi[IO]] = Bind(
 //   source = Bind(
 //     source = Eval(fa = Pure(value = ())),
-//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$13347/0x000000080360f040@694894d6
+//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$13281/0x0000000803617040@3fb9f8a9
 //   ),
-//   fs = cats.effect.kernel.Resource$$Lambda$13348/0x000000080360d840@6e9c23ca
+//   fs = cats.effect.kernel.Resource$$Lambda$13282/0x0000000803628040@4300fa98
 // )
 </span><span>
 </span><span class="identifier">resource</span><span>.</span><span class="identifier">use</span><span> { </span><span class="identifier">flipt</span><span> =&gt; 
@@ -205,7 +205,7 @@
 }
 </span><span class="comment">// res0: IO[Boolean] = FlatMap(
 //   ioe = Pure(value = ()),
-//   f = cats.effect.kernel.Resource$$Lambda$13350/0x000000080360c040@430ae8c3,
+//   f = cats.effect.kernel.Resource$$Lambda$13284/0x000000080362f040@21370756,
 //   event = cats.effect.tracing.TracingEvent$StackTrace
 // )</span></code></pre>
 
