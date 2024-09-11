@@ -70,6 +70,7 @@ lazy val `flipt-sdk-server` = crossProject(
 
 lazy val `flipt-sdk-server-it` = crossProject(JVMPlatform)
   .crossType(CrossType.Pure)
+  .enablePlugins(NoPublishPlugin)
   .in(file("flipt/sdk-server-it"))
   .settings(commonDependencies)
   .settings(
