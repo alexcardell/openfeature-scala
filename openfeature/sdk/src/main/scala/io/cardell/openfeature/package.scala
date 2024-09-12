@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package io.cardell.openfeature.provider
+package io.cardell
 
-import io.cardell.openfeature.BeforeHook
-import io.cardell.openfeature.Hook
+package object openfeature {
+  type HookHints = Map[String, ContextValue]
 
-trait Provider[F[_]] extends EvaluationProvider[F] {
-  def beforeHooks: List[BeforeHook[F]]
-
-  def withHook(hook: Hook[F]): Provider[F]
+  // type BeforeHook[F[_], A] =
+  //   (HookContext[A], HookHints) => F[Option[EvaluationContext]]
 
 }

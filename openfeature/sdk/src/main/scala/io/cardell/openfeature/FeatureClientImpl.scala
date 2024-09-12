@@ -19,11 +19,11 @@ package io.cardell.openfeature
 import cats.Monad
 import cats.syntax.all._
 
-import io.cardell.openfeature.provider.Provider
+import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 
 protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
-    provider: Provider[F],
+    provider: EvaluationProvider[F],
     clientEvaluationContext: EvaluationContext
 ) extends FeatureClient[F] {
 

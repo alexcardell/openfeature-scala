@@ -19,7 +19,7 @@ package io.cardell.openfeature
 import cats.Monad
 import cats.syntax.all._
 
-import io.cardell.openfeature.provider.Provider
+import io.cardell.openfeature.provider.EvaluationProvider
 
 trait OpenFeature[F[_]] {
 
@@ -30,7 +30,7 @@ trait OpenFeature[F[_]] {
 
 object OpenFeature {
 
-  def apply[F[_]: Monad](provider: Provider[F]): OpenFeature[F] =
+  def apply[F[_]: Monad](provider: EvaluationProvider[F]): OpenFeature[F] =
     new OpenFeature[F] {
 
       def client: F[FeatureClient[F]] =
