@@ -40,6 +40,13 @@ object FlagValue {
   case class IntValue(value: Int)                          extends FlagValue
   case class DoubleValue(value: Double)                    extends FlagValue
   case class StructureValue[A: StructureDecoder](value: A) extends FlagValue
+
+  def apply(b: Boolean): FlagValue = BooleanValue(b)
+  def apply(s: String): FlagValue  = StringValue(s)
+  def apply(i: Int): FlagValue     = IntValue(i)
+  def apply(d: Double): FlagValue  = DoubleValue(d)
+
+  def apply[A: StructureDecoder](s: A): FlagValue = StructureValue(s)
 }
 
 case class HookContext(
