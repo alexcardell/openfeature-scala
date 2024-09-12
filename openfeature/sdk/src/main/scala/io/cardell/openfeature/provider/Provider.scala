@@ -23,5 +23,6 @@ trait Provider[F[_]] extends EvaluationProvider[F] {
   def beforeHooks: List[BeforeHook[F]]
 
   def withHook(hook: Hook[F]): Provider[F]
+  // def withHooks(hooks: List[Hook[F]]): Provider[F]
 
 }
