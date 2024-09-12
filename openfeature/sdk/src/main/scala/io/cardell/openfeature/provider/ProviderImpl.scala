@@ -23,7 +23,7 @@ import io.cardell.openfeature.StructureDecoder
 
 protected class ProviderImpl[F[_]](
     evaluationProvider: EvaluationProvider[F],
-    val beforeHooks: List[BeforeHook[F]],
+    val beforeHooks: List[BeforeHook[F]]
 ) extends Provider[F] {
 
   override def metadata: ProviderMetadata = evaluationProvider.metadata
@@ -92,7 +92,7 @@ object ProviderImpl {
   def apply[F[_]](evaluationProvider: EvaluationProvider[F]): ProviderImpl[F] =
     new ProviderImpl[F](
       beforeHooks = List.empty[BeforeHook[F]],
-      evaluationProvider = evaluationProvider,
+      evaluationProvider = evaluationProvider
     )
 
 }

@@ -22,10 +22,12 @@ import cats.syntax.all._
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 
-protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
+protected[openfeature] final class FeatureClientImpl[F[_]](
     provider: EvaluationProvider[F],
-    clientEvaluationContext: EvaluationContext
-) extends FeatureClient[F] {
+    val clientEvaluationContext: EvaluationContext,
+    val beforeHooks: List[BeforeHook[F]]
+)(implicit M: Monad[F])
+    extends FeatureClient[F] {
 
   override def providerMetadata: ProviderMetadata = provider.metadata
 
@@ -34,11 +36,21 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
   override def withEvaluationContext(
       context: EvaluationContext
   ): FeatureClient[F] =
-    new FeatureClientImpl[F](provider, clientEvaluationContext ++ context)
+    new FeatureClientImpl[F](
+      provider,
+      clientEvaluationContext ++ context,
+      beforeHooks
+    )
 
-  // override def hooks: List[Hook] = ???
-  // override def withHook(hook: Hook): FeatureClient[F] = ???
-  // override def withHooks(hooks: List[Hook]): FeatureClient[F] = ???
+  override def withHook(hook: Hook[F]): FeatureClient[F] =
+    hook match {
+      case h: BeforeHook[F] =>
+        new FeatureClientImpl[F](
+          provider,
+          clientEvaluationContext,
+          beforeHooks.appended(h)
+        )
+    }
 
   override def getBooleanValue(flagKey: String, default: Boolean): F[Boolean] =
     getBooleanValue(flagKey, default, EvaluationContext.empty)
@@ -305,5 +317,18 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
       clientEvaluationContext ++ context
     )
     .map(EvaluationDetails(flagKey, _))
+
+}
+
+object FeatureClientImpl {
+
+  def apply[F[_]: Monad](
+      provider: EvaluationProvider[F]
+  ): FeatureClientImpl[F] =
+    new FeatureClientImpl[F](
+      provider = provider,
+      clientEvaluationContext = EvaluationContext.empty,
+      beforeHooks = List.empty[BeforeHook[F]]
+    )
 
 }

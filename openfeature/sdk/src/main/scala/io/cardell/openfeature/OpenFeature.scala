@@ -33,10 +33,9 @@ object OpenFeature {
   def apply[F[_]: Monad](provider: EvaluationProvider[F]): OpenFeature[F] =
     new OpenFeature[F] {
 
-      def client: F[FeatureClient[F]] =
-        new FeatureClientImpl[F](provider, EvaluationContext.empty)
-          .pure[F]
-          .widen[FeatureClient[F]]
+      def client: F[FeatureClient[F]] = FeatureClientImpl[F](provider)
+        .pure[F]
+        .widen[FeatureClient[F]]
 
     }
 
