@@ -23,15 +23,15 @@ import io.cardell.openfeature.StructureDecoder
 
 protected class ProviderImpl[F[_]](
     val beforeHooks: List[BeforeHook[F]],
-    provider: EvaluationProvider[F]
+    evaluationProvider: EvaluationProvider[F]
 ) extends Provider[F] {
 
-  override def metadata: ProviderMetadata = provider.metadata
+  override def metadata: ProviderMetadata = evaluationProvider.metadata
 
   override def withHook(hook: Hook[F]): Provider[F] =
     hook match {
       case bh: BeforeHook[F] =>
-        new ProviderImpl[F](beforeHooks.appended(bh), provider)
+        new ProviderImpl[F](beforeHooks.appended(bh), evaluationProvider)
 
     }
 
@@ -39,7 +39,7 @@ protected class ProviderImpl[F[_]](
       flagKey: String,
       defaultValue: Boolean,
       context: EvaluationContext
-  ): F[ResolutionDetails[Boolean]] = provider.resolveBooleanValue(
+  ): F[ResolutionDetails[Boolean]] = evaluationProvider.resolveBooleanValue(
     flagKey = flagKey,
     defaultValue = defaultValue,
     context = context
@@ -49,7 +49,7 @@ protected class ProviderImpl[F[_]](
       flagKey: String,
       defaultValue: String,
       context: EvaluationContext
-  ): F[ResolutionDetails[String]] = provider.resolveStringValue(
+  ): F[ResolutionDetails[String]] = evaluationProvider.resolveStringValue(
     flagKey = flagKey,
     defaultValue = defaultValue,
     context = context
@@ -59,7 +59,7 @@ protected class ProviderImpl[F[_]](
       flagKey: String,
       defaultValue: Int,
       context: EvaluationContext
-  ): F[ResolutionDetails[Int]] = provider.resolveIntValue(
+  ): F[ResolutionDetails[Int]] = evaluationProvider.resolveIntValue(
     flagKey = flagKey,
     defaultValue = defaultValue,
     context = context
@@ -69,7 +69,7 @@ protected class ProviderImpl[F[_]](
       flagKey: String,
       defaultValue: Double,
       context: EvaluationContext
-  ): F[ResolutionDetails[Double]] = provider.resolveDoubleValue(
+  ): F[ResolutionDetails[Double]] = evaluationProvider.resolveDoubleValue(
     flagKey = flagKey,
     defaultValue = defaultValue,
     context = context
@@ -79,10 +79,20 @@ protected class ProviderImpl[F[_]](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
-  ): F[ResolutionDetails[A]] = provider.resolveStructureValue(
+  ): F[ResolutionDetails[A]] = evaluationProvider.resolveStructureValue(
     flagKey = flagKey,
     defaultValue = defaultValue,
     context = context
   )
+
+}
+
+object ProviderImpl {
+
+  def apply[F[_]](evaluationProvider: EvaluationProvider[F]): ProviderImpl[F] =
+    new ProviderImpl[F](
+      beforeHooks = List.empty[BeforeHook[F]],
+      evaluationProvider = evaluationProvider
+    )
 
 }
