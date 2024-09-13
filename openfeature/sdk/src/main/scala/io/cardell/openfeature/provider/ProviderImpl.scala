@@ -23,13 +23,13 @@ import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.EvaluationContext
+import io.cardell.openfeature.FinallyHook
 import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.Hook
 import io.cardell.openfeature.HookContext
 import io.cardell.openfeature.HookHints
 import io.cardell.openfeature.Hooks
 import io.cardell.openfeature.StructureDecoder
-import io.cardell.openfeature.FinallyHook
 
 protected class ProviderImpl[F[_]: MonadThrow](
     evaluationProvider: EvaluationProvider[F],

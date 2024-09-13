@@ -24,9 +24,9 @@ import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.EvaluationContext
+import io.cardell.openfeature.FinallyHook
 import io.cardell.openfeature.HookContext
 import io.cardell.openfeature.HookHints
-import io.cardell.openfeature.FinallyHook
 
 class ProviderImplTest extends CatsEffectSuite {
   val evaluationProvider = new StubEvaluationProvider[IO]

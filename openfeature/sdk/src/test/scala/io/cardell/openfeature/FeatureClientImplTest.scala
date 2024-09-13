@@ -153,6 +153,102 @@ class FeatureClientImplTest extends CatsEffectSuite {
     } yield assertEquals(result, expected)
   }
 
+  test("finally hooks run on successful evaluation") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val finallyHook = FinallyHook[IO] { case _ => ref.update(_ + 2) }
+
+    val client = FeatureClientImpl[IO](provider)
+      .withHook(finallyHook)
+
+    val expected = 2
+
+    for {
+      _      <- client.getBooleanValue("test-flag", false).attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
+  }
+
+  test("finally hooks run when before hook throws") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val beforeHook = BeforeHook[IO] { case _ =>
+      IO.raiseError(new Throwable("before hook error"))
+    }
+    val finallyHook = FinallyHook[IO] { case _ => ref.update(_ + 2) }
+
+    val client = FeatureClientImpl[IO](provider)
+      .withHook(beforeHook)
+      .withHook(finallyHook)
+
+    val expected = 2
+
+    for {
+      _      <- client.getBooleanValue("test-flag", false).attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
+  }
+
+  test("finally hooks run when evaluation throws") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val finallyHook = FinallyHook[IO] { case _ => ref.update(_ + 2) }
+
+    val client = FeatureClientImpl[IO](ThrowingEvaluationProvider)
+      .withHook(finallyHook)
+
+    val expected = 2
+
+    for {
+      _      <- client.getBooleanValue("test-flag", false).attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
+  }
+
+  test("finally hooks run when after hook throws") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val afterHook = AfterHook[IO] { case _ =>
+      IO.raiseError(new Throwable("after hook error"))
+    }
+    val finallyHook = FinallyHook[IO] { case _ => ref.update(_ + 2) }
+
+    val client = FeatureClientImpl[IO](provider)
+      .withHook(afterHook)
+      .withHook(finallyHook)
+
+    val expected = 2
+
+    for {
+      _      <- client.getBooleanValue("test-flag", false).attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
+  }
+
+  test("finally hooks run when error hook throws") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val afterHook = AfterHook[IO] { case _ =>
+      IO.raiseError(new Throwable("after hook error"))
+    }
+    val errorHook = ErrorHook[IO] { case _ =>
+      IO.raiseError(new Throwable("error hook error"))
+    }
+    val finallyHook = FinallyHook[IO] { case _ => ref.update(_ + 2) }
+
+    val client = FeatureClientImpl[IO](provider)
+      .withHook(afterHook)
+      .withHook(errorHook)
+      .withHook(finallyHook)
+
+    val expected = 2
+
+    for {
+      _      <- client.getBooleanValue("test-flag", false).attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
+  }
+
 }
 
 object ThrowingEvaluationProvider extends EvaluationProvider[IO] {

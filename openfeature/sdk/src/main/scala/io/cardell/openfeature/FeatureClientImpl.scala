@@ -28,7 +28,8 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
     val clientEvaluationContext: EvaluationContext,
     val beforeHooks: List[BeforeHook[F]],
     val errorHooks: List[ErrorHook[F]],
-    val afterHooks: List[AfterHook[F]]
+    val afterHooks: List[AfterHook[F]],
+    val finallyHooks: List[FinallyHook[F]]
 )(implicit M: MonadThrow[F])
     extends FeatureClient[F] {
 
@@ -44,7 +45,8 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
       clientEvaluationContext ++ context,
       beforeHooks,
       errorHooks,
-      afterHooks
+      afterHooks,
+      finallyHooks
     )
 
   override def withHook(hook: Hook[F]): FeatureClient[F] =
@@ -55,7 +57,8 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
           clientEvaluationContext,
           beforeHooks.appended(h),
           errorHooks,
-          afterHooks
+          afterHooks,
+          finallyHooks
         )
       case h: ErrorHook[F] =>
         new FeatureClientImpl[F](
@@ -63,7 +66,8 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
           clientEvaluationContext,
           beforeHooks,
           errorHooks.appended(h),
-          afterHooks
+          afterHooks,
+          finallyHooks
         )
       case h: AfterHook[F] =>
         new FeatureClientImpl[F](
@@ -71,7 +75,17 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
           clientEvaluationContext,
           beforeHooks,
           errorHooks,
-          afterHooks.appended(h)
+          afterHooks.appended(h),
+          finallyHooks
+        )
+      case h: FinallyHook[F] =>
+        new FeatureClientImpl[F](
+          provider,
+          clientEvaluationContext,
+          beforeHooks,
+          errorHooks,
+          afterHooks,
+          finallyHooks.appended(h)
         )
     }
 
@@ -379,13 +393,23 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
           )
       } yield evaluation
 
-    run
-      .onError { case error =>
-        Hooks.runErrors(errorHooks)(hookContext, hookHints, error)
+    val runFinally = Hooks.runFinally(finallyHooks)(hookContext, hookHints)
+    def runError(e: Throwable) =
+      Hooks.runErrors(errorHooks)(hookContext, hookHints, e)
+
+    def errorEvaluation(e: Throwable) = EvaluationDetails(
+      flagKey,
+      ResolutionDetails.error(default, e)
+    )
+
+    run.attempt
+      .flatMap {
+        case Right(value) => runFinally.as(value)
+        case Left(error) =>
+          runError(error).attempt.flatMap { case _ =>
+            runFinally.as(errorEvaluation(error))
+          }
       }
-      .handleError(error =>
-        EvaluationDetails(flagKey, ResolutionDetails.error(default, error))
-      )
 
   }
 
@@ -401,7 +425,8 @@ object FeatureClientImpl {
       clientEvaluationContext = EvaluationContext.empty,
       beforeHooks = List.empty[BeforeHook[F]],
       errorHooks = List.empty[ErrorHook[F]],
-      afterHooks = List.empty[AfterHook[F]]
+      afterHooks = List.empty[AfterHook[F]],
+      finallyHooks = List.empty[FinallyHook[F]]
     )
 
 }
