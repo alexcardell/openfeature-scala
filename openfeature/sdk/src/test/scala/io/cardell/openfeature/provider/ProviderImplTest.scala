@@ -20,6 +20,7 @@ import cats.effect.IO
 import cats.effect.kernel.Ref
 import munit.CatsEffectSuite
 
+import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.EvaluationContext
@@ -47,7 +48,8 @@ class ProviderImplTest extends CatsEffectSuite {
 
     val provider = ProviderImpl(evaluationProvider)
 
-    val result = provider.withHook(beforeHook1).beforeHooks
+    val result =
+      provider.withHook(beforeHook1).asInstanceOf[ProviderImpl[IO]].beforeHooks
 
     assertEquals(result, expected)
   }
@@ -62,7 +64,8 @@ class ProviderImplTest extends CatsEffectSuite {
 
     val provider = ProviderImpl(evaluationProvider).withHook(beforeHook1)
 
-    val result = provider.withHook(beforeHook2).beforeHooks
+    val result =
+      provider.withHook(beforeHook2).asInstanceOf[ProviderImpl[IO]].beforeHooks
 
     assertEquals(result, expected)
   }
@@ -133,6 +136,29 @@ class ProviderImplTest extends CatsEffectSuite {
           )
           .attempt
     } yield assert(result.isLeft, "result was not a Left")
+  }
+
+  test("after hooks run after successful evaluation") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val afterHook = AfterHook[IO] { case _ => ref.update(_ + 2) }
+
+    val provider = ProviderImpl(evaluationProvider)
+      .withHook(afterHook)
+
+    val expected = 2
+
+    for {
+      _ <-
+        provider
+          .resolveBooleanValue(
+            "test-flag",
+            false,
+            EvaluationContext.empty
+          )
+          .attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
   }
 
 }

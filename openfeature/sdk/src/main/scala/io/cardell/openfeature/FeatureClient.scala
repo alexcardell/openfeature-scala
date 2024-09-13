@@ -25,8 +25,6 @@ trait FeatureClient[F[_]] {
   def evaluationContext: EvaluationContext
   def withEvaluationContext(context: EvaluationContext): FeatureClient[F]
 
-  def beforeHooks: List[BeforeHook[F]]
-
   def withHook(hook: Hook[F]): FeatureClient[F]
   // def withHooks(hooks: List[Hook]): FeatureClient[F]
 

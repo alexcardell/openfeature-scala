@@ -48,7 +48,11 @@ class FeatureClientImplTest extends CatsEffectSuite {
 
     val client = FeatureClientImpl[IO](provider)
 
-    val result = client.withHook(beforeHook1).beforeHooks
+    val result =
+      client
+        .withHook(beforeHook1)
+        .asInstanceOf[FeatureClientImpl[IO]]
+        .beforeHooks
 
     assertEquals(expected, result)
   }
@@ -112,6 +116,21 @@ class FeatureClientImplTest extends CatsEffectSuite {
       assertEquals(refCount, expectedCount)
       assertEquals(result, expectedFlag)
     }
+  }
+
+  test("before hooks run on boolean evaluation") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val afterHook = AfterHook[IO] { case _ => ref.update(_ + 2) }
+
+    val client = FeatureClientImpl[IO](provider).withHook(afterHook)
+
+    val expected = 2
+
+    for {
+      _      <- client.getBooleanValue("test-flag", false)
+      result <- ref.get
+    } yield assertEquals(result, expected)
   }
 
 }

@@ -16,6 +16,7 @@
 
 package io.cardell.openfeature
 
+import cats.Applicative
 import cats.Monad
 import cats.syntax.all._
 
@@ -98,12 +99,14 @@ object Hooks {
     aux(hooks, context).map(_.getOrElse(context.evaluationContext))
   }
 
-  def runErrors[F[_]: Monad](
+  def runErrors[F[_]: Applicative](
       hooks: List[ErrorHook[F]]
-  )(
-      context: HookContext,
-      hints: HookHints,
-      error: Throwable
-  ): F[Unit] = hooks.traverse(_.apply(context, hints, error)).void
+  )(context: HookContext, hints: HookHints, error: Throwable): F[Unit] =
+    hooks.traverse(_.apply(context, hints, error)).void
+
+  def runAfter[F[_]: Applicative](
+      hooks: List[AfterHook[F]]
+  )(context: HookContext, hints: HookHints): F[Unit] =
+    hooks.traverse(_.apply(context, hints)).void
 
 }

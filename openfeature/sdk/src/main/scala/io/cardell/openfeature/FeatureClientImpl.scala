@@ -27,7 +27,8 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
     provider: EvaluationProvider[F],
     val clientEvaluationContext: EvaluationContext,
     val beforeHooks: List[BeforeHook[F]],
-    val errorHooks: List[ErrorHook[F]]
+    val errorHooks: List[ErrorHook[F]],
+    val afterHooks: List[AfterHook[F]]
 )(implicit M: MonadThrow[F])
     extends FeatureClient[F] {
 
@@ -42,7 +43,8 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
       provider,
       clientEvaluationContext ++ context,
       beforeHooks,
-      errorHooks
+      errorHooks,
+      afterHooks
     )
 
   override def withHook(hook: Hook[F]): FeatureClient[F] =
@@ -52,14 +54,24 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
           provider,
           clientEvaluationContext,
           beforeHooks.appended(h),
-          errorHooks
+          errorHooks,
+          afterHooks
         )
       case h: ErrorHook[F] =>
         new FeatureClientImpl[F](
           provider,
           clientEvaluationContext,
           beforeHooks,
-          errorHooks.appended(h)
+          errorHooks.appended(h),
+          afterHooks
+        )
+      case h: AfterHook[F] =>
+        new FeatureClientImpl[F](
+          provider,
+          clientEvaluationContext,
+          beforeHooks,
+          errorHooks,
+          afterHooks.appended(h)
         )
     }
 
@@ -360,11 +372,16 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
       for {
         newContext <- Hooks.runBefore[F](beforeHooks)(hookContext, hookHints)
         evaluation <- evaluate(newContext)
+        _ <-
+          Hooks.runAfter[F](afterHooks)(
+            hookContext.copy(evaluationContext = newContext),
+            hookHints
+          )
       } yield evaluation
 
     run
-      .onError { case e =>
-        Hooks.runErrors(errorHooks)(hookContext, hookHints, e)
+      .onError { case error =>
+        Hooks.runErrors(errorHooks)(hookContext, hookHints, error)
       }
       .handleError(error =>
         EvaluationDetails(flagKey, ResolutionDetails.error(default, error))
@@ -383,7 +400,8 @@ object FeatureClientImpl {
       provider = provider,
       clientEvaluationContext = EvaluationContext.empty,
       beforeHooks = List.empty[BeforeHook[F]],
-      errorHooks = List.empty[ErrorHook[F]]
+      errorHooks = List.empty[ErrorHook[F]],
+      afterHooks = List.empty[AfterHook[F]]
     )
 
 }
