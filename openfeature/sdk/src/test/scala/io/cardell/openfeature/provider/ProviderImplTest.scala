@@ -162,6 +162,33 @@ class ProviderImplTest extends CatsEffectSuite {
     } yield assertEquals(result, expected)
   }
 
+  test("after hooks run after successful evaluation") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val afterHook = AfterHook[IO] { case _ =>
+      IO.raiseError(new Throwable("after hook error"))
+    }
+    val errorHook = ErrorHook[IO] { case _ => ref.update(_ + 2) }
+
+    val provider = ProviderImpl(evaluationProvider)
+      .withHook(afterHook)
+      .withHook(errorHook)
+
+    val expected = 2
+
+    for {
+      _ <-
+        provider
+          .resolveBooleanValue(
+            "test-flag",
+            false,
+            EvaluationContext.empty
+          )
+          .attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
+  }
+
   test("after hooks are skipped after before hook throws") {
     val ref = Ref.unsafe[IO, Int](0)
 
