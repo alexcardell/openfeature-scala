@@ -69,40 +69,13 @@ case class HookContext(
 
 }
 
-sealed trait Hook[F[_]]
-
-trait BeforeHook[F[_]] extends Hook[F] {
-
-  def apply(
-      context: HookContext,
-      hints: HookHints
-  ): F[Option[EvaluationContext]]
-
-}
-
-object BeforeHook {
-
-  def apply[F[_]](
-      f: (HookContext, HookHints) => F[Option[EvaluationContext]]
-  ): BeforeHook[F] =
-    new BeforeHook[F] {
-
-      def apply(
-          context: HookContext,
-          hints: HookHints
-      ): F[Option[EvaluationContext]] = f(context, hints)
-
-    }
-
-}
-
 object HookHints {
   def empty: HookHints = Map.empty
 }
 
 object Hooks {
 
-  def run[F[_]: Monad](
+  def runBefore[F[_]: Monad](
       hooks: List[BeforeHook[F]]
   )(context: HookContext, hints: HookHints): F[EvaluationContext] = {
     def aux(
@@ -124,5 +97,13 @@ object Hooks {
 
     aux(hooks, context).map(_.getOrElse(context.evaluationContext))
   }
+
+  def runErrors[F[_]: Monad](
+      hooks: List[ErrorHook[F]]
+  )(
+      context: HookContext,
+      hints: HookHints,
+      error: Throwable
+  ): F[Unit] = hooks.traverse(_.apply(context, hints, error)).void
 
 }

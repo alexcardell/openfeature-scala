@@ -37,3 +37,17 @@ case class ResolutionDetails[A](
     variant: Option[String],
     metadata: Option[FlagMetadata]
 )
+
+object ResolutionDetails {
+
+  def error[A](defaultValue: A, error: Throwable): ResolutionDetails[A] =
+    ResolutionDetails[A](
+      value = defaultValue,
+      errorCode = Some(ErrorCode.General),
+      errorMessage = Some(error.getMessage()),
+      reason = Some(EvaluationReason.Error),
+      variant = None,
+      metadata = None
+    )
+
+}

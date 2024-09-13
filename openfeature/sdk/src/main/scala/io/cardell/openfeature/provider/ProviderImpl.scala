@@ -16,10 +16,11 @@
 
 package io.cardell.openfeature.provider
 
-import cats.Monad
+import cats.MonadThrow
 import cats.syntax.all._
 
 import io.cardell.openfeature.BeforeHook
+import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.Hook
@@ -28,9 +29,10 @@ import io.cardell.openfeature.HookHints
 import io.cardell.openfeature.Hooks
 import io.cardell.openfeature.StructureDecoder
 
-protected class ProviderImpl[F[_]: Monad](
+protected class ProviderImpl[F[_]: MonadThrow](
     evaluationProvider: EvaluationProvider[F],
-    val beforeHooks: List[BeforeHook[F]]
+    val beforeHooks: List[BeforeHook[F]],
+    val errorHooks: List[ErrorHook[F]]
 ) extends Provider[F] {
 
   override def metadata: ProviderMetadata = evaluationProvider.metadata
@@ -38,7 +40,17 @@ protected class ProviderImpl[F[_]: Monad](
   override def withHook(hook: Hook[F]): Provider[F] =
     hook match {
       case bh: BeforeHook[F] =>
-        new ProviderImpl[F](evaluationProvider, beforeHooks.appended(bh))
+        new ProviderImpl[F](
+          evaluationProvider = evaluationProvider,
+          beforeHooks = beforeHooks.appended(bh),
+          errorHooks = errorHooks
+        )
+      case eh: ErrorHook[F] =>
+        new ProviderImpl[F](
+          evaluationProvider = evaluationProvider,
+          beforeHooks = beforeHooks,
+          errorHooks = errorHooks.appended(eh)
+        )
 
     }
 
@@ -47,101 +59,102 @@ protected class ProviderImpl[F[_]: Monad](
       defaultValue: Boolean,
       context: EvaluationContext
   ): F[ResolutionDetails[Boolean]] =
-    for {
-      newContext <-
-        Hooks.run[F](beforeHooks)(
-          HookContext(flagKey, context, FlagValue(defaultValue)),
-          HookHints.empty
-        )
-      res <- evaluationProvider.resolveBooleanValue(
+    hookedResolve[Boolean](flagKey, defaultValue, context) { newContext =>
+      evaluationProvider.resolveBooleanValue(
         flagKey = flagKey,
         defaultValue = defaultValue,
         context = newContext
       )
-    } yield res
+    }
 
   override def resolveStringValue(
       flagKey: String,
       defaultValue: String,
       context: EvaluationContext
   ): F[ResolutionDetails[String]] =
-    for {
-      newContext <-
-        Hooks.run[F](beforeHooks)(
-          HookContext(flagKey, context, FlagValue(defaultValue)),
-          HookHints.empty
-        )
-      res <- evaluationProvider.resolveStringValue(
+    hookedResolve[String](flagKey, defaultValue, context) { newContext =>
+      evaluationProvider.resolveStringValue(
         flagKey = flagKey,
         defaultValue = defaultValue,
         context = newContext
       )
-    } yield res
+    }
 
   override def resolveIntValue(
       flagKey: String,
       defaultValue: Int,
       context: EvaluationContext
   ): F[ResolutionDetails[Int]] =
-    for {
-      newContext <-
-        Hooks.run[F](beforeHooks)(
-          HookContext(flagKey, context, FlagValue(defaultValue)),
-          HookHints.empty
-        )
-      res <- evaluationProvider.resolveIntValue(
+    hookedResolve[Int](flagKey, defaultValue, context) { newContext =>
+      evaluationProvider.resolveIntValue(
         flagKey = flagKey,
         defaultValue = defaultValue,
         context = newContext
       )
-    } yield res
+    }
 
   override def resolveDoubleValue(
       flagKey: String,
       defaultValue: Double,
       context: EvaluationContext
   ): F[ResolutionDetails[Double]] =
-    for {
-      newContext <-
-        Hooks.run[F](beforeHooks)(
-          HookContext(flagKey, context, FlagValue(defaultValue)),
-          HookHints.empty
-        )
-      res <- evaluationProvider.resolveDoubleValue(
+    hookedResolve[Double](flagKey, defaultValue, context) { newContext =>
+      evaluationProvider.resolveDoubleValue(
         flagKey = flagKey,
         defaultValue = defaultValue,
         context = newContext
       )
-    } yield res
+    }
 
   override def resolveStructureValue[A: StructureDecoder](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
   ): F[ResolutionDetails[A]] =
-    for {
-      newContext <-
-        Hooks.run[F](beforeHooks)(
-          HookContext(flagKey, context, FlagValue(defaultValue)),
-          HookHints.empty
-        )
-      res <- evaluationProvider.resolveStructureValue(
+    hookedResolve[A](flagKey, defaultValue, context) { newContext =>
+      evaluationProvider.resolveStructureValue(
         flagKey = flagKey,
         defaultValue = defaultValue,
         context = newContext
       )
-    } yield res
+    }
+
+  private def hookedResolve[A](
+      flagKey: String,
+      default: A,
+      evaluationContext: EvaluationContext
+  )(
+      resolve: (EvaluationContext) => F[ResolutionDetails[A]]
+  ): F[ResolutionDetails[A]] = {
+    val hc = HookContext(
+      flagKey = flagKey,
+      defaultValue = FlagValue(default),
+      evaluationContext = evaluationContext
+    )
+    val hints = HookHints.empty
+
+    val run =
+      for {
+        context <- Hooks.runBefore(beforeHooks)(hc, hints)
+        res     <- resolve(context)
+      } yield res
+
+    run.onError(error =>
+      Hooks.runErrors(errorHooks)(hc, HookHints.empty, error)
+    )
+  }
 
 }
 
 object ProviderImpl {
 
-  def apply[F[_]: Monad](
+  def apply[F[_]: MonadThrow](
       evaluationProvider: EvaluationProvider[F]
   ): ProviderImpl[F] =
     new ProviderImpl[F](
+      evaluationProvider = evaluationProvider,
       beforeHooks = List.empty[BeforeHook[F]],
-      evaluationProvider = evaluationProvider
+      errorHooks = List.empty[ErrorHook[F]]
     )
 
 }

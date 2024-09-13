@@ -43,7 +43,7 @@ class HookTest extends CatsEffectSuite {
     val ctx = hookContext(initContext)
 
     for {
-      result <- Hooks.run(hooks)(ctx, HookHints.empty)
+      result <- Hooks.runBefore(hooks)(ctx, HookHints.empty)
     } yield assertEquals(result, expected)
 
   }
@@ -62,7 +62,7 @@ class HookTest extends CatsEffectSuite {
     val ctx = hookContext(initContext)
 
     for {
-      result <- Hooks.run(hooks)(ctx, HookHints.empty)
+      result <- Hooks.runBefore(hooks)(ctx, HookHints.empty)
     } yield assertEquals(result, expected)
 
   }
@@ -84,7 +84,7 @@ class HookTest extends CatsEffectSuite {
     val ctx = hookContext(initContext)
 
     for {
-      result <- Hooks.run(hooks)(ctx, HookHints.empty)
+      result <- Hooks.runBefore(hooks)(ctx, HookHints.empty)
     } yield assertEquals(result, expected)
 
   }
