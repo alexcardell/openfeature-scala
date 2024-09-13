@@ -21,6 +21,7 @@ import cats.syntax.all._
 
 import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
+import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.Hook
@@ -32,24 +33,34 @@ import io.cardell.openfeature.StructureDecoder
 protected class ProviderImpl[F[_]: MonadThrow](
     evaluationProvider: EvaluationProvider[F],
     val beforeHooks: List[BeforeHook[F]],
-    val errorHooks: List[ErrorHook[F]]
+    val errorHooks: List[ErrorHook[F]],
+    val afterHooks: List[AfterHook[F]]
 ) extends Provider[F] {
 
   override def metadata: ProviderMetadata = evaluationProvider.metadata
 
   override def withHook(hook: Hook[F]): Provider[F] =
     hook match {
-      case bh: BeforeHook[F] =>
+      case h: BeforeHook[F] =>
         new ProviderImpl[F](
           evaluationProvider = evaluationProvider,
-          beforeHooks = beforeHooks.appended(bh),
-          errorHooks = errorHooks
+          beforeHooks = beforeHooks.appended(h),
+          errorHooks = errorHooks,
+          afterHooks = afterHooks
         )
-      case eh: ErrorHook[F] =>
+      case h: ErrorHook[F] =>
         new ProviderImpl[F](
           evaluationProvider = evaluationProvider,
           beforeHooks = beforeHooks,
-          errorHooks = errorHooks.appended(eh)
+          errorHooks = errorHooks.appended(h),
+          afterHooks = afterHooks
+        )
+      case h: AfterHook[F] =>
+        new ProviderImpl[F](
+          evaluationProvider = evaluationProvider,
+          beforeHooks = beforeHooks,
+          errorHooks = errorHooks,
+          afterHooks = afterHooks.appended(h)
         )
 
     }
@@ -137,6 +148,11 @@ protected class ProviderImpl[F[_]: MonadThrow](
       for {
         context <- Hooks.runBefore(beforeHooks)(hc, hints)
         res     <- resolve(context)
+        _ <-
+          Hooks.runAfter(afterHooks)(
+            hc.copy(evaluationContext = context),
+            hints
+          )
       } yield res
 
     run.onError(error =>
@@ -154,7 +170,8 @@ object ProviderImpl {
     new ProviderImpl[F](
       evaluationProvider = evaluationProvider,
       beforeHooks = List.empty[BeforeHook[F]],
-      errorHooks = List.empty[ErrorHook[F]]
+      errorHooks = List.empty[ErrorHook[F]],
+      afterHooks = List.empty[AfterHook[F]]
     )
 
 }

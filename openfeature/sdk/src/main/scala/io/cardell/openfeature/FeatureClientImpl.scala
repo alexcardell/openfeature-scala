@@ -61,6 +61,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
           beforeHooks,
           errorHooks.appended(h)
         )
+      case _ => ???
     }
 
   override def getBooleanValue(flagKey: String, default: Boolean): F[Boolean] =

@@ -22,6 +22,7 @@ import munit.CatsEffectSuite
 
 import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
+import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.HookContext
 import io.cardell.openfeature.HookHints
@@ -133,6 +134,29 @@ class ProviderImplTest extends CatsEffectSuite {
           )
           .attempt
     } yield assert(result.isLeft, "result was not a Left")
+  }
+
+  test("after hooks run after successful evaluation") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val afterHook = AfterHook[IO] { case _ => ref.update(_ + 2) }
+
+    val provider = ProviderImpl(evaluationProvider)
+      .withHook(afterHook)
+
+    val expected = 2
+
+    for {
+      _ <-
+        provider
+          .resolveBooleanValue(
+            "test-flag",
+            false,
+            EvaluationContext.empty
+          )
+          .attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
   }
 
 }
