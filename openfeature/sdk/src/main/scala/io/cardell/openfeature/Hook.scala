@@ -65,3 +65,25 @@ object ErrorHook {
     }
 
 }
+
+trait AfterHook[F[_]] extends Hook[F] {
+
+  def apply(context: HookContext, hints: HookHints): F[Unit]
+
+}
+
+object AfterHook {
+
+  def apply[F[_]](
+      f: (HookContext, HookHints) => F[Unit]
+  ): AfterHook[F] =
+    new AfterHook[F] {
+
+      def apply(
+          context: HookContext,
+          hints: HookHints
+      ): F[Unit] = f(context, hints)
+
+    }
+
+}
