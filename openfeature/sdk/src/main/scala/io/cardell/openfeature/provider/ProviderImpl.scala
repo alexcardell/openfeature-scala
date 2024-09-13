@@ -20,10 +20,8 @@ import cats.MonadThrow
 import cats.syntax.all._
 
 import io.cardell.openfeature.BeforeHook
-import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.EvaluationContext
-import io.cardell.openfeature.EvaluationReason
 import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.Hook
 import io.cardell.openfeature.HookContext
@@ -141,17 +139,9 @@ protected class ProviderImpl[F[_]: MonadThrow](
         res     <- resolve(context)
       } yield res
 
-    def defaultResolution(error: Throwable): ResolutionDetails[A] =
-      ResolutionDetails[A](
-        value = default,
-        errorCode = Some(ErrorCode.General),
-        errorMessage = Some(error.getMessage()),
-        reason = Some(EvaluationReason.Error),
-        variant = None,
-        metadata = None
-      )
-
-    run.handleError(error => defaultResolution(error))
+    run.onError(error =>
+      Hooks.runErrors(errorHooks)(hc, HookHints.empty, error)
+    )
   }
 
 }

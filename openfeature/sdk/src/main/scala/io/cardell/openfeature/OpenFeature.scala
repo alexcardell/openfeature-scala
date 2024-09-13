@@ -16,7 +16,7 @@
 
 package io.cardell.openfeature
 
-import cats.Monad
+import cats.MonadThrow
 import cats.syntax.all._
 
 import io.cardell.openfeature.provider.EvaluationProvider
@@ -30,7 +30,7 @@ trait OpenFeature[F[_]] {
 
 object OpenFeature {
 
-  def apply[F[_]: Monad](provider: EvaluationProvider[F]): OpenFeature[F] =
+  def apply[F[_]: MonadThrow](provider: EvaluationProvider[F]): OpenFeature[F] =
     new OpenFeature[F] {
 
       def client: F[FeatureClient[F]] = FeatureClientImpl[F](provider)
