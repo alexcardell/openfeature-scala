@@ -17,10 +17,12 @@
 package io.cardell.openfeature.provider
 
 import io.cardell.openfeature.BeforeHook
+import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.Hook
 
 trait Provider[F[_]] extends EvaluationProvider[F] {
   def beforeHooks: List[BeforeHook[F]]
+  def errorHooks: List[ErrorHook[F]]
 
   def withHook(hook: Hook[F]): Provider[F]
   // def withHooks(hooks: List[Hook[F]]): Provider[F]
