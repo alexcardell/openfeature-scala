@@ -109,4 +109,9 @@ object Hooks {
   )(context: HookContext, hints: HookHints): F[Unit] =
     hooks.traverse(_.apply(context, hints)).void
 
+  def runFinally[F[_]: Applicative](
+      hooks: List[FinallyHook[F]]
+  )(context: HookContext, hints: HookHints): F[Unit] =
+    hooks.traverse(_.apply(context, hints)).void
+
 }

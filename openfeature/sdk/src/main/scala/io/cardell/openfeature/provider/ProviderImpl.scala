@@ -23,6 +23,7 @@ import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.EvaluationContext
+import io.cardell.openfeature.FinallyHook
 import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.Hook
 import io.cardell.openfeature.HookContext
@@ -34,7 +35,8 @@ protected class ProviderImpl[F[_]: MonadThrow](
     evaluationProvider: EvaluationProvider[F],
     val beforeHooks: List[BeforeHook[F]],
     val errorHooks: List[ErrorHook[F]],
-    val afterHooks: List[AfterHook[F]]
+    val afterHooks: List[AfterHook[F]],
+    val finallyHooks: List[FinallyHook[F]]
 ) extends Provider[F] {
 
   override def metadata: ProviderMetadata = evaluationProvider.metadata
@@ -46,21 +48,32 @@ protected class ProviderImpl[F[_]: MonadThrow](
           evaluationProvider = evaluationProvider,
           beforeHooks = beforeHooks.appended(h),
           errorHooks = errorHooks,
-          afterHooks = afterHooks
+          afterHooks = afterHooks,
+          finallyHooks = finallyHooks
         )
       case h: ErrorHook[F] =>
         new ProviderImpl[F](
           evaluationProvider = evaluationProvider,
           beforeHooks = beforeHooks,
           errorHooks = errorHooks.appended(h),
-          afterHooks = afterHooks
+          afterHooks = afterHooks,
+          finallyHooks = finallyHooks
         )
       case h: AfterHook[F] =>
         new ProviderImpl[F](
           evaluationProvider = evaluationProvider,
           beforeHooks = beforeHooks,
           errorHooks = errorHooks,
-          afterHooks = afterHooks.appended(h)
+          afterHooks = afterHooks.appended(h),
+          finallyHooks = finallyHooks
+        )
+      case h: FinallyHook[F] =>
+        new ProviderImpl[F](
+          evaluationProvider = evaluationProvider,
+          beforeHooks = beforeHooks,
+          errorHooks = errorHooks,
+          afterHooks = afterHooks,
+          finallyHooks = finallyHooks.appended(h)
         )
 
     }
@@ -147,17 +160,27 @@ protected class ProviderImpl[F[_]: MonadThrow](
     val run =
       for {
         context <- Hooks.runBefore(beforeHooks)(hc, hints)
-        res     <- resolve(context)
+        hc2 = hc.copy(evaluationContext = context)
+        res <- resolve(context)
         _ <-
           Hooks.runAfter(afterHooks)(
-            hc.copy(evaluationContext = context),
+            hc2,
             hints
           )
       } yield res
 
-    run.onError(error =>
-      Hooks.runErrors(errorHooks)(hc, HookHints.empty, error)
-    )
+    val runFinally              = Hooks.runFinally(finallyHooks)(hc, hints)
+    def runErrors(e: Throwable) = Hooks.runErrors(errorHooks)(hc, hints, e)
+
+    run.attempt.flatMap {
+      case Right(value) => runFinally *> value.pure[F]
+      case Left(error) =>
+        runErrors(error).attempt.flatMap {
+          case Right(_) => runFinally *> error.raiseError
+          // TODO how to handle error in error hook?
+          case Left(_) => runFinally *> error.raiseError
+        }
+    }
   }
 
 }
@@ -171,7 +194,8 @@ object ProviderImpl {
       evaluationProvider = evaluationProvider,
       beforeHooks = List.empty[BeforeHook[F]],
       errorHooks = List.empty[ErrorHook[F]],
-      afterHooks = List.empty[AfterHook[F]]
+      afterHooks = List.empty[AfterHook[F]],
+      finallyHooks = List.empty[FinallyHook[F]]
     )
 
 }

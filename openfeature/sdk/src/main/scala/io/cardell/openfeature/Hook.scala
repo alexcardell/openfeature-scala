@@ -87,3 +87,25 @@ object AfterHook {
     }
 
 }
+
+trait FinallyHook[F[_]] extends Hook[F] {
+
+  def apply(context: HookContext, hints: HookHints): F[Unit]
+
+}
+
+object FinallyHook {
+
+  def apply[F[_]](
+      f: (HookContext, HookHints) => F[Unit]
+  ): FinallyHook[F] =
+    new FinallyHook[F] {
+
+      def apply(
+          context: HookContext,
+          hints: HookHints
+      ): F[Unit] = f(context, hints)
+
+    }
+
+}

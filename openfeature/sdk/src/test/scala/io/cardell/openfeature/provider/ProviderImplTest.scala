@@ -24,6 +24,7 @@ import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.EvaluationContext
+import io.cardell.openfeature.FinallyHook
 import io.cardell.openfeature.HookContext
 import io.cardell.openfeature.HookHints
 
@@ -145,6 +146,112 @@ class ProviderImplTest extends CatsEffectSuite {
 
     val provider = ProviderImpl(evaluationProvider)
       .withHook(afterHook)
+
+    val expected = 2
+
+    for {
+      _ <-
+        provider
+          .resolveBooleanValue(
+            "test-flag",
+            false,
+            EvaluationContext.empty
+          )
+          .attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
+  }
+
+  test("after hooks run after successful evaluation") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val afterHook = AfterHook[IO] { case _ =>
+      IO.raiseError(new Throwable("after hook error"))
+    }
+    val errorHook = ErrorHook[IO] { case _ => ref.update(_ + 2) }
+
+    val provider = ProviderImpl(evaluationProvider)
+      .withHook(afterHook)
+      .withHook(errorHook)
+
+    val expected = 2
+
+    for {
+      _ <-
+        provider
+          .resolveBooleanValue(
+            "test-flag",
+            false,
+            EvaluationContext.empty
+          )
+          .attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
+  }
+
+  test("after hooks are skipped after before hook throws") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val beforeHook = AfterHook[IO] { case _ =>
+      IO.raiseError(new Throwable("before hook error"))
+    }
+
+    val afterHook = AfterHook[IO] { case _ => ref.update(_ + 2) }
+
+    val provider = ProviderImpl(evaluationProvider)
+      .withHook(beforeHook)
+      .withHook(afterHook)
+
+    val expected = 0
+
+    for {
+      _ <-
+        provider
+          .resolveBooleanValue(
+            "test-flag",
+            false,
+            EvaluationContext.empty
+          )
+          .attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
+  }
+
+  test("finally hooks run after successful evaluation") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val finallyHook = FinallyHook[IO] { case _ => ref.update(_ + 2) }
+
+    val provider = ProviderImpl(evaluationProvider)
+      .withHook(finallyHook)
+
+    val expected = 2
+
+    for {
+      _ <-
+        provider
+          .resolveBooleanValue(
+            "test-flag",
+            false,
+            EvaluationContext.empty
+          )
+          .attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
+  }
+
+  test("finally hooks run when before hook throws") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val beforeHook = BeforeHook[IO] { case _ =>
+      IO.raiseError(new Throwable("before hook error"))
+    }
+
+    val finallyHook = FinallyHook[IO] { case _ => ref.update(_ + 2) }
+
+    val provider = ProviderImpl(evaluationProvider)
+      .withHook(beforeHook)
+      .withHook(finallyHook)
 
     val expected = 2
 
