@@ -60,6 +60,19 @@ def provider(flipt: FliptApi[IO])(implicit d: Decoder[SomeVariant]) = {
 }
 ```
 
+### Hooks
+
+Hooks are work-in-progress. All four OpenFeature [hook types](https://openfeature.dev/specification/sections/hooks)
+are supported but only on the `FeatureClient` and `Provider` interfaces.
+
+### Implementing A New `EvaluationProvider`
+
+`EvaluationProvider` does not need to handle any errors that aren't deemed recoverable, or need
+to implement any hook logic. Running hooks, and handling default evaluations on error is handled 
+in the library
+
+Implement the call, response decoding, and handle any recoverable errors that make sense. 
+
 ## Flipt Usage
 
 The Flipt client is bare-bones, using it is not recommended, unless as OpenFeature SDK Provider.
