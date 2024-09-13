@@ -21,6 +21,7 @@ import cats.effect.kernel.Ref
 import munit.CatsEffectSuite
 
 import io.cardell.openfeature.BeforeHook
+import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.HookContext
 import io.cardell.openfeature.HookHints
@@ -84,6 +85,54 @@ class ProviderImplTest extends CatsEffectSuite {
       )
       result <- ref.get
     } yield assertEquals(result, expected)
+  }
+
+  test("error hooks run when before hook throws") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val beforeHook = BeforeHook[IO] { case _ =>
+      IO.raiseError(new Throwable("before hook error"))
+    }
+
+    val errorHook = ErrorHook[IO] { case _ => ref.update(_ + 2) }
+
+    val provider = ProviderImpl(evaluationProvider)
+      .withHook(beforeHook)
+      .withHook(errorHook)
+
+    val expected = 2
+
+    for {
+      _ <-
+        provider
+          .resolveBooleanValue(
+            "test-flag",
+            false,
+            EvaluationContext.empty
+          )
+          .attempt
+      result <- ref.get
+    } yield assertEquals(result, expected)
+  }
+
+  test("before hook errors are raised from provider") {
+    val beforeHook = BeforeHook[IO] { case _ =>
+      IO.raiseError(new Throwable("before hook error"))
+    }
+
+    val provider = ProviderImpl(evaluationProvider)
+      .withHook(beforeHook)
+
+    for {
+      result <-
+        provider
+          .resolveBooleanValue(
+            "test-flag",
+            false,
+            EvaluationContext.empty
+          )
+          .attempt
+    } yield assert(result.isLeft, "result was not a Left")
   }
 
 }

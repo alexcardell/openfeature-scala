@@ -17,14 +17,14 @@
 package io.cardell.openfeature
 
 import cats.effect.IO
+import cats.effect.kernel.Ref
 import munit.CatsEffectSuite
 
-import io.cardell.openfeature.provider.ProviderImpl
-import io.cardell.openfeature.provider.StubEvaluationProvider
 import io.cardell.openfeature.provider.EvaluationProvider
+import io.cardell.openfeature.provider.ProviderImpl
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
-import cats.effect.kernel.Ref
+import io.cardell.openfeature.provider.StubEvaluationProvider
 
 class FeatureClientImplTest extends CatsEffectSuite {
   val evalProvider = new StubEvaluationProvider[IO]()
