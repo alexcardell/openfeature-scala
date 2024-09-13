@@ -48,7 +48,8 @@ class ProviderImplTest extends CatsEffectSuite {
 
     val provider = ProviderImpl(evaluationProvider)
 
-    val result = provider.withHook(beforeHook1).beforeHooks
+    val result =
+      provider.withHook(beforeHook1).asInstanceOf[ProviderImpl[IO]].beforeHooks
 
     assertEquals(result, expected)
   }
@@ -63,7 +64,8 @@ class ProviderImplTest extends CatsEffectSuite {
 
     val provider = ProviderImpl(evaluationProvider).withHook(beforeHook1)
 
-    val result = provider.withHook(beforeHook2).beforeHooks
+    val result =
+      provider.withHook(beforeHook2).asInstanceOf[ProviderImpl[IO]].beforeHooks
 
     assertEquals(result, expected)
   }
