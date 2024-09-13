@@ -75,7 +75,7 @@ object HookHints {
 
 object Hooks {
 
-  def run[F[_]: Monad](
+  def runBefore[F[_]: Monad](
       hooks: List[BeforeHook[F]]
   )(context: HookContext, hints: HookHints): F[EvaluationContext] = {
     def aux(

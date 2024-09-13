@@ -102,7 +102,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
   ): F[EvaluationDetails[Boolean]] =
     for {
       newContext <-
-        Hooks.run[F](beforeHooks)(
+        Hooks.runBefore[F](beforeHooks)(
           HookContext(
             flagKey,
             clientEvaluationContext ++ context,
@@ -172,7 +172,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
   ): F[EvaluationDetails[String]] =
     for {
       newContext <-
-        Hooks.run[F](beforeHooks)(
+        Hooks.runBefore[F](beforeHooks)(
           HookContext(
             flagKey,
             clientEvaluationContext ++ context,
@@ -231,7 +231,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
   ): F[EvaluationDetails[Int]] =
     for {
       newContext <-
-        Hooks.run[F](beforeHooks)(
+        Hooks.runBefore[F](beforeHooks)(
           HookContext(
             flagKey,
             clientEvaluationContext ++ context,
@@ -291,7 +291,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
   ): F[EvaluationDetails[Double]] =
     for {
       newContext <-
-        Hooks.run[F](beforeHooks)(
+        Hooks.runBefore[F](beforeHooks)(
           HookContext(
             flagKey,
             clientEvaluationContext ++ context,
@@ -354,7 +354,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
   ): F[EvaluationDetails[A]] =
     for {
       newContext <-
-        Hooks.run[F](beforeHooks)(
+        Hooks.runBefore[F](beforeHooks)(
           HookContext(
             flagKey,
             clientEvaluationContext ++ context,

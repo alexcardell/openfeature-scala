@@ -49,7 +49,7 @@ protected class ProviderImpl[F[_]: Monad](
   ): F[ResolutionDetails[Boolean]] =
     for {
       newContext <-
-        Hooks.run[F](beforeHooks)(
+        Hooks.runBefore[F](beforeHooks)(
           HookContext(flagKey, context, FlagValue(defaultValue)),
           HookHints.empty
         )
@@ -67,7 +67,7 @@ protected class ProviderImpl[F[_]: Monad](
   ): F[ResolutionDetails[String]] =
     for {
       newContext <-
-        Hooks.run[F](beforeHooks)(
+        Hooks.runBefore[F](beforeHooks)(
           HookContext(flagKey, context, FlagValue(defaultValue)),
           HookHints.empty
         )
@@ -85,7 +85,7 @@ protected class ProviderImpl[F[_]: Monad](
   ): F[ResolutionDetails[Int]] =
     for {
       newContext <-
-        Hooks.run[F](beforeHooks)(
+        Hooks.runBefore[F](beforeHooks)(
           HookContext(flagKey, context, FlagValue(defaultValue)),
           HookHints.empty
         )
@@ -103,7 +103,7 @@ protected class ProviderImpl[F[_]: Monad](
   ): F[ResolutionDetails[Double]] =
     for {
       newContext <-
-        Hooks.run[F](beforeHooks)(
+        Hooks.runBefore[F](beforeHooks)(
           HookContext(flagKey, context, FlagValue(defaultValue)),
           HookHints.empty
         )
@@ -121,7 +121,7 @@ protected class ProviderImpl[F[_]: Monad](
   ): F[ResolutionDetails[A]] =
     for {
       newContext <-
-        Hooks.run[F](beforeHooks)(
+        Hooks.runBefore[F](beforeHooks)(
           HookContext(flagKey, context, FlagValue(defaultValue)),
           HookHints.empty
         )
