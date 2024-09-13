@@ -21,6 +21,7 @@ import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.Hook
 
 trait Provider[F[_]] extends EvaluationProvider[F] {
+  // TODO remove
   def beforeHooks: List[BeforeHook[F]]
   def errorHooks: List[ErrorHook[F]]
 

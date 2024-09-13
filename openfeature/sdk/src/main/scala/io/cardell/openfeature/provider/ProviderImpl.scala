@@ -19,9 +19,9 @@ package io.cardell.openfeature.provider
 import cats.MonadThrow
 import cats.syntax.all._
 
+import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
-import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.Hook

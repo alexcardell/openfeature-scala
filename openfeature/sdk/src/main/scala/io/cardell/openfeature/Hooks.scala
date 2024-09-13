@@ -16,6 +16,7 @@
 
 package io.cardell.openfeature
 
+import cats.Applicative
 import cats.Monad
 import cats.syntax.all._
 
@@ -24,7 +25,6 @@ import io.cardell.openfeature.FlagValue.DoubleValue
 import io.cardell.openfeature.FlagValue.IntValue
 import io.cardell.openfeature.FlagValue.StringValue
 import io.cardell.openfeature.FlagValue.StructureValue
-import cats.Applicative
 
 sealed trait FlagValueType
 

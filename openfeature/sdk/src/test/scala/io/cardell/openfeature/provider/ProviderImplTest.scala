@@ -20,9 +20,9 @@ import cats.effect.IO
 import cats.effect.kernel.Ref
 import munit.CatsEffectSuite
 
+import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
-import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.HookContext
 import io.cardell.openfeature.HookHints
