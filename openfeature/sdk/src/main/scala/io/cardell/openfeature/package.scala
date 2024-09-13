@@ -14,29 +14,8 @@
  * limitations under the License.
  */
 
-package io.cardell.openfeature
+package io.cardell
 
-import cats.Monad
-import cats.syntax.all._
-
-import io.cardell.openfeature.provider.EvaluationProvider
-
-trait OpenFeature[F[_]] {
-
-  /** Create a client using the default provider
-    */
-  def client: F[FeatureClient[F]]
-}
-
-object OpenFeature {
-
-  def apply[F[_]: Monad](provider: EvaluationProvider[F]): OpenFeature[F] =
-    new OpenFeature[F] {
-
-      def client: F[FeatureClient[F]] = FeatureClientImpl[F](provider)
-        .pure[F]
-        .widen[FeatureClient[F]]
-
-    }
-
+package object openfeature {
+  type HookHints = Map[String, ContextValue]
 }

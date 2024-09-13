@@ -16,40 +16,13 @@
 
 package io.cardell.openfeature.provider
 
-import io.cardell.openfeature.EvaluationContext
-import io.cardell.openfeature.StructureDecoder
+import io.cardell.openfeature.BeforeHook
+import io.cardell.openfeature.Hook
 
-trait Provider[F[_]] {
-  def metadata: ProviderMetadata
+trait Provider[F[_]] extends EvaluationProvider[F] {
+  def beforeHooks: List[BeforeHook[F]]
 
-  def resolveBooleanValue(
-      flagKey: String,
-      defaultValue: Boolean,
-      context: EvaluationContext
-  ): F[ResolutionDetails[Boolean]]
-
-  def resolveStringValue(
-      flagKey: String,
-      defaultValue: String,
-      context: EvaluationContext
-  ): F[ResolutionDetails[String]]
-
-  def resolveIntValue(
-      flagKey: String,
-      defaultValue: Int,
-      context: EvaluationContext
-  ): F[ResolutionDetails[Int]]
-
-  def resolveDoubleValue(
-      flagKey: String,
-      defaultValue: Double,
-      context: EvaluationContext
-  ): F[ResolutionDetails[Double]]
-
-  def resolveStructureValue[A: StructureDecoder](
-      flagKey: String,
-      defaultValue: A,
-      context: EvaluationContext
-  ): F[ResolutionDetails[A]]
+  def withHook(hook: Hook[F]): Provider[F]
+  // def withHooks(hooks: List[Hook[F]]): Provider[F]
 
 }

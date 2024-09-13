@@ -140,7 +140,6 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
               None
             )
           )
-          _ <- IO.println(res)
           result = res.map(_.variantAttachment)
         } yield assertEquals(result, Right(Some(TestVariant("string", 33))))
       }
@@ -162,7 +161,6 @@ class FliptApiImplItTest extends CatsEffectSuite with TestContainerForAll {
               None
             )
           )
-          _ <- IO.println(res)
           result = res.map(_.variantAttachment)
         } yield assertEquals(result, Right(None))
       }

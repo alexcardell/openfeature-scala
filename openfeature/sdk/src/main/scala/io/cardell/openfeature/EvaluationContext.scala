@@ -55,4 +55,8 @@ case class EvaluationContext(
 
 object EvaluationContext {
   def empty: EvaluationContext = EvaluationContext(None, Map.empty)
+
+  def apply(values: Map[String, ContextValue]): EvaluationContext =
+    EvaluationContext(targetingKey = None, values = values)
+
 }

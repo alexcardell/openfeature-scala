@@ -19,13 +19,15 @@ package io.cardell.openfeature
 import cats.Monad
 import cats.syntax.all._
 
-import io.cardell.openfeature.provider.Provider
+import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 
-protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
-    provider: Provider[F],
-    clientEvaluationContext: EvaluationContext
-) extends FeatureClient[F] {
+protected[openfeature] final class FeatureClientImpl[F[_]](
+    provider: EvaluationProvider[F],
+    val clientEvaluationContext: EvaluationContext,
+    val beforeHooks: List[BeforeHook[F]]
+)(implicit M: Monad[F])
+    extends FeatureClient[F] {
 
   override def providerMetadata: ProviderMetadata = provider.metadata
 
@@ -34,11 +36,21 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
   override def withEvaluationContext(
       context: EvaluationContext
   ): FeatureClient[F] =
-    new FeatureClientImpl[F](provider, clientEvaluationContext ++ context)
+    new FeatureClientImpl[F](
+      provider,
+      clientEvaluationContext ++ context,
+      beforeHooks
+    )
 
-  // override def hooks: List[Hook] = ???
-  // override def withHook(hook: Hook): FeatureClient[F] = ???
-  // override def withHooks(hooks: List[Hook]): FeatureClient[F] = ???
+  override def withHook(hook: Hook[F]): FeatureClient[F] =
+    hook match {
+      case h: BeforeHook[F] =>
+        new FeatureClientImpl[F](
+          provider,
+          clientEvaluationContext,
+          beforeHooks.appended(h)
+        )
+    }
 
   override def getBooleanValue(flagKey: String, default: Boolean): F[Boolean] =
     getBooleanValue(flagKey, default, EvaluationContext.empty)
@@ -87,13 +99,24 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
       default: Boolean,
       context: EvaluationContext,
       options: EvaluationOptions
-  ): F[EvaluationDetails[Boolean]] = provider
-    .resolveBooleanValue(
-      flagKey,
-      default,
-      clientEvaluationContext ++ context
-    )
-    .map(EvaluationDetails[Boolean](flagKey, _))
+  ): F[EvaluationDetails[Boolean]] =
+    for {
+      newContext <-
+        Hooks.run[F](beforeHooks)(
+          HookContext(
+            flagKey,
+            clientEvaluationContext ++ context,
+            FlagValue(default)
+          ),
+          HookHints.empty
+        )
+      resolution <- provider
+        .resolveBooleanValue(
+          flagKey,
+          default,
+          newContext
+        )
+    } yield EvaluationDetails[Boolean](flagKey, resolution)
 
   override def getStringValue(flagKey: String, default: String): F[String] =
     getStringValue(flagKey, default, EvaluationContext.empty)
@@ -146,9 +169,19 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
       default: String,
       context: EvaluationContext,
       options: EvaluationOptions
-  ): F[EvaluationDetails[String]] = provider
-    .resolveStringValue(flagKey, default, clientEvaluationContext ++ context)
-    .map(EvaluationDetails[String](flagKey, _))
+  ): F[EvaluationDetails[String]] =
+    for {
+      newContext <-
+        Hooks.run[F](beforeHooks)(
+          HookContext(
+            flagKey,
+            clientEvaluationContext ++ context,
+            FlagValue(default)
+          ),
+          HookHints.empty
+        )
+      resolution <- provider.resolveStringValue(flagKey, default, newContext)
+    } yield EvaluationDetails[String](flagKey, resolution)
 
   override def getIntValue(flagKey: String, default: Int): F[Int] = getIntValue(
     flagKey,
@@ -195,9 +228,19 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
       default: Int,
       context: EvaluationContext,
       options: EvaluationOptions
-  ): F[EvaluationDetails[Int]] = provider
-    .resolveIntValue(flagKey, default, clientEvaluationContext ++ context)
-    .map(EvaluationDetails[Int](flagKey, _))
+  ): F[EvaluationDetails[Int]] =
+    for {
+      newContext <-
+        Hooks.run[F](beforeHooks)(
+          HookContext(
+            flagKey,
+            clientEvaluationContext ++ context,
+            FlagValue(default)
+          ),
+          HookHints.empty
+        )
+      resolution <- provider.resolveIntValue(flagKey, default, newContext)
+    } yield EvaluationDetails[Int](flagKey, resolution)
 
   override def getDoubleValue(flagKey: String, default: Double): F[Double] =
     getDoubleValue(flagKey, default, EvaluationContext.empty)
@@ -245,9 +288,19 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
       default: Double,
       context: EvaluationContext,
       options: EvaluationOptions
-  ): F[EvaluationDetails[Double]] = provider
-    .resolveDoubleValue(flagKey, default, clientEvaluationContext ++ context)
-    .map(EvaluationDetails[Double](flagKey, _))
+  ): F[EvaluationDetails[Double]] =
+    for {
+      newContext <-
+        Hooks.run[F](beforeHooks)(
+          HookContext(
+            flagKey,
+            clientEvaluationContext ++ context,
+            FlagValue(default)
+          ),
+          HookHints.empty
+        )
+      resolution <- provider.resolveDoubleValue(flagKey, default, newContext)
+    } yield EvaluationDetails[Double](flagKey, resolution)
 
   override def getStructureValue[A: StructureDecoder](
       flagKey: String,
@@ -298,12 +351,32 @@ protected[openfeature] final class FeatureClientImpl[F[_]: Monad](
       default: A,
       context: EvaluationContext,
       options: EvaluationOptions
-  ): F[EvaluationDetails[A]] = provider
-    .resolveStructureValue[A](
-      flagKey,
-      default,
-      clientEvaluationContext ++ context
+  ): F[EvaluationDetails[A]] =
+    for {
+      newContext <-
+        Hooks.run[F](beforeHooks)(
+          HookContext(
+            flagKey,
+            clientEvaluationContext ++ context,
+            FlagValue(default)
+          ),
+          HookHints.empty
+        )
+      resolution <- provider
+        .resolveStructureValue[A](flagKey, default, newContext)
+    } yield EvaluationDetails(flagKey, resolution)
+
+}
+
+object FeatureClientImpl {
+
+  def apply[F[_]: Monad](
+      provider: EvaluationProvider[F]
+  ): FeatureClientImpl[F] =
+    new FeatureClientImpl[F](
+      provider = provider,
+      clientEvaluationContext = EvaluationContext.empty,
+      beforeHooks = List.empty[BeforeHook[F]]
     )
-    .map(EvaluationDetails(flagKey, _))
 
 }

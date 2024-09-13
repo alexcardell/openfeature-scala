@@ -29,15 +29,15 @@ import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureDecoderError
+import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.FlagMetadataValue
-import io.cardell.openfeature.provider.Provider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
 
 final class FliptProvider[F[_]: MonadThrow](
     flipt: FliptApi[F],
     namespace: String
-) extends Provider[F] {
+) extends EvaluationProvider[F] {
 
   override def metadata: ProviderMetadata = ProviderMetadata(name = "flipt")
 
