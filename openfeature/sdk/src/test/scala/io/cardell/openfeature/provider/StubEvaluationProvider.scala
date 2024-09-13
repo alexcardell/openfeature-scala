@@ -20,9 +20,6 @@ import cats.Monad
 
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.StructureDecoder
-import io.cardell.openfeature.provider.EvaluationProvider
-import io.cardell.openfeature.provider.ProviderMetadata
-import io.cardell.openfeature.provider.ResolutionDetails
 
 class StubEvaluationProvider[F[_]: Monad]() extends EvaluationProvider[F] {
 
