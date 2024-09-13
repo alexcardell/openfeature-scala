@@ -18,8 +18,4 @@ package io.cardell
 
 package object openfeature {
   type HookHints = Map[String, ContextValue]
-
-  // type BeforeHook[F[_], A] =
-  //   (HookContext[A], HookHints) => F[Option[EvaluationContext]]
-
 }

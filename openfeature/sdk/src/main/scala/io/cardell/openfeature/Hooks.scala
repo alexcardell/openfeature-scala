@@ -16,6 +16,9 @@
 
 package io.cardell.openfeature
 
+import cats.Monad
+import cats.syntax.all._
+
 import io.cardell.openfeature.FlagValue.BooleanValue
 import io.cardell.openfeature.FlagValue.DoubleValue
 import io.cardell.openfeature.FlagValue.IntValue
@@ -35,18 +38,18 @@ object FlagValueType {
 sealed trait FlagValue
 
 object FlagValue {
-  case class BooleanValue(value: Boolean)                  extends FlagValue
-  case class StringValue(value: String)                    extends FlagValue
-  case class IntValue(value: Int)                          extends FlagValue
-  case class DoubleValue(value: Double)                    extends FlagValue
-  case class StructureValue[A: StructureDecoder](value: A) extends FlagValue
+  case class BooleanValue(value: Boolean) extends FlagValue
+  case class StringValue(value: String)   extends FlagValue
+  case class IntValue(value: Int)         extends FlagValue
+  case class DoubleValue(value: Double)   extends FlagValue
+  case class StructureValue[A](value: A)  extends FlagValue
 
   def apply(b: Boolean): FlagValue = BooleanValue(b)
   def apply(s: String): FlagValue  = StringValue(s)
   def apply(i: Int): FlagValue     = IntValue(i)
   def apply(d: Double): FlagValue  = DoubleValue(d)
 
-  def apply[A: StructureDecoder](s: A): FlagValue = StructureValue(s)
+  def apply[A](s: A): FlagValue = StructureValue(s)
 }
 
 case class HookContext(
@@ -74,5 +77,52 @@ trait BeforeHook[F[_]] extends Hook[F] {
       context: HookContext,
       hints: HookHints
   ): F[Option[EvaluationContext]]
+
+}
+
+object BeforeHook {
+
+  def apply[F[_]](
+      f: (HookContext, HookHints) => F[Option[EvaluationContext]]
+  ): BeforeHook[F] =
+    new BeforeHook[F] {
+
+      def apply(
+          context: HookContext,
+          hints: HookHints
+      ): F[Option[EvaluationContext]] = f(context, hints)
+
+    }
+
+}
+
+object HookHints {
+  def empty: HookHints = Map.empty
+}
+
+object Hooks {
+
+  def run[F[_]: Monad](
+      hooks: List[BeforeHook[F]]
+  )(context: HookContext, hints: HookHints): F[EvaluationContext] = {
+    def aux(
+        hooks: List[BeforeHook[F]],
+        context: HookContext
+    ): F[Option[EvaluationContext]] =
+      hooks match {
+        case head :: tail =>
+          head.apply(context, hints).flatMap {
+            case Some(evaluationContext) =>
+              val newContext = context.copy(evaluationContext =
+                context.evaluationContext ++ evaluationContext
+              )
+              aux(tail, newContext)
+            case None => aux(tail, context)
+          }
+        case Nil => context.evaluationContext.some.pure[F]
+      }
+
+    aux(hooks, context).map(_.getOrElse(context.evaluationContext))
+  }
 
 }

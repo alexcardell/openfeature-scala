@@ -17,9 +17,11 @@
 package io.cardell.openfeature.provider
 
 import cats.effect.IO
+import cats.effect.kernel.Ref
 import munit.CatsEffectSuite
 
 import io.cardell.openfeature.BeforeHook
+import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.HookContext
 import io.cardell.openfeature.HookHints
 
@@ -62,6 +64,26 @@ class ProviderImplTest extends CatsEffectSuite {
     val result = provider.withHook(beforeHook2).beforeHooks
 
     assertEquals(result, expected)
+  }
+
+  test("before hooks run on boolean evaluation") {
+    val ref = Ref.unsafe[IO, Int](0)
+
+    val h1 = BeforeHook[IO] { case _ => ref.update(_ + 1).as(None) }
+    val h2 = BeforeHook[IO] { case _ => ref.update(_ + 2).as(None) }
+
+    val provider = ProviderImpl(evaluationProvider).withHook(h1).withHook(h2)
+
+    val expected = 3
+
+    for {
+      _ <- provider.resolveBooleanValue(
+        "test-flag",
+        false,
+        EvaluationContext.empty
+      )
+      result <- ref.get
+    } yield assertEquals(result, expected)
   }
 
 }
