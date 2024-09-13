@@ -81,7 +81,9 @@
   <ul class="nav-list">
     <li class="level1 nav-leaf"><a href="#features">Features</a></li>
     <li class="level1 nav-leaf"><a href="#installing">Installing</a></li>
-    <li class="level1 nav-leaf"><a href="#openfeature-usage">OpenFeature Usage</a></li>
+    <li class="level1 nav-node"><a href="#openfeature-usage">OpenFeature Usage</a></li>
+    <li class="level2 nav-leaf"><a href="#hooks">Hooks</a></li>
+    <li class="level2 nav-leaf"><a href="#implementing-a-new-evaluationprovider">Implementing A New <code>EvaluationProvider</code></a></li>
     <li class="level1 nav-leaf"><a href="#flipt-usage">Flipt Usage</a></li>
   </ul>
 
@@ -150,6 +152,16 @@
     }
 }</span></code></pre>
         
+        <h3 id="hooks" class="section"><a class="anchor-link left" href="#hooks"><i class="icofont-laika link">&#xef71;</i></a>Hooks</h3>
+        <p>Hooks are work-in-progress. All four OpenFeature <a href="https://openfeature.dev/specification/sections/hooks">hook types</a>
+        are supported but only on the <code>FeatureClient</code> and <code>Provider</code> interfaces.</p>
+        
+        <h3 id="implementing-a-new-evaluationprovider" class="section"><a class="anchor-link left" href="#implementing-a-new-evaluationprovider"><i class="icofont-laika link">&#xef71;</i></a>Implementing A New <code>EvaluationProvider</code></h3>
+        <p><code>EvaluationProvider</code> does not need to handle any errors that aren&#39;t deemed recoverable, or need
+        to implement any hook logic. Running hooks, and handling default evaluations on error is handled 
+        in the library</p>
+        <p>Implement the call, response decoding, and handle any recoverable errors that make sense. </p>
+        
         <h2 id="flipt-usage" class="section"><a class="anchor-link left" href="#flipt-usage"><i class="icofont-laika link">&#xef71;</i></a>Flipt Usage</h2>
         <p>The Flipt client is bare-bones, using it is not recommended, unless as OpenFeature SDK Provider.</p>
         <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
@@ -185,9 +197,9 @@
 </span><span class="comment">// resource: cats.effect.kernel.Resource[IO, FliptApi[IO]] = Bind(
 //   source = Bind(
 //     source = Eval(fa = Pure(value = ())),
-//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$14287/0x00000008039bf040@725392bf
+//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$14109/0x00000008038f6840@50a26404
 //   ),
-//   fs = cats.effect.kernel.Resource$$Lambda$14288/0x00000008039bd840@5d9aa84f
+//   fs = cats.effect.kernel.Resource$$Lambda$14110/0x00000008038f5840@1559a03c
 // )
 </span><span>
 </span><span class="identifier">resource</span><span>.</span><span class="identifier">use</span><span> { </span><span class="identifier">flipt</span><span> =&gt; 
@@ -205,7 +217,7 @@
 }
 </span><span class="comment">// res0: IO[Boolean] = FlatMap(
 //   ioe = Pure(value = ()),
-//   f = cats.effect.kernel.Resource$$Lambda$14290/0x00000008039bc040@3822e402,
+//   f = cats.effect.kernel.Resource$$Lambda$14112/0x000000080390f840@5450a7d7,
 //   event = cats.effect.tracing.TracingEvent$StackTrace
 // )</span></code></pre>
 
