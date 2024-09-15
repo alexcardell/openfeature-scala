@@ -127,6 +127,28 @@ class MemoryProviderTest extends CatsEffectSuite {
     }
   }
 
+  test("can return structure values") {
+    val expected = TestStructure("a", 0)
+
+    val flag  = FlagValue.StructureValue(expected)
+    val key   = "structure-flag-key"
+    val state = Map(key -> flag)
+
+    val default = TestStructure("a", 0)
+
+    MemoryProvider[IO](state).flatMap { provider =>
+      val resolution = provider.resolveStructureValue[TestStructure](
+        key,
+        default,
+        EvaluationContext.empty
+      )
+
+      for {
+        result <- resolution.map(_.value)
+      } yield assertEquals(result, expected)
+    }
+  }
+
   test("receives type mismatch error when boolean not received") {
     val expectedValue     = false
     val expectedErrorCode = Some(ErrorCode.TypeMismatch)
@@ -238,5 +260,30 @@ class MemoryProviderTest extends CatsEffectSuite {
       }
     }
   }
+
+  // test(
+  //   "receives type mismatch error when expected structure type not received"
+  // ) {
+  //   val expected = TestStructure("a", 0)
+  //
+  //   val flag  = FlagValue.StructureValue(OtherTestStructure(40.0))
+  //   val key   = "structure-flag-key"
+  //   val state = Map(key -> flag)
+  //
+  //   val default = expected
+  //
+  //   MemoryProvider[IO](state).flatMap { provider =>
+  //     val resolution = provider.resolveStructureValue(
+  //       key,
+  //       default,
+  //       EvaluationContext.empty
+  //     )
+  //
+  //     for {
+  //       result <- resolution
+  //       _ <- IO.println("alexxxxxx")
+  //     } yield assertEquals(result.value, expected)
+  //   }
+  // }
 
 }

@@ -30,6 +30,8 @@ import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
 
+/** Probably don't use in production, see `resolveStructureValue` for why
+  */
 final class MemoryProvider[F[_]: MonadThrow](
     ref: Ref[F, Map[String, FlagValue]]
 ) extends EvaluationProvider[F] {
@@ -117,29 +119,28 @@ final class MemoryProvider[F[_]: MonadThrow](
     }
   }
 
+  /** NOTE: StructureValue can contain anything, and therefore may throw
+    * classcast exceptions
+    *
+    * Can't get around type erasure to do the check
+    */
   override def resolveStructureValue[A: StructureDecoder](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
-  ): F[ResolutionDetails[A]] = MonadThrow[F].raiseError(
-    new NotImplementedError(
-      "Structure values not implemented in in-memory provider"
-    )
-  )
-  // {
-  //   val resolved = ref.get.map { state =>
-  //     val x = state.get(flagKey) match {
-  //       case None => missing[A](flagKey, defaultValue)
-  //       case Some(StructureFlagState(value)) => resolution[A](value.asInstanceOf[A])
-  //       case Some(_) => typeMismatch(flagKey, defaultValue)
-  //     }
-  //     @nowarn
-  //     val value: A = x.value
-  //     x
-  //   }
-  //
-  //   resolved.handleError { case _ => missing[A](flagKey, defaultValue) }
-  // }
+  ): F[ResolutionDetails[A]] = {
+    val resolved = ref.get.map { state =>
+      state.get(flagKey) match {
+        case None => missing[A](flagKey, defaultValue)
+        case Some(FlagValue.StructureValue(value)) =>
+          val v = value.asInstanceOf[A]
+          resolution[A](v)
+        case Some(_) => typeMismatch(flagKey, defaultValue)
+      }
+    }
+
+    resolved.handleError { case _ => missing[A](flagKey, defaultValue) }
+  }
 
 }
 
