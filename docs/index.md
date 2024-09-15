@@ -5,7 +5,8 @@
 - Cross-platform, cross-version Scala feature flagging
 - [OpenFeature](https://openfeature.dev) SDK
 - [Flipt](https://flipt.io) client
-- Flipt OpenFeature provider
+- Flipt OpenFeature Provider
+- In-Memory OpenFeature Provider
 
 ## Installing
 
