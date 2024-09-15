@@ -26,7 +26,6 @@ trait FeatureClient[F[_]] {
   def withEvaluationContext(context: EvaluationContext): FeatureClient[F]
 
   def withHook(hook: Hook[F]): FeatureClient[F]
-  // def withHooks(hooks: List[Hook]): FeatureClient[F]
 
   def getBooleanValue(flagKey: String, default: Boolean): F[Boolean]
 
