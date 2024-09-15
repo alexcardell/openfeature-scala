@@ -16,7 +16,7 @@
       {
         devShell = pkgs.devshell.mkShell {
           imports = [ typelevel-nix.typelevelShell ];
-          name = "ff4s-shell";
+          name = "openfeature-scala-shell";
           typelevelShell = {
             jdk.package = pkgs.jdk11;
             nodejs.enable = true;

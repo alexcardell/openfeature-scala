@@ -1,12 +1,11 @@
-# ff4s - Feature Flags For Scala
+# openfeature-scala
 
 ## Features
 
 - Cross-platform, cross-version Scala feature flagging
-- [Flipt](https://flipt.io) client
 - [OpenFeature](https://openfeature.dev) SDK
+- [Flipt](https://flipt.io) client
 - Flipt OpenFeature provider
-- LaunchDarkly OpenFeature provider with [Catalyst](https://typelevel.org/catapult)
 
 ## Installing
 
@@ -120,3 +119,7 @@ resource.use { flipt =>
 }
 ```
 
+## Future Work
+
+- Java OpenFeature Provider wrapper, to unlock more SDKs
+- LaunchDarkly Provider using `typelevel/catapult`
