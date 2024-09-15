@@ -16,4 +16,4 @@
 
 package io.cardell.openfeature
 
-package object syntax extends FeatureClientSyntax {}
+package object syntax extends FeatureClientSyntax with ProviderSyntax

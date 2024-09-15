@@ -20,54 +20,53 @@ import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.EvaluationContext
-import io.cardell.openfeature.FeatureClient
 import io.cardell.openfeature.FinallyHook
 import io.cardell.openfeature.Hook
 import io.cardell.openfeature.HookContext
 import io.cardell.openfeature.HookHints
+import io.cardell.openfeature.provider.Provider
 
-trait FeatureClientSyntax {
+trait ProviderSyntax {
 
-  implicit def hookOps[F[_]](
-      client: FeatureClient[F]
-  ): FeatureClientHookOps[F] = new FeatureClientHookOps[F](client)
+  implicit def providerOps[F[_]](provider: Provider[F]): ProviderOps[F] =
+    new ProviderOps[F](provider)
 
 }
 
-class FeatureClientHookOps[F[_]](client: FeatureClient[F]) {
+final class ProviderOps[F[_]](provider: Provider[F]) {
 
-  def withHooks(hooks: List[Hook[F]]): FeatureClient[F] =
-    hooks.foldLeft(client)((client, hook) => client.withHook(hook))
+  def withHooks(hooks: List[Hook[F]]): Provider[F] =
+    hooks.foldLeft(provider)((provider, hook) => provider.withHook(hook))
 
-  def withBeforeHook(hook: BeforeHook[F]): FeatureClient[F] = client.withHook(
+  def withBeforeHook(hook: BeforeHook[F]): Provider[F] = provider.withHook(
     hook
   )
 
   def withBeforeHook(
       hook: (HookContext, HookHints) => F[Option[EvaluationContext]]
-  ): FeatureClient[F] = client.withHook(BeforeHook[F](hook))
+  ): Provider[F] = provider.withHook(BeforeHook[F](hook))
 
-  def withErrorHook(hook: ErrorHook[F]): FeatureClient[F] = client.withHook(
+  def withErrorHook(hook: ErrorHook[F]): Provider[F] = provider.withHook(
     hook
   )
 
   def withErrorHook(
       hook: (HookContext, HookHints, Throwable) => F[Unit]
-  ): FeatureClient[F] = client.withHook(ErrorHook[F](hook))
+  ): Provider[F] = provider.withHook(ErrorHook[F](hook))
 
-  def withAfterHook(hook: AfterHook[F]): FeatureClient[F] = client.withHook(
+  def withAfterHook(hook: AfterHook[F]): Provider[F] = provider.withHook(
     hook
   )
 
   def withAfterHook(
       hook: (HookContext, HookHints) => F[Unit]
-  ): FeatureClient[F] = client.withHook(AfterHook[F](hook))
+  ): Provider[F] = provider.withHook(AfterHook[F](hook))
 
-  def withFinallyHook(hook: FinallyHook[F]): FeatureClient[F] = client
+  def withFinallyHook(hook: FinallyHook[F]): Provider[F] = provider
     .withHook(hook)
 
   def withFinallyHook(
       hook: (HookContext, HookHints) => F[Unit]
-  ): FeatureClient[F] = client.withHook(FinallyHook[F](hook))
+  ): Provider[F] = provider.withHook(FinallyHook[F](hook))
 
 }
