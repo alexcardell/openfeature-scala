@@ -81,6 +81,7 @@
   <ul class="nav-list">
     <li class="level1 nav-leaf"><a href="#features">Features</a></li>
     <li class="level1 nav-leaf"><a href="#installing">Installing</a></li>
+    <li class="level1 nav-leaf"><a href="#openfeature-compatibility">OpenFeature Compatibility</a></li>
     <li class="level1 nav-node"><a href="#openfeature-usage">OpenFeature Usage</a></li>
     <li class="level2 nav-leaf"><a href="#hooks">Hooks</a></li>
     <li class="level2 nav-leaf"><a href="#implementing-a-new-evaluationprovider">Implementing A New <code>EvaluationProvider</code></a></li>
@@ -99,13 +100,7 @@
         <ul>
           <li>Cross-platform, cross-version Scala feature flagging</li>
           <li><a href="https://flipt.io">Flipt</a> client</li>
-          <li>
-            <a href="https://openfeature.dev">OpenFeature</a> SDK
-            <ul>
-              <li>Provider Evaluation</li>
-              <li>🚧 Hooks</li>
-            </ul>
-          </li>
+          <li><a href="https://openfeature.dev">OpenFeature</a> SDK</li>
           <li>Flipt OpenFeature provider</li>
           <li>LaunchDarkly OpenFeature provider with <a href="https://typelevel.org/catapult">Catalyst</a></li>
         </ul>
@@ -120,6 +115,46 @@
     </span><span class="comment">// to use flipt as a backend
 </span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-provider-flipt&quot;</span><span> % </span><span class="string-literal">&quot;0.2.1&quot;</span><span>
 )</span></code></pre>
+        
+        <h2 id="openfeature-compatibility" class="section"><a class="anchor-link left" href="#openfeature-compatibility"><i class="icofont-laika link">&#xef71;</i></a>OpenFeature Compatibility</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Features</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Providers</td>
+              <td>✅</td>
+            </tr>
+            <tr>
+              <td>Targeting</td>
+              <td>✅</td>
+            </tr>
+            <tr>
+              <td>Logging</td>
+              <td>🚧</td>
+            </tr>
+            <tr>
+              <td>Domains</td>
+              <td>🚧</td>
+            </tr>
+            <tr>
+              <td>Eventing</td>
+              <td>🚧</td>
+            </tr>
+            <tr>
+              <td>Shutdown</td>
+              <td>🚧</td>
+            </tr>
+            <tr>
+              <td>Transaction Context Propagation</td>
+              <td>🚧</td>
+            </tr>
+          </tbody>
+        </table>
         
         <h2 id="openfeature-usage" class="section"><a class="anchor-link left" href="#openfeature-usage"><i class="icofont-laika link">&#xef71;</i></a>OpenFeature Usage</h2>
         <p>The OpenFeature SDK adds features like handling default values in case of errors.
@@ -197,9 +232,9 @@
 </span><span class="comment">// resource: cats.effect.kernel.Resource[IO, FliptApi[IO]] = Bind(
 //   source = Bind(
 //     source = Eval(fa = Pure(value = ())),
-//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$14117/0x0000000803927040@73231134
+//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$14219/0x0000000802579840@6a38c03f
 //   ),
-//   fs = cats.effect.kernel.Resource$$Lambda$14118/0x0000000803926040@569ae434
+//   fs = cats.effect.kernel.Resource$$Lambda$14220/0x000000080257a040@6bd83f28
 // )
 </span><span>
 </span><span class="identifier">resource</span><span>.</span><span class="identifier">use</span><span> { </span><span class="identifier">flipt</span><span> =&gt; 
@@ -217,7 +252,7 @@
 }
 </span><span class="comment">// res0: IO[Boolean] = FlatMap(
 //   ioe = Pure(value = ()),
-//   f = cats.effect.kernel.Resource$$Lambda$14120/0x0000000803924840@2f2e2988,
+//   f = cats.effect.kernel.Resource$$Lambda$14222/0x0000000802560840@340d0,
 //   event = cats.effect.tracing.TracingEvent$StackTrace
 // )</span></code></pre>
 
