@@ -20,59 +20,11 @@ import cats.Applicative
 import cats.Monad
 import cats.syntax.all._
 
-import io.cardell.openfeature.FlagValue.BooleanValue
-import io.cardell.openfeature.FlagValue.DoubleValue
-import io.cardell.openfeature.FlagValue.IntValue
-import io.cardell.openfeature.FlagValue.StringValue
-import io.cardell.openfeature.FlagValue.StructureValue
-
-sealed trait FlagValueType
-
-object FlagValueType {
-  case object BooleanValueType   extends FlagValueType
-  case object StringValueType    extends FlagValueType
-  case object IntValueType       extends FlagValueType
-  case object DoubleValueType    extends FlagValueType
-  case object StructureValueType extends FlagValueType
-}
-
-sealed trait FlagValue
-
-object FlagValue {
-  case class BooleanValue(value: Boolean) extends FlagValue
-  case class StringValue(value: String)   extends FlagValue
-  case class IntValue(value: Int)         extends FlagValue
-  case class DoubleValue(value: Double)   extends FlagValue
-  case class StructureValue[A](value: A)  extends FlagValue
-
-  def apply(b: Boolean): FlagValue = BooleanValue(b)
-  def apply(s: String): FlagValue  = StringValue(s)
-  def apply(i: Int): FlagValue     = IntValue(i)
-  def apply(d: Double): FlagValue  = DoubleValue(d)
-
-  def apply[A](s: A): FlagValue = StructureValue(s)
-}
-
 case class HookContext(
     flagKey: String,
     evaluationContext: EvaluationContext,
     defaultValue: FlagValue
-) {
-
-  def valueType: FlagValueType =
-    defaultValue match {
-      case _: BooleanValue      => FlagValueType.BooleanValueType
-      case _: StringValue       => FlagValueType.StringValueType
-      case _: IntValue          => FlagValueType.IntValueType
-      case _: DoubleValue       => FlagValueType.DoubleValueType
-      case _: StructureValue[_] => FlagValueType.StructureValueType
-    }
-
-}
-
-object HookHints {
-  def empty: HookHints = Map.empty
-}
+)
 
 object Hooks {
 

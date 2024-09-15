@@ -20,8 +20,8 @@ import cats.effect.IO
 import munit.CatsEffectSuite
 
 import io.cardell.openfeature.ErrorCode
-import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.EvaluationContext
+import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureDecoderError
 

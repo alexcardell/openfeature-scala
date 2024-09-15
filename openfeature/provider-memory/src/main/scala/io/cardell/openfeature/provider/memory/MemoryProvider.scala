@@ -22,9 +22,9 @@ import cats.effect.kernel.Sync
 import cats.syntax.all._
 
 import io.cardell.openfeature.ErrorCode
-import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
+import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
@@ -77,7 +77,7 @@ final class MemoryProvider[F[_]: MonadThrow](
     state.get(flagKey) match {
       case None => missing[Boolean](flagKey, defaultValue)
       case Some(FlagValue.BooleanValue(value)) => resolution[Boolean](value)
-      case Some(_)                       => typeMismatch(flagKey, defaultValue)
+      case Some(_) => typeMismatch(flagKey, defaultValue)
     }
   }
 
@@ -89,7 +89,7 @@ final class MemoryProvider[F[_]: MonadThrow](
     state.get(flagKey) match {
       case None => missing[String](flagKey, defaultValue)
       case Some(FlagValue.StringValue(value)) => resolution[String](value)
-      case Some(_)                      => typeMismatch(flagKey, defaultValue)
+      case Some(_) => typeMismatch(flagKey, defaultValue)
     }
   }
 
@@ -99,9 +99,9 @@ final class MemoryProvider[F[_]: MonadThrow](
       context: EvaluationContext
   ): F[ResolutionDetails[Int]] = ref.get.map { state =>
     state.get(flagKey) match {
-      case None                      => missing[Int](flagKey, defaultValue)
+      case None => missing[Int](flagKey, defaultValue)
       case Some(FlagValue.IntValue(value)) => resolution[Int](value)
-      case Some(_)                   => typeMismatch(flagKey, defaultValue)
+      case Some(_) => typeMismatch(flagKey, defaultValue)
     }
   }
 
@@ -113,7 +113,7 @@ final class MemoryProvider[F[_]: MonadThrow](
     state.get(flagKey) match {
       case None => missing[Double](flagKey, defaultValue)
       case Some(FlagValue.DoubleValue(value)) => resolution[Double](value)
-      case Some(_)                      => typeMismatch(flagKey, defaultValue)
+      case Some(_) => typeMismatch(flagKey, defaultValue)
     }
   }
 

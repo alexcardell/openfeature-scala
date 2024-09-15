@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package io.cardell
+package io.cardell.openfeature
 
-package object openfeature {
-  type HookHints = Map[String, ContextValue]
+sealed trait FlagValueType
 
-  object HookHints {
-    def empty: HookHints = Map.empty
-  }
-
+object FlagValueType {
+  case object BooleanValueType   extends FlagValueType
+  case object StringValueType    extends FlagValueType
+  case object IntValueType       extends FlagValueType
+  case object DoubleValueType    extends FlagValueType
+  case object StructureValueType extends FlagValueType
 }
