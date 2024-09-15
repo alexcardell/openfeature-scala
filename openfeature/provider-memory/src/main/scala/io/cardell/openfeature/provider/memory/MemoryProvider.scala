@@ -24,25 +24,17 @@ import cats.syntax.all._
 import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
+import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
 
-sealed trait MemoryFlagState
-
-object MemoryFlagState {
-  case class BooleanFlagState(value: Boolean) extends MemoryFlagState
-  case class StringFlagState(value: String)   extends MemoryFlagState
-  case class IntFlagState(value: Int)         extends MemoryFlagState
-  case class DoubleFlagState(value: Double)   extends MemoryFlagState
-}
-
+/** Probably don't use in production, see `resolveStructureValue` for why
+  */
 final class MemoryProvider[F[_]: MonadThrow](
-    ref: Ref[F, Map[String, MemoryFlagState]]
+    ref: Ref[F, Map[String, FlagValue]]
 ) extends EvaluationProvider[F] {
-
-  import MemoryFlagState._
 
   override def metadata: ProviderMetadata = ProviderMetadata("memory")
 
@@ -86,8 +78,8 @@ final class MemoryProvider[F[_]: MonadThrow](
   ): F[ResolutionDetails[Boolean]] = ref.get.map { state =>
     state.get(flagKey) match {
       case None => missing[Boolean](flagKey, defaultValue)
-      case Some(BooleanFlagState(value)) => resolution[Boolean](value)
-      case Some(_)                       => typeMismatch(flagKey, defaultValue)
+      case Some(FlagValue.BooleanValue(value)) => resolution[Boolean](value)
+      case Some(_) => typeMismatch(flagKey, defaultValue)
     }
   }
 
@@ -98,8 +90,8 @@ final class MemoryProvider[F[_]: MonadThrow](
   ): F[ResolutionDetails[String]] = ref.get.map { state =>
     state.get(flagKey) match {
       case None => missing[String](flagKey, defaultValue)
-      case Some(StringFlagState(value)) => resolution[String](value)
-      case Some(_)                      => typeMismatch(flagKey, defaultValue)
+      case Some(FlagValue.StringValue(value)) => resolution[String](value)
+      case Some(_) => typeMismatch(flagKey, defaultValue)
     }
   }
 
@@ -109,9 +101,9 @@ final class MemoryProvider[F[_]: MonadThrow](
       context: EvaluationContext
   ): F[ResolutionDetails[Int]] = ref.get.map { state =>
     state.get(flagKey) match {
-      case None                      => missing[Int](flagKey, defaultValue)
-      case Some(IntFlagState(value)) => resolution[Int](value)
-      case Some(_)                   => typeMismatch(flagKey, defaultValue)
+      case None => missing[Int](flagKey, defaultValue)
+      case Some(FlagValue.IntValue(value)) => resolution[Int](value)
+      case Some(_) => typeMismatch(flagKey, defaultValue)
     }
   }
 
@@ -122,44 +114,43 @@ final class MemoryProvider[F[_]: MonadThrow](
   ): F[ResolutionDetails[Double]] = ref.get.map { state =>
     state.get(flagKey) match {
       case None => missing[Double](flagKey, defaultValue)
-      case Some(DoubleFlagState(value)) => resolution[Double](value)
-      case Some(_)                      => typeMismatch(flagKey, defaultValue)
+      case Some(FlagValue.DoubleValue(value)) => resolution[Double](value)
+      case Some(_) => typeMismatch(flagKey, defaultValue)
     }
   }
 
+  /** NOTE: StructureValue can contain anything, and therefore may throw
+    * classcast exceptions
+    *
+    * Can't get around type erasure to do the check
+    */
   override def resolveStructureValue[A: StructureDecoder](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
-  ): F[ResolutionDetails[A]] = MonadThrow[F].raiseError(
-    new NotImplementedError(
-      "Structure values not implemented in in-memory provider"
-    )
-  )
-  // {
-  //   val resolved = ref.get.map { state =>
-  //     val x = state.get(flagKey) match {
-  //       case None => missing[A](flagKey, defaultValue)
-  //       case Some(StructureFlagState(value)) => resolution[A](value.asInstanceOf[A])
-  //       case Some(_) => typeMismatch(flagKey, defaultValue)
-  //     }
-  //     @nowarn
-  //     val value: A = x.value
-  //     x
-  //   }
-  //
-  //   resolved.handleError { case _ => missing[A](flagKey, defaultValue) }
-  // }
+  ): F[ResolutionDetails[A]] = {
+    val resolved = ref.get.map { state =>
+      state.get(flagKey) match {
+        case None => missing[A](flagKey, defaultValue)
+        case Some(FlagValue.StructureValue(value)) =>
+          val v = value.asInstanceOf[A]
+          resolution[A](v)
+        case Some(_) => typeMismatch(flagKey, defaultValue)
+      }
+    }
+
+    resolved.handleError { case _ => missing[A](flagKey, defaultValue) }
+  }
 
 }
 
 object MemoryProvider {
 
   def apply[F[_]: Sync](
-      state: Map[String, MemoryFlagState]
+      state: Map[String, FlagValue]
   ): F[MemoryProvider[F]] =
     for {
-      ref <- Ref.of[F, Map[String, MemoryFlagState]](state)
+      ref <- Ref.of[F, Map[String, FlagValue]](state)
     } yield new MemoryProvider[F](ref)
 
 }

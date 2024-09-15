@@ -21,6 +21,7 @@ import munit.CatsEffectSuite
 
 import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
+import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureDecoderError
 
@@ -41,7 +42,7 @@ class MemoryProviderTest extends CatsEffectSuite {
   test("can return boolean values") {
     val expected = true
 
-    val flag  = MemoryFlagState.BooleanFlagState(expected)
+    val flag  = FlagValue.BooleanValue(expected)
     val key   = "boolean-flag-key"
     val state = Map(key -> flag)
 
@@ -63,7 +64,7 @@ class MemoryProviderTest extends CatsEffectSuite {
   test("can return string values") {
     val expected = "string"
 
-    val flag  = MemoryFlagState.StringFlagState(expected)
+    val flag  = FlagValue.StringValue(expected)
     val key   = "string-flag-key"
     val state = Map(key -> flag)
 
@@ -85,7 +86,7 @@ class MemoryProviderTest extends CatsEffectSuite {
   test("can return int values when type is as expected") {
     val expected = 33
 
-    val flag  = MemoryFlagState.IntFlagState(expected)
+    val flag  = FlagValue.IntValue(expected)
     val key   = "int-flag-key"
     val state = Map(key -> flag)
 
@@ -107,7 +108,7 @@ class MemoryProviderTest extends CatsEffectSuite {
   test("can return double values when type is as expected") {
     val expected = 40.0
 
-    val flag  = MemoryFlagState.DoubleFlagState(expected)
+    val flag  = FlagValue.DoubleValue(expected)
     val key   = "double-flag-key"
     val state = Map(key -> flag)
 
@@ -126,11 +127,33 @@ class MemoryProviderTest extends CatsEffectSuite {
     }
   }
 
+  test("can return structure values") {
+    val expected = TestStructure("a", 0)
+
+    val flag  = FlagValue.StructureValue(expected)
+    val key   = "structure-flag-key"
+    val state = Map(key -> flag)
+
+    val default = TestStructure("a", 0)
+
+    MemoryProvider[IO](state).flatMap { provider =>
+      val resolution = provider.resolveStructureValue[TestStructure](
+        key,
+        default,
+        EvaluationContext.empty
+      )
+
+      for {
+        result <- resolution.map(_.value)
+      } yield assertEquals(result, expected)
+    }
+  }
+
   test("receives type mismatch error when boolean not received") {
     val expectedValue     = false
     val expectedErrorCode = Some(ErrorCode.TypeMismatch)
 
-    val flag  = MemoryFlagState.DoubleFlagState(0.0)
+    val flag  = FlagValue.DoubleValue(0.0)
     val key   = "boolean-flag-key"
     val state = Map(key -> flag)
 
@@ -158,7 +181,7 @@ class MemoryProviderTest extends CatsEffectSuite {
     val expectedValue     = "default"
     val expectedErrorCode = Some(ErrorCode.TypeMismatch)
 
-    val flag  = MemoryFlagState.DoubleFlagState(0.0)
+    val flag  = FlagValue.DoubleValue(0.0)
     val key   = "string-flag-key"
     val state = Map(key -> flag)
 
@@ -186,7 +209,7 @@ class MemoryProviderTest extends CatsEffectSuite {
     val expectedValue     = 33
     val expectedErrorCode = Some(ErrorCode.TypeMismatch)
 
-    val flag  = MemoryFlagState.DoubleFlagState(0.0)
+    val flag  = FlagValue.DoubleValue(0.0)
     val key   = "int-flag-key"
     val state = Map(key -> flag)
 
@@ -214,7 +237,7 @@ class MemoryProviderTest extends CatsEffectSuite {
     val expectedValue     = 40.0
     val expectedErrorCode = Some(ErrorCode.TypeMismatch)
 
-    val flag  = MemoryFlagState.IntFlagState(0)
+    val flag  = FlagValue.IntValue(0)
     val key   = "double-flag-key"
     val state = Map(key -> flag)
 
@@ -237,5 +260,30 @@ class MemoryProviderTest extends CatsEffectSuite {
       }
     }
   }
+
+  // test(
+  //   "receives type mismatch error when expected structure type not received"
+  // ) {
+  //   val expected = TestStructure("a", 0)
+  //
+  //   val flag  = FlagValue.StructureValue(OtherTestStructure(40.0))
+  //   val key   = "structure-flag-key"
+  //   val state = Map(key -> flag)
+  //
+  //   val default = expected
+  //
+  //   MemoryProvider[IO](state).flatMap { provider =>
+  //     val resolution = provider.resolveStructureValue(
+  //       key,
+  //       default,
+  //       EvaluationContext.empty
+  //     )
+  //
+  //     for {
+  //       result <- resolution
+  //       _ <- IO.println("alexxxxxx")
+  //     } yield assertEquals(result.value, expected)
+  //   }
+  // }
 
 }
