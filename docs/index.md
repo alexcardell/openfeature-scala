@@ -24,6 +24,18 @@ libraryDependencies ++= Seq(
 )
 ```
 
+## OpenFeature Compatibility
+
+|Features|Status|
+|---|---|
+|Providers|✅|
+|Targeting|✅|
+|Logging|🚧|
+|Domains|🚧|
+|Eventing|🚧|
+|Shutdown|🚧|
+|Transaction Context Propagation|🚧|
+
 ## OpenFeature Usage
 
 The OpenFeature SDK adds features like handling default values in case of errors.
