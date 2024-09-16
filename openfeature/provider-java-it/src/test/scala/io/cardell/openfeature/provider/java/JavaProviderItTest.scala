@@ -142,6 +142,22 @@ class JavaProviderItTest extends CatsEffectSuite with TestContainerForAll {
     }
   }
 
+  test("can resolve structure".ignore) {
+    val expected = TestVariant("string", 33)
+
+    withContainers { containers =>
+      provider(containers).use { flipt =>
+        for {
+          res <- flipt.resolveStructureValue(
+            "variant-flag-1",
+            TestVariant("a", 0),
+            evaluationContext
+          )
+        } yield assertEquals(res.value, expected)
+      }
+    }
+  }
+
   test("feature client handles error when flag not found") {
     val expected = true
 
@@ -161,3 +177,4 @@ class JavaProviderItTest extends CatsEffectSuite with TestContainerForAll {
   }
 
 }
+

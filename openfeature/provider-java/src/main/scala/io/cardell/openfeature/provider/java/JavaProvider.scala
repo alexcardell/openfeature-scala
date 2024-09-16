@@ -1,5 +1,22 @@
+/*
+ * Copyright 2023 Alex Cardell
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.cardell.openfeature.provider.java
 
+import cats.effect.kernel.Resource
 import cats.effect.kernel.Sync
 import cats.syntax.all._
 import dev.openfeature.sdk.{ErrorCode => JErrorCode}
@@ -19,7 +36,6 @@ import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
-import cats.effect.kernel.Resource
 
 private[java] class JavaProvider[F[_]: Sync](jProvider: JProvider)
     extends EvaluationProvider[F] {
@@ -113,25 +129,53 @@ private[java] class JavaProvider[F[_]: Sync](jProvider: JProvider)
       flagKey: String,
       defaultValue: String,
       context: EvaluationContext
-  ): F[ResolutionDetails[String]] = ???
+  ): F[ResolutionDetails[String]] = Sync[F]
+    .blocking(
+      jProvider.getStringEvaluation(flagKey, defaultValue, toJContext(context))
+    )
+    .map(toResolutionDetails[java.lang.String, String](_, identity))
 
   override def resolveIntValue(
       flagKey: String,
       defaultValue: Int,
       context: EvaluationContext
-  ): F[ResolutionDetails[Int]] = ???
+  ): F[ResolutionDetails[Int]] = Sync[F]
+    .blocking(
+      jProvider.getIntegerEvaluation(flagKey, defaultValue, toJContext(context))
+    )
+    .map(toResolutionDetails[java.lang.Integer, Int](_, identity))
 
   override def resolveDoubleValue(
       flagKey: String,
       defaultValue: Double,
       context: EvaluationContext
-  ): F[ResolutionDetails[Double]] = ???
+  ): F[ResolutionDetails[Double]] = Sync[F]
+    .blocking(
+      jProvider.getDoubleEvaluation(flagKey, defaultValue, toJContext(context))
+    )
+    .map(toResolutionDetails[java.lang.Double, Double](_, identity))
 
   override def resolveStructureValue[A: StructureDecoder](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
-  ): F[ResolutionDetails[A]] = ???
+  ): F[ResolutionDetails[A]] = {
+    // TODO figure out how to get any case class to be a Value
+    // is this a use case for json
+    val value = new JValue(defaultValue)
+
+    Sync[F]
+      .blocking(
+        jProvider.getObjectEvaluation(
+          flagKey,
+          value,
+          toJContext(context)
+        )
+      )
+      .map(toResolutionDetails[JValue, A](_, _.asObject().asInstanceOf[A]))
+
+    ???
+  }
 
 }
 
