@@ -45,7 +45,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     tailChildContainers = true
   )
 
-  def api(containers: Containers): Resource[IO, FliptProvider[IO]] = {
+  def provider(containers: Containers): Resource[IO, FliptProvider[IO]] = {
     val flipt =
       containers
         .asInstanceOf[DockerComposeContainer]
@@ -82,7 +82,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     val expected = true
 
     withContainers { containers =>
-      api(containers).use { flipt =>
+      provider(containers).use { flipt =>
         for {
           res <- flipt.resolveBooleanValue(
             "boolean-flag-1",
@@ -98,7 +98,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     val expected = false
 
     withContainers { containers =>
-      api(containers).use { flipt =>
+      provider(containers).use { flipt =>
         for {
           res <- flipt.resolveBooleanValue(
             "no-flag",
@@ -114,7 +114,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     val expected = "string-variant-1"
 
     withContainers { containers =>
-      api(containers).use { flipt =>
+      provider(containers).use { flipt =>
         for {
           res <- flipt.resolveStringValue(
             "string-variant-flag-1",
@@ -130,7 +130,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     val expected = "some-string"
 
     withContainers { containers =>
-      api(containers).use { flipt =>
+      provider(containers).use { flipt =>
         for {
           res <- flipt.resolveStringValue(
             "no-flag",
@@ -146,7 +146,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     val expected = 13
 
     withContainers { containers =>
-      api(containers).use { flipt =>
+      provider(containers).use { flipt =>
         for {
           res <- flipt.resolveIntValue(
             "int-variant-flag-1",
@@ -162,7 +162,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     val expected = 17.1
 
     withContainers { containers =>
-      api(containers).use { flipt =>
+      provider(containers).use { flipt =>
         for {
           res <- flipt.resolveDoubleValue(
             "double-variant-flag-1",
@@ -178,7 +178,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     val expected = TestVariant("string", 33)
 
     withContainers { containers =>
-      api(containers).use { flipt =>
+      provider(containers).use { flipt =>
         for {
           res <- flipt.resolveStructureValue[TestVariant](
             "variant-flag-1",
