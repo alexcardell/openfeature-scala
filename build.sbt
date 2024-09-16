@@ -94,7 +94,27 @@ lazy val `openfeature-provider-java` = crossProject(JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("openfeature/provider-java"))
   .settings(commonDependencies)
+  .settings(
+    libraryDependencies ++= Seq(
+      "dev.openfeature" % "sdk" % "1.10.0"
+    )
+  )
   .dependsOn(`openfeature-sdk`)
+
+lazy val `openfeature-provider-java-it` = crossProject(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("openfeature/provider-java-it"))
+  .enablePlugins(NoPublishPlugin)
+  .settings(commonDependencies)
+  .settings(
+    libraryDependencies ++= Seq(
+      "dev.openfeature.contrib.providers" % "flipt" % "0.1.0" % Test,
+      "com.dimafeng" %% "testcontainers-scala-munit" % V.testcontainers % Test
+    )
+  )
+  .dependsOn(
+    `openfeature-provider-java`
+  )
 
 lazy val `openfeature-provider-flipt` = crossProject(
   JVMPlatform,
@@ -156,7 +176,6 @@ lazy val `flipt-sdk-server-it` = crossProject(JVMPlatform)
     )
   )
   .dependsOn(`flipt-sdk-server`)
-
 
 lazy val examples = crossProject(JVMPlatform)
   .crossType(CrossType.Pure)
