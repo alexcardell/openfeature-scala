@@ -97,7 +97,8 @@ lazy val `openfeature-provider-java` = crossProject(JVMPlatform)
   .settings(
     libraryDependencies ++= Seq(
       "dev.openfeature" % "sdk" % "1.10.0"
-    )
+    ),
+    tlVersionIntroduced := List("2.13", "3").map(_ -> "0.3.1").toMap
   )
   .dependsOn(`openfeature-sdk`)
 
