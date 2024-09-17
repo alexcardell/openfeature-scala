@@ -2,6 +2,9 @@ package io.cardell.openfeature.provider.java
 
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureDecoderError
+import io.cardell.openfeature.StructureEncoder
+import io.cardell.openfeature.StructureEncoderError
+import io.cardell.openfeature.FlagValue
 
 case class TestVariant(field: String, intField: Int)
 
@@ -16,5 +19,13 @@ object TestVariant {
 
     }
 
-}
+  implicit val se: StructureEncoder[TestVariant] =
+    new StructureEncoder[TestVariant] {
 
+      def encodeStructure(
+          in: TestVariant
+      ): Either[StructureEncoderError, Map[String, FlagValue]] = ???
+
+    }
+
+}

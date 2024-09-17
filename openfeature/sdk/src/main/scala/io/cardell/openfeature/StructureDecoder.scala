@@ -26,3 +26,34 @@ object StructureDecoder {
     implicitly
 
 }
+
+trait StructureEncoder[A] {
+
+  def encodeStructure(
+      in: A
+  ): Either[StructureEncoderError, Map[String, FlagValue]]
+
+}
+
+trait StructureCodec[A] extends StructureDecoder[A] with StructureEncoder[A]
+
+object StructureCodec {
+
+  implicit def codec[A](
+      implicit d: StructureDecoder[A],
+      e: StructureEncoder[A]
+  ): StructureCodec[A] =
+    new StructureCodec[A] {
+
+      def encodeStructure(
+          in: A
+      ): Either[StructureEncoderError, Map[String, FlagValue]] = e
+        .encodeStructure(in)
+
+      def decodeStructure(s: String): Either[StructureDecoderError, A] = d
+        .decodeStructure(s)
+
+    }
+
+  def apply[A](implicit sc: StructureCodec[A]): StructureCodec[A] = implicitly
+}

@@ -17,3 +17,4 @@
 package io.cardell.openfeature
 
 trait StructureDecoderError extends Throwable
+trait StructureEncoderError extends Throwable

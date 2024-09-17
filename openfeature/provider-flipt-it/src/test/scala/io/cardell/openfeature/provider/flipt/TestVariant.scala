@@ -17,10 +17,13 @@
 package io.cardell.openfeature.provider.flipt
 
 import io.circe.Decoder
+import io.circe.Encoder
 import io.circe.generic.semiauto.deriveDecoder
+import io.circe.generic.semiauto.deriveEncoder
 
 case class TestVariant(field: String, intField: Int)
 
 object TestVariant {
-  implicit val decoder: Decoder[TestVariant] = deriveDecoder
+  implicit val decoder: Decoder[TestVariant]          = deriveDecoder
+  implicit val encoder: Encoder.AsObject[TestVariant] = deriveEncoder
 }

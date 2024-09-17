@@ -32,7 +32,7 @@ import io.cardell.openfeature.ContextValue
 import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
-import io.cardell.openfeature.StructureDecoder
+import io.cardell.openfeature.StructureCodec
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
@@ -155,7 +155,7 @@ private[java] class JavaProvider[F[_]: Sync](jProvider: JProvider)
     )
     .map(toResolutionDetails[java.lang.Double, Double](_, identity))
 
-  override def resolveStructureValue[A: StructureDecoder](
+  override def resolveStructureValue[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext

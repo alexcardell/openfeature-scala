@@ -27,6 +27,7 @@ import io.cardell.flipt.model.{EvaluationReason => FliptReason}
 import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
+import io.cardell.openfeature.StructureCodec
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureDecoderError
 import io.cardell.openfeature.provider.EvaluationProvider
@@ -103,7 +104,7 @@ final class FliptProvider[F[_]: MonadThrow](
     context
   )
 
-  override def resolveStructureValue[A: StructureDecoder](
+  override def resolveStructureValue[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
@@ -119,7 +120,7 @@ final class FliptProvider[F[_]: MonadThrow](
     )
 
     val resolution = flipt.evaluateVariant(req).map { evaluation =>
-      val decodedAttachment = StructureDecoder[A]
+      val decodedAttachment = StructureCodec[A]
         .decodeStructure(evaluation.variantAttachment)
 
       decodedAttachment match {

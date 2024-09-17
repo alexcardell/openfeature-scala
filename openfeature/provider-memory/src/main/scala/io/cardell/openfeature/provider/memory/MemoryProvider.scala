@@ -25,7 +25,7 @@ import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
 import io.cardell.openfeature.FlagValue
-import io.cardell.openfeature.StructureDecoder
+import io.cardell.openfeature.StructureCodec
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
@@ -124,7 +124,7 @@ final class MemoryProvider[F[_]: MonadThrow](
     *
     * Can't get around type erasure to do the check
     */
-  override def resolveStructureValue[A: StructureDecoder](
+  override def resolveStructureValue[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext

@@ -24,6 +24,8 @@ import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureDecoderError
+import io.cardell.openfeature.StructureEncoder
+import io.cardell.openfeature.StructureEncoderError
 
 class MemoryProviderTest extends CatsEffectSuite {
 
@@ -36,6 +38,15 @@ class MemoryProviderTest extends CatsEffectSuite {
       def decodeStructure(
           string: String
       ): Either[StructureDecoderError, TestStructure] = ???
+
+    }
+
+  implicit val b: StructureEncoder[TestStructure] =
+    new StructureEncoder[TestStructure] {
+
+      def encodeStructure(
+          in: TestStructure
+      ): Either[StructureEncoderError, Map[String, FlagValue]] = ???
 
     }
 

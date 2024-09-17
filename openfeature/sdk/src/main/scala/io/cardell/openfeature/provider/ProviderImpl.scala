@@ -29,7 +29,7 @@ import io.cardell.openfeature.Hook
 import io.cardell.openfeature.HookContext
 import io.cardell.openfeature.HookHints
 import io.cardell.openfeature.Hooks
-import io.cardell.openfeature.StructureDecoder
+import io.cardell.openfeature.StructureCodec
 
 protected class ProviderImpl[F[_]: MonadThrow](
     evaluationProvider: EvaluationProvider[F],
@@ -130,7 +130,7 @@ protected class ProviderImpl[F[_]: MonadThrow](
       )
     }
 
-  override def resolveStructureValue[A: StructureDecoder](
+  override def resolveStructureValue[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
