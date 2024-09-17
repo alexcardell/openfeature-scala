@@ -33,8 +33,6 @@ import io.cardell.flipt.auth.AuthenticationStrategy
 import io.cardell.openfeature.ContextValue
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.StructureCodec
-import io.cardell.openfeature.StructureDecoder
-import io.cardell.openfeature.StructureEncoder
 import io.cardell.openfeature.circe._
 
 // see docker-compose features.yaml for flag test data
@@ -180,7 +178,7 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
   test("can deserialise variant match") {
     val expected = TestVariant("string", 33)
 
-    val i = implicitly[StructureCodec[TestVariant]]
+    implicitly[StructureCodec[TestVariant]]
 
     withContainers { containers =>
       provider(containers).use { flipt =>

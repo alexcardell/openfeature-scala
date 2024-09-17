@@ -142,7 +142,7 @@ class JavaProviderItTest extends CatsEffectSuite with TestContainerForAll {
     }
   }
 
-  test("can resolve structure".ignore) {
+  test("can resolve structure") {
     val expected = TestVariant("string", 33)
 
     withContainers { containers =>

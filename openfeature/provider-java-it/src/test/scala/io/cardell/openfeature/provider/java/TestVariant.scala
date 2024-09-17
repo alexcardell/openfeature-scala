@@ -5,6 +5,7 @@ import io.cardell.openfeature.StructureDecoderError
 import io.cardell.openfeature.StructureEncoder
 import io.cardell.openfeature.StructureEncoderError
 import io.cardell.openfeature.FlagValue
+import io.cardell.openfeature.FlagValue.{StringValue, IntValue}
 
 case class TestVariant(field: String, intField: Int)
 
@@ -24,7 +25,12 @@ object TestVariant {
 
       def encodeStructure(
           in: TestVariant
-      ): Either[StructureEncoderError, Map[String, FlagValue]] = ???
+      ): Either[StructureEncoderError, Map[String, FlagValue]] = Right(
+        Map(
+          "field"    -> StringValue(in.field),
+          "intField" -> IntValue(in.intField)
+        )
+      )
 
     }
 

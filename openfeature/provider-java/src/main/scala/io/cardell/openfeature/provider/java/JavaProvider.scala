@@ -22,6 +22,7 @@ import cats.syntax.all._
 import dev.openfeature.sdk.{ErrorCode => JErrorCode}
 import dev.openfeature.sdk.{FeatureProvider => JProvider}
 import dev.openfeature.sdk.{ImmutableContext => JContext}
+import dev.openfeature.sdk.{ImmutableStructure => JImmutableStructure}
 import dev.openfeature.sdk.{ProviderEvaluation => JEvaluation}
 import dev.openfeature.sdk.{Reason => JReason}
 import dev.openfeature.sdk.{Value => JValue}
@@ -32,6 +33,7 @@ import io.cardell.openfeature.ContextValue
 import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
+import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.StructureCodec
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
@@ -98,6 +100,20 @@ private[java] class JavaProvider[F[_]: Sync](jProvider: JProvider)
     )
   }
 
+  private def toJStructure(map: Map[String, FlagValue]): JImmutableStructure =
+    new JImmutableStructure(map.map { case (k, v) => (k, toJValue(v)) }.asJava)
+
+  private def toJValue(f: FlagValue): JValue =
+    f match {
+      case FlagValue.BooleanValue(b)   => new JValue(b)
+      case FlagValue.StringValue(s)    => new JValue(s)
+      case FlagValue.IntValue(i)       => new JValue(i)
+      case FlagValue.DoubleValue(d)    => new JValue(d)
+      case FlagValue.StructureValue(_) => new JValue("")
+      // val attrs = toJValueMap(s.encoded.get)
+      // new JValue(attrs)
+    }
+
   override def metadata: ProviderMetadata = {
     lazy val default = ProviderMetadata(name = "java-default")
 
@@ -162,19 +178,21 @@ private[java] class JavaProvider[F[_]: Sync](jProvider: JProvider)
   ): F[ResolutionDetails[A]] = {
     // TODO figure out how to get any case class to be a Value
     // is this a use case for json
-    val value = new JValue(defaultValue)
+    val maybeValue = StructureCodec[A].encodeStructure(defaultValue)
 
-    Sync[F]
-      .blocking(
-        jProvider.getObjectEvaluation(
-          flagKey,
-          value,
-          toJContext(context)
-        )
-      )
-      .map(toResolutionDetails[JValue, A](_, _.asObject().asInstanceOf[A]))
-
-    ???
+    maybeValue match {
+      case Left(e) => Sync[F].raiseError(e)
+      case Right(value) =>
+        Sync[F]
+          .blocking(
+            jProvider.getObjectEvaluation(
+              flagKey,
+              new JValue(toJStructure(value)),
+              toJContext(context)
+            )
+          )
+          .map(toResolutionDetails[JValue, A](_, _.asObject().asInstanceOf[A]))
+    }
   }
 
 }

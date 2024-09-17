@@ -18,8 +18,6 @@ package io.cardell.openfeature.circe
 
 import cats.syntax.all._
 import io.circe.Encoder
-import io.circe.Json
-import io.circe.JsonNumber
 import io.circe.JsonObject
 import io.circe.syntax._
 import scala.util.Try
