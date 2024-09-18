@@ -29,7 +29,7 @@ object FlagMetadataValue {
   // TODO circe unwrapped codecs
 }
 
-case class ResolutionDetails[A](
+case class ResolutionDetails[A] private[openfeature] (
     value: A,
     errorCode: Option[ErrorCode],
     errorMessage: Option[String],
@@ -38,7 +38,19 @@ case class ResolutionDetails[A](
     metadata: Option[FlagMetadata]
 )
 
-object ResolutionDetails {
+private[openfeature] object ResolutionDetails {
+
+  def apply[A](
+      defaultValue: A,
+      reason: Option[EvaluationReason]
+  ): ResolutionDetails[A] = ResolutionDetails[A](
+    value = defaultValue,
+    errorCode = None,
+    errorMessage = None,
+    reason = reason,
+    variant = None,
+    metadata = None
+  )
 
   def error[A](defaultValue: A, error: Throwable): ResolutionDetails[A] =
     ResolutionDetails[A](

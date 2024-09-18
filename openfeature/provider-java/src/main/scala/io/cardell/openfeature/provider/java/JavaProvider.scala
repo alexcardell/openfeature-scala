@@ -171,7 +171,7 @@ private[java] class JavaProvider[F[_]: Sync](jProvider: JProvider)
     )
     .map(toResolutionDetails[java.lang.Double, Double](_, identity))
 
-  override def resolveStructureValue[A: StructureCodec](
+  private def resolveStructureValueImpl[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
@@ -194,6 +194,14 @@ private[java] class JavaProvider[F[_]: Sync](jProvider: JProvider)
           .map(toResolutionDetails[JValue, A](_, _.asObject().asInstanceOf[A]))
     }
   }
+
+  override def resolveStructureValue[A: StructureCodec](
+      flagKey: String,
+      defaultValue: A,
+      context: EvaluationContext
+  ): F[ResolutionDetails[A]] =
+    // don't attempt it, return default
+    ResolutionDetails(defaultValue, Some(EvaluationReason.Default)).pure[F]
 
 }
 
