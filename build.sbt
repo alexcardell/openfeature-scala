@@ -110,6 +110,7 @@ lazy val `openfeature-provider-java-it` = crossProject(JVMPlatform)
   .settings(
     libraryDependencies ++= Seq(
       "dev.openfeature.contrib.providers" % "flipt" % "0.1.0" % Test,
+      "dev.openfeature.contrib.providers" % "flagd" % "0.8.9" % Test,
       "com.dimafeng" %% "testcontainers-scala-munit" % V.testcontainers % Test
     )
   )

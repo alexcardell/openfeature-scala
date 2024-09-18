@@ -34,6 +34,8 @@ import io.cardell.openfeature.ContextValue
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.FeatureClientImpl
 import io.cardell.openfeature.EvaluationReason
+import dev.openfeature.contrib.providers.flagd.FlagdOptions
+import dev.openfeature.contrib.providers.flagd.FlagdProvider
 
 // see docker-compose features.yaml for flag test data
 class JavaProviderItTest extends CatsEffectSuite with TestContainerForAll {
@@ -45,6 +47,25 @@ class JavaProviderItTest extends CatsEffectSuite with TestContainerForAll {
     ),
     tailChildContainers = true
   )
+
+  def flagd(containers: Containers): Resource[IO, JavaProvider[IO]] = {
+    val flagd =
+      containers
+        .asInstanceOf[DockerComposeContainer]
+        .getContainerByServiceName("flagd")
+        .get
+
+    val flagdProvder =
+      new FlagdProvider(
+        FlagdOptions
+          .builder()
+          .host(flagd.getHost())
+          .port(flagd.getMappedPort(8013).toInt)
+          .build()
+      )
+
+    JavaProvider.resource[IO](flagdProvder)
+  }
 
   def provider(containers: Containers): Resource[IO, JavaProvider[IO]] = {
     val flipt =
@@ -142,17 +163,18 @@ class JavaProviderItTest extends CatsEffectSuite with TestContainerForAll {
     }
   }
 
-  test("can resolve structure") {
+  test("can resolve structure".only) {
     val expected = TestVariant("string", 33)
 
     withContainers { containers =>
-      provider(containers).use { flipt =>
+      flagd(containers).use { flagd =>
         for {
-          res <- flipt.resolveStructureValue(
+          res <- flagd.resolveStructureValue(
             "variant-flag-1",
             TestVariant("a", 0),
             evaluationContext
           )
+          _ <- IO.println(res)
         } yield assertEquals(res.value, expected)
       }
     }
@@ -177,4 +199,3 @@ class JavaProviderItTest extends CatsEffectSuite with TestContainerForAll {
   }
 
 }
-

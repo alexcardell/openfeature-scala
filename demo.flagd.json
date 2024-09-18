@@ -1,0 +1,16 @@
+{
+  "$schema": "https://flagd.dev/schema/v0/flags.json",
+  "flags": {
+    "variant-flag-1": {
+      "state": "ENABLED",
+      "defaultVariant": "key-1",
+      "variants": {
+        "key-1": {
+          "field": "string",
+          "intField": 33
+        }
+      },
+      "targeting": {}
+    }
+  }
+}
