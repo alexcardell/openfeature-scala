@@ -44,7 +44,7 @@ See `Flipt usage` on how to set up the `FliptApi`. Once done, set up a provider:
 
 ```scala mdoc
 import cats.effect.IO
-import io.circe.Decoder
+import io.circe.Codec
 
 import io.cardell.flipt.FliptApi
 import io.cardell.openfeature.OpenFeature
@@ -53,7 +53,7 @@ import io.cardell.openfeature.circe._
 
 case class SomeVariant(field: String, field2: Int)
 
-def provider(flipt: FliptApi[IO])(implicit d: Decoder[SomeVariant]) = {
+def provider(flipt: FliptApi[IO])(implicit c: Codec[SomeVariant]) = {
     val featureSdk = OpenFeature[IO](new FliptProvider[IO](flipt, "some-namespace"))
 
     featureSdk.client.flatMap { featureClient =>
