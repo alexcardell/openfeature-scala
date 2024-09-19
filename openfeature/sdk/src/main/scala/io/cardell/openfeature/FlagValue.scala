@@ -48,12 +48,12 @@ object FlagValue {
   def apply(d: Double): FlagValue    = DoubleValue(d)
   def apply(s: Structure): FlagValue = StructureValue(s)
 
-  def structure[A: StructureEncoder](s: A): FlagValue = StructureValue(
-    StructureEncoder[A].encodeStructure(s)
-  )
+  // def structure[A: StructureEncoder](s: A): FlagValue = StructureValue(
+  //   StructureEncoder[A].encodeStructure(s)
+  // )
 
-  def apply[A: HasFlagValue](value: A): FlagValue = HasFlagValue[A].toFlagValue(
-    value
-  )
+  // def apply[A: HasFlagValue](value: A): FlagValue = HasFlagValue[A].toFlagValue(
+  //   value
+  // )
 
 }

@@ -16,11 +16,11 @@
 
 package io.cardell.openfeature
 
-trait StructureEncoder[A] {
+private[openfeature] trait StructureEncoder[A] {
   def encodeStructure(value: A): Structure
 }
 
-object StructureEncoder {
+private[openfeature] object StructureEncoder {
 
   def apply[A](implicit sd: StructureEncoder[A]): StructureEncoder[A] =
     implicitly

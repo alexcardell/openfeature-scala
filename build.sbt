@@ -140,7 +140,7 @@ lazy val `openfeature-provider-flipt` = crossProject(
     name := "openfeature-provider-flipt"
   )
   .dependsOn(
-    `openfeature-sdk`,
+    // `openfeature-sdk`,
     `openfeature-sdk-circe`,
     `flipt-sdk-server`
   )
@@ -159,8 +159,7 @@ lazy val `openfeature-provider-flipt-it` = crossProject(JVMPlatform)
     )
   )
   .dependsOn(
-    `openfeature-provider-flipt`,
-    `openfeature-sdk-circe`
+    `openfeature-provider-flipt`
   )
 
 lazy val examples = crossProject(JVMPlatform)

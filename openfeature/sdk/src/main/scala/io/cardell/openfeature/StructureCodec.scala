@@ -20,9 +20,10 @@ trait StructureCodec[A] extends StructureEncoder[A] with StructureDecoder[A]
 
 object StructureCodec {
 
-  def apply[A](implicit sd: StructureCodec[A]): StructureCodec[A] = implicitly
+  def apply[A](implicit instance: StructureCodec[A]): StructureCodec[A] =
+    instance
 
-  def apply[A](
+  def from[A](
       e: StructureEncoder[A],
       d: StructureDecoder[A]
   ): StructureCodec[A] =
@@ -39,6 +40,6 @@ object StructureCodec {
   implicit def codec[A](
       implicit e: StructureEncoder[A],
       d: StructureDecoder[A]
-  ): StructureCodec[A] = apply(e, d)
+  ): StructureCodec[A] = StructureCodec.from[A](e, d)
 
 }

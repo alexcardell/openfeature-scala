@@ -25,48 +25,18 @@ import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.FlagValue.IntValue
 import io.cardell.openfeature.FlagValue.StringValue
 import io.cardell.openfeature.Structure
+import io.cardell.openfeature.StructureCodec
+import io.cardell.openfeature.StructureCodec._
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureDecoderError
 import io.cardell.openfeature.StructureEncoder
 
+case class TestStructure(s: String, i: Int)
+case class OtherTestStructure(d: Double)
+
 class MemoryProviderTest extends CatsEffectSuite {
 
-  case class TestStructure(s: String, i: Int)
-  case class OtherTestStructure(d: Double)
-
-  implicit val encoder: StructureEncoder[TestStructure] =
-    new StructureEncoder[TestStructure] {
-
-      def encodeStructure(
-          value: TestStructure
-      ): Structure = Structure(
-        Map("s" -> StringValue(value.s), "i" -> IntValue(value.i))
-      )
-
-    }
-
-  implicit val decoder: StructureDecoder[TestStructure] =
-    new StructureDecoder[TestStructure] {
-
-      def decodeStructure(
-          structure: Structure
-      ): Either[StructureDecoderError, TestStructure] = {
-        val values =
-          for {
-            s <- structure.values.get("s")
-            i <- structure.values.get("i")
-          } yield (s, i)
-
-        values match {
-          case None =>
-            Left(StructureDecoderError(new Throwable("missing field")))
-          case Some((StringValue(s), IntValue(i))) => Right(TestStructure(s, i))
-          case Some(_) =>
-            Left(StructureDecoderError(new Throwable("invalid structure")))
-        }
-      }
-
-    }
+  import MemoryProviderTestUtils._
 
   test("can return boolean values") {
     val expected = true
@@ -159,7 +129,9 @@ class MemoryProviderTest extends CatsEffectSuite {
   test("can return structure values") {
     val expected = TestStructure("a", 0)
 
-    val flag  = FlagValue.structure(expected)
+    val flag = FlagValue(
+      StructureCodec[TestStructure].encodeStructure(expected)
+    )
     val key   = "structure-flag-key"
     val state = Map(key -> flag)
 
@@ -314,5 +286,43 @@ class MemoryProviderTest extends CatsEffectSuite {
   //     } yield assertEquals(result.value, expected)
   //   }
   // }
+
+}
+
+object MemoryProviderTestUtils {
+
+  implicit val encoder: StructureEncoder[TestStructure] =
+    new StructureEncoder[TestStructure] {
+
+      def encodeStructure(
+          value: TestStructure
+      ): Structure = Structure(
+        Map("s" -> StringValue(value.s), "i" -> IntValue(value.i))
+      )
+
+    }
+
+  implicit val decoder: StructureDecoder[TestStructure] =
+    new StructureDecoder[TestStructure] {
+
+      def decodeStructure(
+          structure: Structure
+      ): Either[StructureDecoderError, TestStructure] = {
+        val values =
+          for {
+            s <- structure.values.get("s")
+            i <- structure.values.get("i")
+          } yield (s, i)
+
+        values match {
+          case None =>
+            Left(StructureDecoderError(new Throwable("missing field")))
+          case Some((StringValue(s), IntValue(i))) => Right(TestStructure(s, i))
+          case Some(_) =>
+            Left(StructureDecoderError(new Throwable("invalid structure")))
+        }
+      }
+
+    }
 
 }

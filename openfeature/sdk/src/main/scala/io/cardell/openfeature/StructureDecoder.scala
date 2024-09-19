@@ -16,11 +16,11 @@
 
 package io.cardell.openfeature
 
-trait StructureDecoder[A] {
+private[openfeature] trait StructureDecoder[A] {
   def decodeStructure(structure: Structure): Either[StructureDecoderError, A]
 }
 
-object StructureDecoder {
+private[openfeature] object StructureDecoder {
 
   def apply[A](implicit sd: StructureDecoder[A]): StructureDecoder[A] =
     implicitly
