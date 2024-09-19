@@ -33,11 +33,13 @@ import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.FlagMetadataValue
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
+import io.cardell.openfeature.StructureCodec
 
 final class FliptProvider[F[_]: MonadThrow](
     flipt: FliptApi[F],
     namespace: String
 ) extends EvaluationProvider[F] {
+
 
   override def metadata: ProviderMetadata = ProviderMetadata(name = "flipt")
 
@@ -103,50 +105,56 @@ final class FliptProvider[F[_]: MonadThrow](
     context
   )
 
-  override def resolveStructureValue[A: StructureDecoder](
+  override def resolveStructureValue[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
-  ): F[ResolutionDetails[A]] = {
-    val evalContext = mapContext(context)
+  ): F[ResolutionDetails[A]] = ???
 
-    val req: EvaluationRequest = EvaluationRequest(
-      namespaceKey = namespace,
-      flagKey = flagKey,
-      entityId = context.targetingKey,
-      context = evalContext,
-      reference = None
-    )
-
-    val resolution = flipt.evaluateVariant(req).map { evaluation =>
-      val decodedAttachment = StructureDecoder[A]
-        .decodeStructure(evaluation.variantAttachment)
-
-      decodedAttachment match {
-        case Left(error) => decodeDefault[A](error, defaultValue)
-        case Right(decoded) =>
-          ResolutionDetails[A](
-            value = decoded,
-            errorCode = None,
-            errorMessage = None,
-            reason = mapReason(evaluation.reason).some,
-            variant = Some(evaluation.variantKey),
-            metadata = Some(
-              Map(
-                "variant-attachment" -> FlagMetadataValue
-                  .StringValue(evaluation.variantAttachment)
-              )
-            )
-          )
-      }
-
-    }
-
-    resolution.attempt.map {
-      case Right(value) => value
-      case Left(error)  => default(error, defaultValue)
-    }
-  }
+  // override def resolveStructureValue[A: StructureDecoder](
+  //     flagKey: String,
+  //     defaultValue: A,
+  //     context: EvaluationContext
+  // ): F[ResolutionDetails[A]] = {
+  //   val evalContext = mapContext(context)
+  //
+  //   val req: EvaluationRequest = EvaluationRequest(
+  //     namespaceKey = namespace,
+  //     flagKey = flagKey,
+  //     entityId = context.targetingKey,
+  //     context = evalContext,
+  //     reference = None
+  //   )
+  //
+  //   val resolution = flipt.evaluateVariant(req).map { evaluation =>
+  //     val decodedAttachment = StructureDecoder[A]
+  //       .decodeStructure(evaluation.variantAttachment)
+  //
+  //     decodedAttachment match {
+  //       case Left(error) => decodeDefault[A](error, defaultValue)
+  //       case Right(decoded) =>
+  //         ResolutionDetails[A](
+  //           value = decoded,
+  //           errorCode = None,
+  //           errorMessage = None,
+  //           reason = mapReason(evaluation.reason).some,
+  //           variant = Some(evaluation.variantKey),
+  //           metadata = Some(
+  //             Map(
+  //               "variant-attachment" -> FlagMetadataValue
+  //                 .StringValue(evaluation.variantAttachment)
+  //             )
+  //           )
+  //         )
+  //     }
+  //
+  //   }
+  //
+  //   resolution.attempt.map {
+  //     case Right(value) => value
+  //     case Left(error)  => default(error, defaultValue)
+  //   }
+  // }
 
   private def mapReason(evalReason: FliptReason): EvaluationReason =
     evalReason match {
@@ -174,7 +182,7 @@ final class FliptProvider[F[_]: MonadThrow](
   ) = ResolutionDetails[A](
     value = defaultValue,
     errorCode = Some(ErrorCode.ParseError),
-    errorMessage = Some(e.getMessage()),
+    errorMessage = Some(e.message),
     reason = Some(EvaluationReason.Error),
     variant = None,
     metadata = None

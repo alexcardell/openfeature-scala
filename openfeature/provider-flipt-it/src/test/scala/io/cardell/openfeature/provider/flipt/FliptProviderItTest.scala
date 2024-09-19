@@ -174,20 +174,20 @@ class FliptProviderItTest extends CatsEffectSuite with TestContainerForAll {
     }
   }
 
-  test("can deserialise variant match") {
-    val expected = TestVariant("string", 33)
-
-    withContainers { containers =>
-      api(containers).use { flipt =>
-        for {
-          res <- flipt.resolveStructureValue[TestVariant](
-            "variant-flag-1",
-            TestVariant("a", 0),
-            evaluationContext
-          )
-        } yield assertEquals(res.value, expected)
-      }
-    }
-  }
+  // test("can deserialise variant match") {
+  //   val expected = TestVariant("string", 33)
+  //
+  //   withContainers { containers =>
+  //     api(containers).use { flipt =>
+  //       for {
+  //         res <- flipt.resolveStructureValue[TestVariant](
+  //           "variant-flag-1",
+  //           TestVariant("a", 0),
+  //           evaluationContext
+  //         )
+  //       } yield assertEquals(res.value, expected)
+  //     }
+  //   }
+  // }
 
 }

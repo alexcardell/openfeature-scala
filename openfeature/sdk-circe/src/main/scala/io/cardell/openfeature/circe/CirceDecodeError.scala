@@ -22,4 +22,6 @@ import io.cardell.openfeature.StructureDecoderError
 
 case class CirceDecodeError(
     cause: DecodingFailure
-) extends StructureDecoderError
+) extends StructureDecoderError {
+  def message: String = cause.message
+}

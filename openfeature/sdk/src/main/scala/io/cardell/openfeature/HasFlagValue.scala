@@ -13,7 +13,10 @@ trait HasFlagValue[A] {
 object HasFlagValue {
   def apply[A](implicit h: HasFlagValue[A]): HasFlagValue[A] = implicitly
 
-  implicit val boolean: HasFlagValue[Boolean] = BooleanValue.apply _
-  // implicit val boolean: HasFlagValue[Boolean] = (BooleanValue.apply _)
+  implicit val boolean: HasFlagValue[Boolean]     = BooleanValue.apply _
+  implicit val int: HasFlagValue[Int]             = IntValue.apply _
+  implicit val double: HasFlagValue[Double]       = DoubleValue.apply _
+  implicit val string: HasFlagValue[String]       = StringValue.apply _
+  implicit val structure: HasFlagValue[Structure] = StructureValue.apply _
 
 }

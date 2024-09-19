@@ -20,6 +20,7 @@ import cats.Monad
 
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.StructureDecoder
+import io.cardell.openfeature.StructureCodec
 
 class StubEvaluationProvider[F[_]: Monad]() extends EvaluationProvider[F] {
 
@@ -51,7 +52,7 @@ class StubEvaluationProvider[F[_]: Monad]() extends EvaluationProvider[F] {
       context: EvaluationContext
   ): F[ResolutionDetails[Double]] = resolve(defaultValue)
 
-  override def resolveStructureValue[A: StructureDecoder](
+  override def resolveStructureValue[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext

@@ -29,6 +29,7 @@ import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
+import io.cardell.openfeature.StructureCodec
 
 /** Probably don't use in production, see `resolveStructureValue` for why
   */
@@ -124,7 +125,7 @@ final class MemoryProvider[F[_]: MonadThrow](
     *
     * Can't get around type erasure to do the check
     */
-  override def resolveStructureValue[A: StructureDecoder](
+  override def resolveStructureValue[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
