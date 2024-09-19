@@ -48,7 +48,7 @@ object FlagValue {
   def apply(d: Double): FlagValue    = DoubleValue(d)
   def apply(s: Structure): FlagValue = StructureValue(s)
 
-  def apply[A: StructureEncoder](s: A): FlagValue = StructureValue(
+  def structure[A: StructureEncoder](s: A): FlagValue = StructureValue(
     StructureEncoder[A].encodeStructure(s)
   )
 

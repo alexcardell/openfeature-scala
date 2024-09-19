@@ -17,8 +17,8 @@
 package io.cardell.openfeature.provider
 
 import io.cardell.openfeature.EvaluationContext
-import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureCodec
+import io.cardell.openfeature.StructureDecoder
 
 trait EvaluationProvider[F[_]] { self =>
   def metadata: ProviderMetadata

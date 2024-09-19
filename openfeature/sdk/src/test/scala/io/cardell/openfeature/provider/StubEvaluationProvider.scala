@@ -19,8 +19,8 @@ package io.cardell.openfeature.provider
 import cats.Monad
 
 import io.cardell.openfeature.EvaluationContext
-import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureCodec
+import io.cardell.openfeature.StructureDecoder
 
 class StubEvaluationProvider[F[_]: Monad]() extends EvaluationProvider[F] {
 

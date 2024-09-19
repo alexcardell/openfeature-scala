@@ -45,7 +45,7 @@ object StructureCodec {
   def apply[A](implicit sd: StructureCodec[A]): StructureCodec[A] = implicitly
 
   def apply[A](
-      implicit e: StructureEncoder[A],
+      e: StructureEncoder[A],
       d: StructureDecoder2[A]
   ): StructureCodec[A] =
     new StructureCodec[A] {
@@ -57,6 +57,11 @@ object StructureCodec {
       ): Either[StructureDecoderError, A] = d.decodeStructure(structure)
 
     }
+
+  implicit def codec[A](
+      implicit e: StructureEncoder[A],
+      d: StructureDecoder2[A]
+  ): StructureCodec[A] = apply(e, d)
 
 }
 
