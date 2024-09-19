@@ -16,34 +16,13 @@
 
 package io.cardell.openfeature
 
-trait StructureDecoderError {
-  def message: String
-  def cause: Throwable
+trait StructureEncoder[A] {
+  def encodeStructure(value: A): Structure
 }
 
-object StructureDecoderError {
+object StructureEncoder {
 
-  case class ThrowableError(t: Throwable) extends StructureDecoderError {
-    def message = t.getMessage()
-    def cause   = t
-  }
-
-  def apply(t: Throwable): StructureDecoderError = ThrowableError(t)
-
-}
-
-trait StructureEncoderError {
-  def message: String
-  def cause: Throwable
-}
-
-object StructureEncoderError {
-
-  case class ThrowableError(t: Throwable) extends StructureEncoderError {
-    def message = t.getMessage()
-    def cause   = t
-  }
-
-  def apply(t: Throwable): StructureEncoderError = ThrowableError(t)
+  def apply[A](implicit sd: StructureEncoder[A]): StructureEncoder[A] =
+    implicitly
 
 }

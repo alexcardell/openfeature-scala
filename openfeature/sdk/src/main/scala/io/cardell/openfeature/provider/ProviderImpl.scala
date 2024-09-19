@@ -24,14 +24,12 @@ import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.FinallyHook
-import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.HasFlagValue
 import io.cardell.openfeature.Hook
 import io.cardell.openfeature.HookContext
 import io.cardell.openfeature.HookHints
 import io.cardell.openfeature.Hooks
 import io.cardell.openfeature.StructureCodec
-import io.cardell.openfeature.StructureDecoder
 
 protected class ProviderImpl[F[_]: MonadThrow](
     evaluationProvider: EvaluationProvider[F],
@@ -131,19 +129,6 @@ protected class ProviderImpl[F[_]: MonadThrow](
         context = newContext
       )
     }
-
-  // override def resolveStructureValue[A: StructureDecoder](
-  //     flagKey: String,
-  //     defaultValue: A,
-  //     context: EvaluationContext
-  // ): F[ResolutionDetails[A]] = ???
-  // hookedResolve[A](flagKey, defaultValue, context) { newContext =>
-  //   evaluationProvider.resolveStructureValue(
-  //     flagKey = flagKey,
-  //     defaultValue = defaultValue,
-  //     context = newContext
-  //   )
-  // }
 
   override def resolveStructureValue[A: StructureCodec](
       flagKey: String,

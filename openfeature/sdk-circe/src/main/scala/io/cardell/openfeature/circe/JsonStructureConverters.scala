@@ -36,36 +36,38 @@ import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureDecoderError
 import io.cardell.openfeature.StructureEncoder
 
-trait CirceStructureDecoder {
+// TODO rename
+object JsonStructureConverters {
 
-  implicit def circeStructureDecode[A](
-      implicit d: Decoder[A]
-  ): StructureDecoder[A] =
-    new StructureDecoder[A] {
-
-      override def decodeStructure(
-          structure: Structure
-      ): Either[StructureDecoderError, A] = {
-        val jsonObject = JsonStructureConverters.structureToJson(structure)
-
-        jsonObject.toJson.as[A].leftMap(CirceDecodeError)
-      }
-
+  def jsonToStructure(json: JsonObject): Structure = {
+    val structure = json.toMap.mapFilter {
+      case o if o.isObject =>
+        o.asObject.map(jsonToStructure).map(StructureValue)
+      case n if n.isNumber  => n.asNumber.map(_.toDouble).map(DoubleValue)
+      case s if s.isString  => s.asString.map(StringValue)
+      case b if b.isBoolean => b.asBoolean.map(BooleanValue)
+      case n if n.isNull    => none[FlagValue]
+      case _                => none[FlagValue]
     }
 
-}
+    Structure(structure)
+  }
 
-trait CirceStructureEncoder {
+  def structureToJson(structure: Structure): JsonObject = {
+    val json = structure.values.map { case (k, v) =>
+      val value =
+        v match {
+          case BooleanValue(b)   => Json.fromBoolean(b)
+          case DoubleValue(d)    => Json.fromDoubleOrNull(d)
+          case StringValue(s)    => Json.fromString(s)
+          case IntValue(i)       => Json.fromInt(i)
+          case StructureValue(s) => Json.fromJsonObject(structureToJson(s))
+        }
 
-  implicit def circeStructureEncoder[A](
-      implicit encoder: Encoder.AsObject[A]
-  ): StructureEncoder[A] =
-    new StructureEncoder[A] {
-
-      override def encodeStructure(value: A): Structure =
-        JsonStructureConverters
-          .jsonToStructure(encoder.encodeObject(value))
-
+      k -> value
     }
+
+    JsonObject.fromMap(json)
+  }
 
 }

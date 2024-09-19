@@ -30,9 +30,8 @@ import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
 import io.cardell.openfeature.StructureCodec
 import io.cardell.openfeature.StructureDecoder
-import io.cardell.openfeature.StructureDecoder2
 import io.cardell.openfeature.StructureDecoderError
-import io.cardell.openfeature.circe.CirceStuff
+import io.cardell.openfeature.circe.JsonStructureConverters
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.FlagMetadataValue
 import io.cardell.openfeature.provider.ProviderMetadata
@@ -135,8 +134,8 @@ final class FliptProvider[F[_]: MonadThrow](
             new Throwable("did not receive json object")
           )
         case Right(Some(jsonObject)) =>
-          val structure        = CirceStuff.jsonToStructure(jsonObject)
-          val decodedStructure = StructureDecoder2[A].decodeStructure(structure)
+          val structure = JsonStructureConverters.jsonToStructure(jsonObject)
+          val decodedStructure = StructureDecoder[A].decodeStructure(structure)
           decodedStructure match {
             case Left(error) =>
               ResolutionDetails.error[A](defaultValue, error.cause)

@@ -27,7 +27,6 @@ import io.cardell.openfeature.EvaluationReason
 import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.StructureCodec
 import io.cardell.openfeature.StructureDecoder
-import io.cardell.openfeature.StructureDecoder2
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
@@ -135,7 +134,7 @@ final class MemoryProvider[F[_]: MonadThrow](
       state.get(flagKey) match {
         case None => missing[A](flagKey, defaultValue)
         case Some(FlagValue.StructureValue(value)) =>
-          val decoded = StructureDecoder2[A].decodeStructure(value)
+          val decoded = StructureDecoder[A].decodeStructure(value)
 
           decoded match {
             case Right(value) => resolution[A](value)

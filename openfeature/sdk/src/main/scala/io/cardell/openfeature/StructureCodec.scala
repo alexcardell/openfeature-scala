@@ -16,29 +16,7 @@
 
 package io.cardell.openfeature
 
-trait StructureDecoder2[A] {
-  def decodeStructure(structure: Structure): Either[StructureDecoderError, A]
-}
-
-object StructureDecoder2 {
-
-  def apply[A](implicit sd: StructureDecoder2[A]): StructureDecoder2[A] =
-    implicitly
-
-}
-
-trait StructureEncoder[A] {
-  def encodeStructure(value: A): Structure
-}
-
-object StructureEncoder {
-
-  def apply[A](implicit sd: StructureEncoder[A]): StructureEncoder[A] =
-    implicitly
-
-}
-
-trait StructureCodec[A] extends StructureEncoder[A] with StructureDecoder2[A]
+trait StructureCodec[A] extends StructureEncoder[A] with StructureDecoder[A]
 
 object StructureCodec {
 
@@ -46,7 +24,7 @@ object StructureCodec {
 
   def apply[A](
       e: StructureEncoder[A],
-      d: StructureDecoder2[A]
+      d: StructureDecoder[A]
   ): StructureCodec[A] =
     new StructureCodec[A] {
 
@@ -60,19 +38,7 @@ object StructureCodec {
 
   implicit def codec[A](
       implicit e: StructureEncoder[A],
-      d: StructureDecoder2[A]
+      d: StructureDecoder[A]
   ): StructureCodec[A] = apply(e, d)
-
-}
-
-@deprecated(message = "", since = "")
-trait StructureDecoder[A] {
-  def decodeStructure(string: String): Either[StructureDecoderError, A]
-}
-
-object StructureDecoder {
-
-  def apply[A](implicit sd: StructureDecoder[A]): StructureDecoder[A] =
-    implicitly
 
 }

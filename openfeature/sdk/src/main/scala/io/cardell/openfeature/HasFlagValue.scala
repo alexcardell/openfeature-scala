@@ -29,10 +29,18 @@ trait HasFlagValue[A] {
 object HasFlagValue {
   def apply[A](implicit h: HasFlagValue[A]): HasFlagValue[A] = implicitly
 
-  implicit val boolean: HasFlagValue[Boolean]     = BooleanValue.apply _
-  implicit val int: HasFlagValue[Int]             = IntValue.apply _
-  implicit val double: HasFlagValue[Double]       = DoubleValue.apply _
-  implicit val string: HasFlagValue[String]       = StringValue.apply _
-  implicit val structure: HasFlagValue[Structure] = StructureValue.apply _
+  implicit val boolean: HasFlagValue[Boolean] = BooleanValue.apply _
+  implicit val int: HasFlagValue[Int]         = IntValue.apply _
+  implicit val double: HasFlagValue[Double]   = DoubleValue.apply _
+  implicit val string: HasFlagValue[String]   = StringValue.apply _
+
+  implicit def structure[A: StructureCodec]: HasFlagValue[A] =
+    new HasFlagValue[A] {
+
+      def toFlagValue(a: A): FlagValue = StructureValue(
+        StructureEncoder[A].encodeStructure(a)
+      )
+
+    }
 
 }

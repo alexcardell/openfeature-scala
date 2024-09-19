@@ -25,12 +25,9 @@ import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.FlagValue.IntValue
 import io.cardell.openfeature.FlagValue.StringValue
 import io.cardell.openfeature.Structure
-import io.cardell.openfeature.StructureCodecSyntax._
 import io.cardell.openfeature.StructureDecoder
-import io.cardell.openfeature.StructureDecoder2
 import io.cardell.openfeature.StructureDecoderError
 import io.cardell.openfeature.StructureEncoder
-import io.cardell.openfeature.StructureEncoderError
 
 class MemoryProviderTest extends CatsEffectSuite {
 
@@ -48,8 +45,8 @@ class MemoryProviderTest extends CatsEffectSuite {
 
     }
 
-  implicit val decoder: StructureDecoder2[TestStructure] =
-    new StructureDecoder2[TestStructure] {
+  implicit val decoder: StructureDecoder[TestStructure] =
+    new StructureDecoder[TestStructure] {
 
       def decodeStructure(
           structure: Structure
