@@ -126,8 +126,7 @@ final class FliptProvider[F[_]: MonadThrow](
 
       jsonAttachment match {
         case Left(parseError) =>
-          ResolutionDetails
-            .error(defaultValue, parseError) // return parse error
+          ResolutionDetails.error(defaultValue, parseError)
         case Right(None) =>
           ResolutionDetails.error(
             defaultValue,
