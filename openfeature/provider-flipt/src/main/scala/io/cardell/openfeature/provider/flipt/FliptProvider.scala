@@ -18,6 +18,7 @@ package io.cardell.openfeature.provider.flipt
 
 import cats.MonadThrow
 import cats.syntax.all._
+import io.circe.parser.parse
 import scala.util.Success
 import scala.util.Try
 
@@ -29,7 +30,9 @@ import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
 import io.cardell.openfeature.StructureCodec
 import io.cardell.openfeature.StructureDecoder
+import io.cardell.openfeature.StructureDecoder2
 import io.cardell.openfeature.StructureDecoderError
+import io.cardell.openfeature.circe.CirceStuff
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.FlagMetadataValue
 import io.cardell.openfeature.provider.ProviderMetadata
@@ -108,52 +111,46 @@ final class FliptProvider[F[_]: MonadThrow](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
-  ): F[ResolutionDetails[A]] = ???
+  ): F[ResolutionDetails[A]] = {
+    val evalContext = mapContext(context)
 
-  // override def resolveStructureValue[A: StructureDecoder](
-  //     flagKey: String,
-  //     defaultValue: A,
-  //     context: EvaluationContext
-  // ): F[ResolutionDetails[A]] = {
-  //   val evalContext = mapContext(context)
-  //
-  //   val req: EvaluationRequest = EvaluationRequest(
-  //     namespaceKey = namespace,
-  //     flagKey = flagKey,
-  //     entityId = context.targetingKey,
-  //     context = evalContext,
-  //     reference = None
-  //   )
-  //
-  //   val resolution = flipt.evaluateVariant(req).map { evaluation =>
-  //     val decodedAttachment = StructureDecoder[A]
-  //       .decodeStructure(evaluation.variantAttachment)
-  //
-  //     decodedAttachment match {
-  //       case Left(error) => decodeDefault[A](error, defaultValue)
-  //       case Right(decoded) =>
-  //         ResolutionDetails[A](
-  //           value = decoded,
-  //           errorCode = None,
-  //           errorMessage = None,
-  //           reason = mapReason(evaluation.reason).some,
-  //           variant = Some(evaluation.variantKey),
-  //           metadata = Some(
-  //             Map(
-  //               "variant-attachment" -> FlagMetadataValue
-  //                 .StringValue(evaluation.variantAttachment)
-  //             )
-  //           )
-  //         )
-  //     }
-  //
-  //   }
-  //
-  //   resolution.attempt.map {
-  //     case Right(value) => value
-  //     case Left(error)  => default(error, defaultValue)
-  //   }
-  // }
+    val req: EvaluationRequest = EvaluationRequest(
+      namespaceKey = namespace,
+      flagKey = flagKey,
+      entityId = context.targetingKey,
+      context = evalContext,
+      reference = None
+    )
+
+    val resolution = flipt.evaluateVariant(req).map { evaluation =>
+      val jsonAttachment = parse(evaluation.variantAttachment).map(_.asObject)
+
+      jsonAttachment match {
+        case Left(parseError) =>
+          ResolutionDetails
+            .error(defaultValue, parseError) // return parse error
+        case Right(None) =>
+          ResolutionDetails.error(
+            defaultValue,
+            new Throwable("did not receive json object")
+          )
+        case Right(Some(jsonObject)) =>
+          val structure        = CirceStuff.jsonToStructure(jsonObject)
+          val decodedStructure = StructureDecoder2[A].decodeStructure(structure)
+          decodedStructure match {
+            case Left(error) =>
+              ResolutionDetails.error[A](defaultValue, error.cause)
+            case Right(value) => ResolutionDetails[A](value)
+          }
+      }
+
+    }
+
+    resolution.attempt.map {
+      case Right(value) => value
+      case Left(error)  => default(error, defaultValue)
+    }
+  }
 
   private def mapReason(evalReason: FliptReason): EvaluationReason =
     evalReason match {

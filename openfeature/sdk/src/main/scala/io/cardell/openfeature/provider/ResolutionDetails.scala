@@ -40,6 +40,19 @@ case class ResolutionDetails[A](
 
 object ResolutionDetails {
 
+  def apply[A](
+      value: A,
+      reason: Option[EvaluationReason] = None,
+      variant: Option[String] = None
+  ): ResolutionDetails[A] = ResolutionDetails[A](
+    value = value,
+    errorCode = None,
+    errorMessage = None,
+    reason = reason,
+    variant = variant,
+    metadata = None
+  )
+
   def error[A](defaultValue: A, error: Throwable): ResolutionDetails[A] =
     ResolutionDetails[A](
       value = defaultValue,

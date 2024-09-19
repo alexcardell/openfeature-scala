@@ -141,6 +141,7 @@ lazy val `openfeature-provider-flipt` = crossProject(
   )
   .dependsOn(
     `openfeature-sdk`,
+    `openfeature-sdk-circe`,
     `flipt-sdk-server`
   )
 

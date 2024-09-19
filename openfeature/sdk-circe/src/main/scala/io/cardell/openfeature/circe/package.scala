@@ -16,4 +16,4 @@
 
 package io.cardell.openfeature
 
-package object circe extends CirceStructureDecoder {}
+package object circe extends CirceStructureDecoder with CirceStructureEncoder

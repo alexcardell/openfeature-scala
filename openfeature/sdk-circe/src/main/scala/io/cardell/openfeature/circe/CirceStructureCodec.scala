@@ -1,22 +1,40 @@
+/*
+ * Copyright 2023 Alex Cardell
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.cardell.openfeature.circe
 
-import io.circe.syntax._
 import cats.syntax.all._
-import io.cardell.openfeature.StructureDecoder
-import io.cardell.openfeature.StructureDecoder2
 import io.circe.Decoder
-import io.cardell.openfeature.{Structure, StructureDecoderError}
-import io.circe.JsonObject
+import io.circe.Encoder
 import io.circe.Json
-import io.circe.Json.JNull
-import io.circe.Json.JObject
-import io.circe.Json.JBoolean
-import io.circe.Json.JString
-import io.circe.Json.JNumber
 import io.circe.Json.JArray
+import io.circe.Json.JBoolean
+import io.circe.Json.JNull
+import io.circe.Json.JNumber
+import io.circe.Json.JObject
+import io.circe.Json.JString
+import io.circe.JsonObject
+import io.circe.syntax._
+
 import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.FlagValue._
-import io.circe.Encoder
+import io.cardell.openfeature.Structure
+import io.cardell.openfeature.StructureDecoder
+import io.cardell.openfeature.StructureDecoder2
+import io.cardell.openfeature.StructureDecoderError
 import io.cardell.openfeature.StructureEncoder
 
 trait CirceStructureDecoder {
@@ -52,6 +70,7 @@ trait CirceStructureEncoder {
 
 }
 
+// TODO rename
 object CirceStuff {
 
   def jsonToStructure(json: JsonObject): Structure = {
