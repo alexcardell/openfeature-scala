@@ -1,64 +1,64 @@
 version: "1.2"
 namespace: default
 flags:
-- key: boolean-flag-1
-  name: boolean-flag-1
-  type: BOOLEAN_FLAG_TYPE
-  enabled: true
-- key: variant-flag-1
-  name: variant-flag-1
-  type: VARIANT_FLAG_TYPE
-  enabled: true
-  variants:
-  - key: key-1
-    attachment:
-      field: string
-      intField: 33
-  rules:
-  - segment: default-ns-segment-1
-    distributions:
-    - variant: key-1
-      rollout: 100
-- key: string-variant-flag-1
-  name: string-variant-flag-1
-  type: VARIANT_FLAG_TYPE
-  enabled: true
-  variants:
-  - key: string-variant-1
-  rules:
-  - segment: default-ns-segment-1
-    distributions:
-    - variant: string-variant-1
-      rollout: 100
-- key: int-variant-flag-1
-  name: int-variant-flag-1
-  type: VARIANT_FLAG_TYPE
-  enabled: true
-  variants:
-  - key: '13'
-  rules:
-  - segment: default-ns-segment-1
-    distributions:
-    - variant: '13'
-      rollout: 100
-- key: double-variant-flag-1
-  name: double-variant-flag-1
-  type: VARIANT_FLAG_TYPE
-  enabled: true
-  variants:
-  - key: '17.1'
-  rules:
-  - segment: default-ns-segment-1
-    distributions:
-    - variant: '17.1'
-      rollout: 100
+  - key: boolean-flag-1
+    name: boolean-flag-1
+    type: BOOLEAN_FLAG_TYPE
+    enabled: true
+  - key: variant-flag-1
+    name: variant-flag-1
+    type: VARIANT_FLAG_TYPE
+    enabled: true
+    variants:
+      - key: key-1
+        attachment:
+          field: string
+          intField: 33
+    rules:
+      - segment: default-ns-segment-1
+        distributions:
+          - variant: key-1
+            rollout: 100
+  - key: string-variant-flag-1
+    name: string-variant-flag-1
+    type: VARIANT_FLAG_TYPE
+    enabled: true
+    variants:
+      - key: string-variant-1
+    rules:
+      - segment: default-ns-segment-1
+        distributions:
+          - variant: string-variant-1
+            rollout: 100
+  - key: int-variant-flag-1
+    name: int-variant-flag-1
+    type: VARIANT_FLAG_TYPE
+    enabled: true
+    variants:
+      - key: '13'
+    rules:
+      - segment: default-ns-segment-1
+        distributions:
+          - variant: '13'
+            rollout: 100
+  - key: double-variant-flag-1
+    name: double-variant-flag-1
+    type: VARIANT_FLAG_TYPE
+    enabled: true
+    variants:
+      - key: '17.1'
+    rules:
+      - segment: default-ns-segment-1
+        distributions:
+          - variant: '17.1'
+            rollout: 100
 
 segments:
-- key: default-ns-segment-1
-  name: default-ns-segment-1
-  constraints:
-  - type: STRING_COMPARISON_TYPE
-    property: test-property
-    operator: eq
-    value: matched-property-value
-  match_type: ALL_MATCH_TYPE
+  - key: default-ns-segment-1
+    name: default-ns-segment-1
+    constraints:
+      - type: STRING_COMPARISON_TYPE
+        property: test-property
+        operator: eq
+        value: matched-property-value
+    match_type: ALL_MATCH_TYPE
