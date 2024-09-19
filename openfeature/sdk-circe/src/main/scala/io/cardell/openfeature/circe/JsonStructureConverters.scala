@@ -30,10 +30,10 @@ object JsonStructureConverters {
   def jsonToStructure(json: JsonObject): Structure = {
     val structure = json.toMap.mapFilter {
       case o if o.isObject =>
-        o.asObject.map(jsonToStructure).map(StructureValue)
-      case n if n.isNumber  => n.asNumber.map(_.toDouble).map(DoubleValue)
-      case s if s.isString  => s.asString.map(StringValue)
-      case b if b.isBoolean => b.asBoolean.map(BooleanValue)
+        o.asObject.map(jsonToStructure).map(StructureValue(_))
+      case n if n.isNumber  => n.asNumber.map(_.toDouble).map(DoubleValue(_))
+      case s if s.isString  => s.asString.map(StringValue(_))
+      case b if b.isBoolean => b.asBoolean.map(BooleanValue(_))
       case n if n.isNull    => none[FlagValue]
       case _                => none[FlagValue]
     }

@@ -37,7 +37,7 @@ trait CirceStructureDecoder {
       ): Either[StructureDecoderError, A] = {
         val jsonObject = JsonStructureConverters.structureToJson(structure)
 
-        jsonObject.toJson.as[A].leftMap(CirceDecodeError)
+        jsonObject.toJson.as[A].leftMap(CirceDecodeError(_))
       }
 
     }
