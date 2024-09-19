@@ -22,6 +22,7 @@ import munit.CatsEffectSuite
 import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.FlagValue
+import io.cardell.openfeature.FlagValue.DoubleValue
 import io.cardell.openfeature.FlagValue.IntValue
 import io.cardell.openfeature.FlagValue.StringValue
 import io.cardell.openfeature.Structure
@@ -262,30 +263,33 @@ class MemoryProviderTest extends CatsEffectSuite {
     }
   }
 
-  // test(
-  //   "receives type mismatch error when expected structure type not received"
-  // ) {
-  //   val expected = TestStructure("a", 0)
-  //
-  //   val flag  = FlagValue.StructureValue(OtherTestStructure(40.0))
-  //   val key   = "structure-flag-key"
-  //   val state = Map(key -> flag)
-  //
-  //   val default = expected
-  //
-  //   MemoryProvider[IO](state).flatMap { provider =>
-  //     val resolution = provider.resolveStructureValue(
-  //       key,
-  //       default,
-  //       EvaluationContext.empty
-  //     )
-  //
-  //     for {
-  //       result <- resolution
-  //       _ <- IO.println("alexxxxxx")
-  //     } yield assertEquals(result.value, expected)
-  //   }
-  // }
+  test(
+    "receives type mismatch error when expected structure type not received"
+  ) {
+    val expected = TestStructure("a", 0)
+
+    val flag = FlagValue.StructureValue(
+      StructureCodec[OtherTestStructure].encodeStructure(
+        OtherTestStructure(40.0)
+      )
+    )
+    val key   = "structure-flag-key"
+    val state = Map(key -> flag)
+
+    val default = expected
+
+    MemoryProvider[IO](state).flatMap { provider =>
+      val resolution = provider.resolveStructureValue(
+        key,
+        default,
+        EvaluationContext.empty
+      )
+
+      for {
+        result <- resolution
+      } yield assertEquals(result.value, expected)
+    }
+  }
 
 }
 
@@ -318,6 +322,39 @@ object MemoryProviderTestUtils {
           case None =>
             Left(StructureDecoderError(new Throwable("missing field")))
           case Some((StringValue(s), IntValue(i))) => Right(TestStructure(s, i))
+          case Some(_) =>
+            Left(StructureDecoderError(new Throwable("invalid structure")))
+        }
+      }
+
+    }
+
+  implicit val otherEncoder: StructureEncoder[OtherTestStructure] =
+    new StructureEncoder[OtherTestStructure] {
+
+      def encodeStructure(
+          value: OtherTestStructure
+      ): Structure = Structure(
+        Map("d" -> DoubleValue(value.d))
+      )
+
+    }
+
+  implicit val otherDecoder: StructureDecoder[OtherTestStructure] =
+    new StructureDecoder[OtherTestStructure] {
+
+      def decodeStructure(
+          structure: Structure
+      ): Either[StructureDecoderError, OtherTestStructure] = {
+        val values =
+          for {
+            d <- structure.values.get("d")
+          } yield d
+
+        values match {
+          case None =>
+            Left(StructureDecoderError(new Throwable("missing field")))
+          case Some(DoubleValue(d)) => Right(OtherTestStructure(d))
           case Some(_) =>
             Left(StructureDecoderError(new Throwable("invalid structure")))
         }
