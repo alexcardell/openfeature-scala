@@ -19,18 +19,7 @@ package io.cardell.openfeature.circe
 import cats.syntax.all._
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.Json
-import io.circe.Json.JArray
-import io.circe.Json.JBoolean
-import io.circe.Json.JNull
-import io.circe.Json.JNumber
-import io.circe.Json.JObject
-import io.circe.Json.JString
-import io.circe.JsonObject
-import io.circe.syntax._
 
-import io.cardell.openfeature.FlagValue
-import io.cardell.openfeature.FlagValue._
 import io.cardell.openfeature.Structure
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureDecoderError
