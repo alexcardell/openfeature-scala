@@ -26,25 +26,34 @@ sealed trait FlagValue {
 
   def valueType: FlagValueType =
     this match {
-      case _: BooleanValue      => FlagValueType.BooleanValueType
-      case _: StringValue       => FlagValueType.StringValueType
-      case _: IntValue          => FlagValueType.IntValueType
-      case _: DoubleValue       => FlagValueType.DoubleValueType
-      case _: StructureValue[_] => FlagValueType.StructureValueType
+      case _: BooleanValue   => FlagValueType.BooleanValueType
+      case _: StringValue    => FlagValueType.StringValueType
+      case _: IntValue       => FlagValueType.IntValueType
+      case _: DoubleValue    => FlagValueType.DoubleValueType
+      case _: StructureValue => FlagValueType.StructureValueType
     }
 
 }
 
 object FlagValue {
-  case class BooleanValue(value: Boolean) extends FlagValue
-  case class StringValue(value: String)   extends FlagValue
-  case class IntValue(value: Int)         extends FlagValue
-  case class DoubleValue(value: Double)   extends FlagValue
-  case class StructureValue[A](value: A)  extends FlagValue
+  case class BooleanValue(value: Boolean)     extends FlagValue
+  case class StringValue(value: String)       extends FlagValue
+  case class IntValue(value: Int)             extends FlagValue
+  case class DoubleValue(value: Double)       extends FlagValue
+  case class StructureValue(value: Structure) extends FlagValue
 
-  def apply(b: Boolean): FlagValue = BooleanValue(b)
-  def apply(s: String): FlagValue  = StringValue(s)
-  def apply(i: Int): FlagValue     = IntValue(i)
-  def apply(d: Double): FlagValue  = DoubleValue(d)
-  def apply[A](s: A): FlagValue    = StructureValue(s)
+  def apply(b: Boolean): FlagValue   = BooleanValue(b)
+  def apply(s: String): FlagValue    = StringValue(s)
+  def apply(i: Int): FlagValue       = IntValue(i)
+  def apply(d: Double): FlagValue    = DoubleValue(d)
+  def apply(s: Structure): FlagValue = StructureValue(s)
+
+  // def structure[A: StructureEncoder](s: A): FlagValue = StructureValue(
+  //   StructureEncoder[A].encodeStructure(s)
+  // )
+
+  // def apply[A: HasFlagValue](value: A): FlagValue = HasFlagValue[A].toFlagValue(
+  //   value
+  // )
+
 }

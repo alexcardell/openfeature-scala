@@ -32,6 +32,7 @@ import io.cardell.flipt.FliptApi
 import io.cardell.flipt.auth.AuthenticationStrategy
 import io.cardell.openfeature.ContextValue
 import io.cardell.openfeature.EvaluationContext
+import io.cardell.openfeature.StructureCodec._
 import io.cardell.openfeature.circe._
 
 // see docker-compose features.yaml for flag test data

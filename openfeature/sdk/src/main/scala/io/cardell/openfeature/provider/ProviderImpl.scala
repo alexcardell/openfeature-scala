@@ -24,12 +24,12 @@ import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.ErrorHook
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.FinallyHook
-import io.cardell.openfeature.FlagValue
+import io.cardell.openfeature.HasFlagValue
 import io.cardell.openfeature.Hook
 import io.cardell.openfeature.HookContext
 import io.cardell.openfeature.HookHints
 import io.cardell.openfeature.Hooks
-import io.cardell.openfeature.StructureDecoder
+import io.cardell.openfeature.StructureCodec
 
 protected class ProviderImpl[F[_]: MonadThrow](
     evaluationProvider: EvaluationProvider[F],
@@ -130,20 +130,13 @@ protected class ProviderImpl[F[_]: MonadThrow](
       )
     }
 
-  override def resolveStructureValue[A: StructureDecoder](
+  override def resolveStructureValue[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
-  ): F[ResolutionDetails[A]] =
-    hookedResolve[A](flagKey, defaultValue, context) { newContext =>
-      evaluationProvider.resolveStructureValue(
-        flagKey = flagKey,
-        defaultValue = defaultValue,
-        context = newContext
-      )
-    }
+  ): F[ResolutionDetails[A]] = ???
 
-  private def hookedResolve[A](
+  private def hookedResolve[A: HasFlagValue](
       flagKey: String,
       default: A,
       evaluationContext: EvaluationContext
@@ -152,7 +145,7 @@ protected class ProviderImpl[F[_]: MonadThrow](
   ): F[ResolutionDetails[A]] = {
     val hc = HookContext(
       flagKey = flagKey,
-      defaultValue = FlagValue(default),
+      defaultValue = HasFlagValue[A].toFlagValue(default),
       evaluationContext = evaluationContext
     )
     val hints = HookHints.empty

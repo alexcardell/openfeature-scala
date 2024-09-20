@@ -18,6 +18,7 @@ package io.cardell.openfeature.provider.flipt
 
 import cats.MonadThrow
 import cats.syntax.all._
+import io.circe.parser.parse
 import scala.util.Success
 import scala.util.Try
 
@@ -27,8 +28,10 @@ import io.cardell.flipt.model.{EvaluationReason => FliptReason}
 import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
+import io.cardell.openfeature.StructureCodec
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureDecoderError
+import io.cardell.openfeature.circe.JsonStructureConverters
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.FlagMetadataValue
 import io.cardell.openfeature.provider.ProviderMetadata
@@ -103,7 +106,7 @@ final class FliptProvider[F[_]: MonadThrow](
     context
   )
 
-  override def resolveStructureValue[A: StructureDecoder](
+  override def resolveStructureValue[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
@@ -119,25 +122,24 @@ final class FliptProvider[F[_]: MonadThrow](
     )
 
     val resolution = flipt.evaluateVariant(req).map { evaluation =>
-      val decodedAttachment = StructureDecoder[A]
-        .decodeStructure(evaluation.variantAttachment)
+      val jsonAttachment = parse(evaluation.variantAttachment).map(_.asObject)
 
-      decodedAttachment match {
-        case Left(error) => decodeDefault[A](error, defaultValue)
-        case Right(decoded) =>
-          ResolutionDetails[A](
-            value = decoded,
-            errorCode = None,
-            errorMessage = None,
-            reason = mapReason(evaluation.reason).some,
-            variant = Some(evaluation.variantKey),
-            metadata = Some(
-              Map(
-                "variant-attachment" -> FlagMetadataValue
-                  .StringValue(evaluation.variantAttachment)
-              )
-            )
+      jsonAttachment match {
+        case Left(parseError) =>
+          ResolutionDetails.error(defaultValue, parseError)
+        case Right(None) =>
+          ResolutionDetails.error(
+            defaultValue,
+            new Throwable("did not receive json object")
           )
+        case Right(Some(jsonObject)) =>
+          val structure = JsonStructureConverters.jsonToStructure(jsonObject)
+          val decodedStructure = StructureDecoder[A].decodeStructure(structure)
+          decodedStructure match {
+            case Left(error) =>
+              ResolutionDetails.error[A](defaultValue, error.cause)
+            case Right(value) => ResolutionDetails[A](value)
+          }
       }
 
     }
@@ -174,7 +176,7 @@ final class FliptProvider[F[_]: MonadThrow](
   ) = ResolutionDetails[A](
     value = defaultValue,
     errorCode = Some(ErrorCode.ParseError),
-    errorMessage = Some(e.getMessage()),
+    errorMessage = Some(e.message),
     reason = Some(EvaluationReason.Error),
     variant = None,
     metadata = None

@@ -3,7 +3,7 @@ import build.V
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 // https://typelevel.org/sbt-typelevel/faq.html#what-is-a-base-version-anyway
-ThisBuild / tlBaseVersion := "0.3" // your current series x.y
+ThisBuild / tlBaseVersion := "0.4" // your current series x.y
 
 ThisBuild / organization     := "io.cardell"
 ThisBuild / organizationName := "Alex Cardell"
@@ -140,7 +140,8 @@ lazy val `openfeature-provider-flipt` = crossProject(
     name := "openfeature-provider-flipt"
   )
   .dependsOn(
-    `openfeature-sdk`,
+    // `openfeature-sdk`,
+    `openfeature-sdk-circe`,
     `flipt-sdk-server`
   )
 
@@ -158,8 +159,7 @@ lazy val `openfeature-provider-flipt-it` = crossProject(JVMPlatform)
     )
   )
   .dependsOn(
-    `openfeature-provider-flipt`,
-    `openfeature-sdk-circe`
+    `openfeature-provider-flipt`
   )
 
 lazy val examples = crossProject(JVMPlatform)

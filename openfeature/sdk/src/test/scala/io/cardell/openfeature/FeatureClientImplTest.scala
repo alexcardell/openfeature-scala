@@ -284,7 +284,7 @@ object ThrowingEvaluationProvider extends EvaluationProvider[IO] {
       context: EvaluationContext
   ): IO[ResolutionDetails[Double]] = raise
 
-  override def resolveStructureValue[A: StructureDecoder](
+  override def resolveStructureValue[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext

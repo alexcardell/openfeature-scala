@@ -25,6 +25,7 @@ import io.cardell.openfeature.ErrorCode
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.EvaluationReason
 import io.cardell.openfeature.FlagValue
+import io.cardell.openfeature.StructureCodec
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
@@ -124,7 +125,7 @@ final class MemoryProvider[F[_]: MonadThrow](
     *
     * Can't get around type erasure to do the check
     */
-  override def resolveStructureValue[A: StructureDecoder](
+  override def resolveStructureValue[A: StructureCodec](
       flagKey: String,
       defaultValue: A,
       context: EvaluationContext
@@ -133,8 +134,12 @@ final class MemoryProvider[F[_]: MonadThrow](
       state.get(flagKey) match {
         case None => missing[A](flagKey, defaultValue)
         case Some(FlagValue.StructureValue(value)) =>
-          val v = value.asInstanceOf[A]
-          resolution[A](v)
+          val decoded = StructureDecoder[A].decodeStructure(value)
+
+          decoded match {
+            case Right(value) => resolution[A](value)
+            case Left(_)      => typeMismatch[A](flagKey, defaultValue)
+          }
         case Some(_) => typeMismatch(flagKey, defaultValue)
       }
     }

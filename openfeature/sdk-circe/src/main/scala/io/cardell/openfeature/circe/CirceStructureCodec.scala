@@ -18,23 +18,42 @@ package io.cardell.openfeature.circe
 
 import cats.syntax.all._
 import io.circe.Decoder
-import io.circe.parser.parse
+import io.circe.Encoder
 
+import io.cardell.openfeature.Structure
 import io.cardell.openfeature.StructureDecoder
 import io.cardell.openfeature.StructureDecoderError
+import io.cardell.openfeature.StructureEncoder
 
 trait CirceStructureDecoder {
 
-  implicit def decoder[A](
-      implicit circeDecoder: Decoder[A]
+  implicit def circeStructureDecode[A](
+      implicit d: Decoder[A]
   ): StructureDecoder[A] =
     new StructureDecoder[A] {
 
-      def decodeStructure(string: String): Either[StructureDecoderError, A] =
-        for {
-          parsed  <- parse(string).leftMap(CirceParseError(_))
-          decoded <- parsed.as[A].leftMap(CirceDecodeError(_))
-        } yield decoded
+      override def decodeStructure(
+          structure: Structure
+      ): Either[StructureDecoderError, A] = {
+        val jsonObject = JsonStructureConverters.structureToJson(structure)
+
+        jsonObject.toJson.as[A].leftMap(CirceDecodeError(_))
+      }
+
+    }
+
+}
+
+trait CirceStructureEncoder {
+
+  implicit def circeStructureEncoder[A](
+      implicit encoder: Encoder.AsObject[A]
+  ): StructureEncoder[A] =
+    new StructureEncoder[A] {
+
+      override def encodeStructure(value: A): Structure =
+        JsonStructureConverters
+          .jsonToStructure(encoder.encodeObject(value))
 
     }
 

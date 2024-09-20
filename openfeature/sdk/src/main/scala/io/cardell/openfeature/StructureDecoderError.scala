@@ -16,4 +16,18 @@
 
 package io.cardell.openfeature
 
-trait StructureDecoderError extends Throwable
+trait StructureDecoderError {
+  def message: String
+  def cause: Throwable
+}
+
+object StructureDecoderError {
+
+  case class ThrowableError(t: Throwable) extends StructureDecoderError {
+    def message = t.getMessage()
+    def cause   = t
+  }
+
+  def apply(t: Throwable): StructureDecoderError = ThrowableError(t)
+
+}

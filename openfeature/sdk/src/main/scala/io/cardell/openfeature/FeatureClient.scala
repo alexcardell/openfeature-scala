@@ -156,36 +156,36 @@ trait FeatureClient[F[_]] {
       options: EvaluationOptions
   ): F[EvaluationDetails[Double]]
 
-  def getStructureValue[A: StructureDecoder](
+  def getStructureValue[A: StructureCodec](
       flagKey: String,
       default: A
   ): F[A]
 
-  def getStructureValue[A: StructureDecoder](
+  def getStructureValue[A: StructureCodec](
       flagKey: String,
       default: A,
       context: EvaluationContext
   ): F[A]
 
-  def getStructureValue[A: StructureDecoder](
+  def getStructureValue[A: StructureCodec](
       flagKey: String,
       default: A,
       context: EvaluationContext,
       options: EvaluationOptions
   ): F[A]
 
-  def getStructureDetails[A: StructureDecoder](
+  def getStructureDetails[A: StructureCodec](
       flagKey: String,
       default: A
   ): F[EvaluationDetails[A]]
 
-  def getStructureDetails[A: StructureDecoder](
+  def getStructureDetails[A: StructureCodec](
       flagKey: String,
       default: A,
       context: EvaluationContext
   ): F[EvaluationDetails[A]]
 
-  def getStructureDetails[A: StructureDecoder](
+  def getStructureDetails[A: StructureCodec](
       flagKey: String,
       default: A,
       context: EvaluationContext,

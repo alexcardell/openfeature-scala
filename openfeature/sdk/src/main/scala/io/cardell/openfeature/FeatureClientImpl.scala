@@ -310,12 +310,12 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
           .map(EvaluationDetails[Double](flagKey, _))
     }
 
-  override def getStructureValue[A: StructureDecoder](
+  override def getStructureValue[A: StructureCodec](
       flagKey: String,
       default: A
   ): F[A] = getStructureValue[A](flagKey, default, EvaluationContext.empty)
 
-  override def getStructureValue[A: StructureDecoder](
+  override def getStructureValue[A: StructureCodec](
       flagKey: String,
       default: A,
       context: EvaluationContext
@@ -326,7 +326,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
     EvaluationOptions.Defaults
   )
 
-  override def getStructureValue[A: StructureDecoder](
+  override def getStructureValue[A: StructureCodec](
       flagKey: String,
       default: A,
       context: EvaluationContext,
@@ -334,7 +334,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
   ): F[A] = getStructureDetails[A](flagKey, default, context)
     .map(_.value)
 
-  override def getStructureDetails[A: StructureDecoder](
+  override def getStructureDetails[A: StructureCodec](
       flagKey: String,
       default: A
   ): F[EvaluationDetails[A]] = getStructureDetails[A](
@@ -343,7 +343,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
     EvaluationContext.empty
   )
 
-  override def getStructureDetails[A: StructureDecoder](
+  override def getStructureDetails[A: StructureCodec](
       flagKey: String,
       default: A,
       context: EvaluationContext
@@ -354,20 +354,21 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
     EvaluationOptions.Defaults
   )
 
-  override def getStructureDetails[A: StructureDecoder](
+  override def getStructureDetails[A: StructureCodec](
       flagKey: String,
       default: A,
       context: EvaluationContext,
       options: EvaluationOptions
-  ): F[EvaluationDetails[A]] =
+  ): F[EvaluationDetails[A]] = {
     hookedEvaluate[A](flagKey, default, clientEvaluationContext ++ context) {
       newContext =>
         provider
           .resolveStructureValue[A](flagKey, default, newContext)
           .map(EvaluationDetails(flagKey, _))
     }
+  }
 
-  private def hookedEvaluate[A](
+  private def hookedEvaluate[A: HasFlagValue](
       flagKey: String,
       default: A,
       context: EvaluationContext
@@ -377,7 +378,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
     val hookContext = HookContext(
       flagKey,
       clientEvaluationContext ++ context,
-      FlagValue(default)
+      HasFlagValue[A].toFlagValue(default)
     )
 
     val hookHints = HookHints.empty
