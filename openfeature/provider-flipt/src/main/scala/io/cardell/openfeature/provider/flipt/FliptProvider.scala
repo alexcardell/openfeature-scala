@@ -126,18 +126,15 @@ final class FliptProvider[F[_]: MonadThrow](
 
       jsonAttachment match {
         case Left(parseError) =>
-          ResolutionDetails.error(defaultValue, parseError)
+          ResolutionDetails.fromThrowable(defaultValue, parseError)
         case Right(None) =>
-          ResolutionDetails.error(
-            defaultValue,
-            new Throwable("did not receive json object")
-          )
+          ResolutionDetails.error(defaultValue, "did not receive json object")
         case Right(Some(jsonObject)) =>
           val structure = JsonStructureConverters.jsonToStructure(jsonObject)
           val decodedStructure = StructureDecoder[A].decodeStructure(structure)
           decodedStructure match {
             case Left(error) =>
-              ResolutionDetails.error[A](defaultValue, error.cause)
+              ResolutionDetails.fromThrowable[A](defaultValue, error.cause)
             case Right(value) => ResolutionDetails[A](value)
           }
       }

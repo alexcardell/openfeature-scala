@@ -40,34 +40,69 @@ The OpenFeature SDK adds features like handling default values in case of errors
 Eventually the SDK will cover the full range of the [openfeature](https://openfeature.dev)
 specification, like hooks, events, static vs dynamic context.
 
-See `Flipt usage` on how to set up the `FliptApi`. Once done, set up a provider:
+### OpenFeature Java Compatibility
 
-```scala mdoc
+The `openfeature-provider-java` module wraps existing 
+[OpenFeature Java SDKs](https://github.com/open-feature/java-sdk-contrib).
+
+#### Installation 
+
+Using Flagd as an example:
+
+```scala
+libraryDependencies ++= Seq(
+    "io.cardell" %%% "openfeature-sdk" % "@VERSION@",
+    "io.cardell" %%% "openfeature-provider-java" % "@VERSION@",
+    "dev.openfeature.contrib.providers" % "flagd" % "0.8.9",
+)
+```
+
+```scala mdoc:compile-only
 import cats.effect.IO
-import io.circe.Decoder
-import io.circe.Encoder
+import dev.openfeature.contrib.providers.flagd.FlagdOptions
+import dev.openfeature.contrib.providers.flagd.FlagdProvider
 
-import io.cardell.flipt.FliptApi
 import io.cardell.openfeature.OpenFeature
-import io.cardell.openfeature.provider.flipt.FliptProvider
-import io.cardell.openfeature.circe._
+import io.cardell.openfeature.provider.java.JavaProvider
+
+val provider =
+    new FlagdProvider(
+        FlagdOptions
+            .builder()
+            .host("host")
+            .port(8013)
+            .build()
+    )
+
+JavaProvider
+    .resource[IO](provider)
+    .map(OpenFeature[IO])
+    .evalMap(_.client)
+```
+
+
+### FeatureClient Evaluation
+
+```scala mdoc:compile-only
+import cats.effect.IO
+
+import io.cardell.openfeature.FeatureClient
+import io.cardell.openfeature.StructureCodec
 
 case class SomeVariant(field: String, field2: Int)
 
-def provider(flipt: FliptApi[IO])(implicit d: Decoder[SomeVariant], e: Encoder.AsObject[SomeVariant]) = {
-    val featureSdk = OpenFeature[IO](new FliptProvider[IO](flipt, "some-namespace"))
-
-    featureSdk.client.flatMap { featureClient =>
-        for {
-            eval <- featureClient.getBooleanValue("boolean-flag", false)
-            _ <- IO.println(s"${eval}")
-            eval2 <- featureClient.getStructureValue[SomeVariant](
-                "structure-flag",
-                SomeVariant("a", 1)
-            )
-            _ <- IO.println(s"${eval2}")
-        } yield ()
-    }
+def program(features: FeatureClient[IO])(
+    implicit codec: StructureCodec[SomeVariant]
+) = {
+    for {
+        flagEnabled <- features.getBooleanValue("boolean-flag", false)
+        _ <- IO.println(s"${flagEnabled}")
+        variant <- features.getStructureValue[SomeVariant](
+            "structure-flag",
+            SomeVariant("a", 1)
+        )
+        _ <- IO.println(s"${variant}")
+    } yield ()
 }
 ```
 
@@ -75,6 +110,46 @@ def provider(flipt: FliptApi[IO])(implicit d: Decoder[SomeVariant], e: Encoder.A
 
 Hooks are work-in-progress. All four OpenFeature [hook types](https://openfeature.dev/specification/sections/hooks)
 are supported but only on the `FeatureClient` and `Provider` interfaces.
+
+### Variants
+
+Providers offer resolving a particular variant, using a Structure type. Typically this is JSON defined on the server side. 
+
+To provide arbitrary case classes for variant decoding, a `StructureCodec[A]` is required.
+
+This could be done explicitly, but you can also derive them from JSON codecs. Currently only Circe is supported.
+
+#### Circe Integration
+
+Provider implicit `Decoder[A]` and `Encoder.AsObject[A]`. Import `io.cardell.openfeature.circe._`
+
+```scala mdoc:compile-only
+import cats.effect.IO
+import io.circe.Decoder
+import io.circe.Encoder
+
+import io.cardell.openfeature.FeatureClient
+import io.cardell.openfeature.circe._
+
+case class SomeVariant(field: String, field2: Int)
+
+def circeProgram(features: FeatureClient[IO])(
+    implicit d: Decoder[SomeVariant],
+    e: Encoder.AsObject[SomeVariant]
+) = {
+    for {
+        flagEnabled <- features.getBooleanValue("boolean-flag", false)
+        _ <- IO.println(s"${flagEnabled}")
+        variant <- features.getStructureValue[SomeVariant](
+            "structure-flag",
+            SomeVariant("a", 1)
+        )
+        _ <- IO.println(s"${variant}")
+    } yield ()
+}
+```
+
+Alternative, `Codec.AsObject[A]` would work.
 
 ### Implementing A New `EvaluationProvider`
 
@@ -120,8 +195,3 @@ resource.use { flipt =>
     } yield res.enabled
 }
 ```
-
-## Future Work
-
-- Java OpenFeature Provider wrapper, to unlock more SDKs
-- LaunchDarkly Provider using `typelevel/catapult`

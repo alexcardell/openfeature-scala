@@ -400,7 +400,7 @@ protected[openfeature] final class FeatureClientImpl[F[_]](
 
     def errorEvaluation(e: Throwable) = EvaluationDetails(
       flagKey,
-      ResolutionDetails.error(default, e)
+      ResolutionDetails.fromThrowable(default, e)
     )
 
     run.attempt
