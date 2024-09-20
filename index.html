@@ -107,14 +107,14 @@
         </ul>
         
         <h2 id="installing" class="section"><a class="anchor-link left" href="#installing"><i class="icofont-laika link">&#xef71;</i></a>Installing</h2>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;flipt-sdk-server&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0-RC1&quot;</span><span>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;flipt-sdk-server&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>
 </span><span class="comment">// or
 </span><span class="identifier">libraryDependencies</span><span> ++= </span><span class="type-name">Seq</span><span>(
-    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0-RC1&quot;</span><span>,
+    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>,
     </span><span class="comment">// for circe json variant types
-</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk-circe&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0-RC1&quot;</span><span>,
+</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk-circe&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>,
     </span><span class="comment">// to use flipt as a backend
-</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-provider-flipt&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0-RC1&quot;</span><span>
+</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-provider-flipt&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>
 )</span></code></pre>
         
         <h2 id="openfeature-compatibility" class="section"><a class="anchor-link left" href="#openfeature-compatibility"><i class="icofont-laika link">&#xef71;</i></a>OpenFeature Compatibility</h2>
@@ -164,6 +164,7 @@
         <p>See <code>Flipt usage</code> on how to set up the <code>FliptApi</code>. Once done, set up a provider:</p>
         <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
 </span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">circe</span><span>.</span><span class="type-name">Decoder</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">circe</span><span>.</span><span class="type-name">Encoder</span><span>
 
 </span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">flipt</span><span>.</span><span class="type-name">FliptApi</span><span>
 </span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="type-name">OpenFeature</span><span>
@@ -172,7 +173,7 @@
 
 </span><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">SomeVariant</span><span>(</span><span class="identifier">field</span><span>: </span><span class="type-name">String</span><span>, </span><span class="identifier">field2</span><span>: </span><span class="type-name">Int</span><span>)
 
-</span><span class="keyword">def</span><span> </span><span class="declaration-name">provider</span><span>(</span><span class="identifier">flipt</span><span>: </span><span class="type-name">FliptApi</span><span>[</span><span class="type-name">IO</span><span>])(</span><span class="keyword">implicit</span><span> </span><span class="identifier">d</span><span>: </span><span class="type-name">Decoder</span><span>[</span><span class="type-name">SomeVariant</span><span>]) = {
+</span><span class="keyword">def</span><span> </span><span class="declaration-name">provider</span><span>(</span><span class="identifier">flipt</span><span>: </span><span class="type-name">FliptApi</span><span>[</span><span class="type-name">IO</span><span>])(</span><span class="keyword">implicit</span><span> </span><span class="identifier">d</span><span>: </span><span class="type-name">Decoder</span><span>[</span><span class="type-name">SomeVariant</span><span>], </span><span class="identifier">e</span><span>: </span><span class="type-name">Encoder</span><span>.</span><span class="type-name">AsObject</span><span>[</span><span class="type-name">SomeVariant</span><span>]) = {
     </span><span class="keyword">val</span><span> </span><span class="identifier">featureSdk</span><span> = </span><span class="type-name">OpenFeature</span><span>[</span><span class="type-name">IO</span><span>](</span><span class="keyword">new</span><span> </span><span class="type-name">FliptProvider</span><span>[</span><span class="type-name">IO</span><span>](</span><span class="identifier">flipt</span><span>, </span><span class="string-literal">&quot;some-namespace&quot;</span><span>))
 
     </span><span class="identifier">featureSdk</span><span>.</span><span class="identifier">client</span><span>.</span><span class="identifier">flatMap</span><span> { </span><span class="identifier">featureClient</span><span> =&gt;
@@ -233,9 +234,9 @@
 </span><span class="comment">// resource: cats.effect.kernel.Resource[IO, FliptApi[IO]] = Bind(
 //   source = Bind(
 //     source = Eval(fa = Pure(value = ())),
-//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$15870/0x00000008041e6840@1710e3fc
+//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$13417/0x00000008036f0040@1561846
 //   ),
-//   fs = cats.effect.kernel.Resource$$Lambda$15871/0x00000008041f8040@1ac50675
+//   fs = cats.effect.kernel.Resource$$Lambda$13418/0x00000008036f1040@2feca20f
 // )
 </span><span>
 </span><span class="identifier">resource</span><span>.</span><span class="identifier">use</span><span> { </span><span class="identifier">flipt</span><span> =&gt; 
@@ -253,7 +254,7 @@
 }
 </span><span class="comment">// res0: IO[Boolean] = FlatMap(
 //   ioe = Pure(value = ()),
-//   f = cats.effect.kernel.Resource$$Lambda$15873/0x00000008041ff840@47ac4d2f,
+//   f = cats.effect.kernel.Resource$$Lambda$13420/0x00000008036f2840@40d5c631,
 //   event = cats.effect.tracing.TracingEvent$StackTrace
 // )</span></code></pre>
         
