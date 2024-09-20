@@ -37,6 +37,8 @@ lazy val projects = Seq(
   `openfeature-sdk`,
   `openfeature-sdk-circe`,
   `openfeature-provider-memory`,
+  `openfeature-provider-java`,
+  `openfeature-provider-java-it`,
   `openfeature-provider-flipt`,
   `openfeature-provider-flipt-it`,
   examples,
@@ -127,6 +129,32 @@ lazy val `openfeature-provider-memory` = crossProject(
     name := "openfeature-provider-memory"
   )
   .dependsOn(`openfeature-sdk`)
+
+lazy val `openfeature-provider-java` = crossProject(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("openfeature/provider-java"))
+  .settings(commonDependencies)
+  .settings(
+    libraryDependencies ++= Seq(
+      "dev.openfeature" % "sdk" % "1.10.0"
+    )
+  )
+  .dependsOn(`openfeature-sdk`)
+
+lazy val `openfeature-provider-java-it` = crossProject(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("openfeature/provider-java-it"))
+  .enablePlugins(NoPublishPlugin)
+  .settings(commonDependencies)
+  .settings(
+    libraryDependencies ++= Seq(
+      "dev.openfeature.contrib.providers" % "flagd" % "0.8.9" % Test,
+      "com.dimafeng" %% "testcontainers-scala-munit" % V.testcontainers % Test
+    )
+  )
+  .dependsOn(
+    `openfeature-provider-java`
+  )
 
 lazy val `openfeature-provider-flipt` = crossProject(
   JVMPlatform,
