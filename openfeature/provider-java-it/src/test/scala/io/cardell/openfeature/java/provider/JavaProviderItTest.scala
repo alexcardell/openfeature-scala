@@ -54,7 +54,7 @@ class JavaProviderItTest extends CatsEffectSuite with TestContainerForAll {
         .getContainerByServiceName("flagd")
         .get
 
-    val flagdProvder =
+    val flagdProvider =
       new FlagdProvider(
         FlagdOptions
           .builder()
@@ -64,7 +64,7 @@ class JavaProviderItTest extends CatsEffectSuite with TestContainerForAll {
       )
 
       JavaProvider
-        .resource[IO](flagdProvder)
+        .resource[IO](flagdProvider)
         .map(OpenFeature[IO])
         .evalMap(_.client)
   }
