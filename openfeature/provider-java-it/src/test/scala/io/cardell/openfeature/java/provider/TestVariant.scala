@@ -16,7 +16,6 @@
 
 package io.cardell.openfeature.provider.java
 
-import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.FlagValue.IntValue
 import io.cardell.openfeature.FlagValue.StringValue
 import io.cardell.openfeature.Structure

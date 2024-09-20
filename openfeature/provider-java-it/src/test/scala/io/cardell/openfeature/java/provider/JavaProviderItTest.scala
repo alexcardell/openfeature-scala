@@ -18,7 +18,6 @@ package io.cardell.openfeature.provider.java
 
 import cats.effect.IO
 import cats.effect.kernel.Resource
-import cats.syntax.all._
 import com.dimafeng.testcontainers.ContainerDef
 import com.dimafeng.testcontainers.DockerComposeContainer
 import com.dimafeng.testcontainers.ExposedService
