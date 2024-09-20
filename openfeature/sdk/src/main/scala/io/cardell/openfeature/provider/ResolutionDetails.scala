@@ -53,14 +53,30 @@ object ResolutionDetails {
     metadata = None
   )
 
-  def error[A](defaultValue: A, error: Throwable): ResolutionDetails[A] =
-    ResolutionDetails[A](
-      value = defaultValue,
-      errorCode = Some(ErrorCode.General),
-      errorMessage = Some(error.getMessage()),
-      reason = Some(EvaluationReason.Error),
-      variant = None,
-      metadata = None
-    )
+  def fromThrowable[A](
+      defaultValue: A,
+      error: Throwable,
+      errorCode: ErrorCode = ErrorCode.General
+  ): ResolutionDetails[A] = ResolutionDetails[A](
+    value = defaultValue,
+    errorCode = Some(errorCode),
+    errorMessage = Some(error.getMessage()),
+    reason = Some(EvaluationReason.Error),
+    variant = None,
+    metadata = None
+  )
+
+  def error[A](
+      defaultValue: A,
+      errorMessage: String,
+      errorCode: ErrorCode = ErrorCode.General
+  ): ResolutionDetails[A] = ResolutionDetails[A](
+    value = defaultValue,
+    errorCode = Some(errorCode),
+    errorMessage = Some(errorMessage),
+    reason = Some(EvaluationReason.Error),
+    variant = None,
+    metadata = None
+  )
 
 }

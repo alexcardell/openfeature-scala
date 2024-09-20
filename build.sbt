@@ -153,6 +153,7 @@ lazy val `openfeature-provider-java-it` = crossProject(JVMPlatform)
     )
   )
   .dependsOn(
+    `openfeature-sdk-circe`,
     `openfeature-provider-java`
   )
 

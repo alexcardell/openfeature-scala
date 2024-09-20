@@ -8,3 +8,11 @@ services:
       FLIPT_STORAGE_LOCAL_PATH: "/config"
     volumes:
       - "./docker/flipt/features.yaml:/config/features.yaml"
+
+  flagd:
+    image: ghcr.io/open-feature/flagd:v0.11.2
+    command: 'start --uri file:./etc/flagd/flagd-features.json'
+    ports:
+      - "8013:8013"
+    volumes:
+      - "./docker/flagd/flagd-features.json:/etc/flagd/flagd-features.json"

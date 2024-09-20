@@ -1,0 +1,55 @@
+{
+  "$schema": "https://flagd.dev/schema/v0/flags.json",
+  "flags": {
+    "boolean-flag-1": {
+      "state": "ENABLED",
+      "variants": {
+        "on": true,
+        "off": false
+      },
+      "defaultVariant": "on"
+    },
+    "string-variant-flag-1": {
+      "state": "ENABLED",
+      "defaultVariant": "key-1",
+      "variants": {
+        "key-1": "string-value-1",
+        "key-2": "string-value-1"
+      },
+      "targeting": {}
+    },
+    "int-variant-flag-1": {
+      "state": "ENABLED",
+      "defaultVariant": "key-1",
+      "variants": {
+        "key-1": 13,
+        "key-2": 88
+      },
+      "targeting": {}
+    },
+    "double-variant-flag-1": {
+      "state": "ENABLED",
+      "defaultVariant": "key-2",
+      "variants": {
+        "key-1": 88.0,
+        "key-2": 17.1
+      },
+      "targeting": {}
+    },
+    "structure-variant-flag-1": {
+      "state": "ENABLED",
+      "defaultVariant": "structure-1",
+      "variants": {
+        "structure-1": {
+          "field": "string",
+          "intField": 33
+        },
+        "structure-2": {
+          "field": "other",
+          "intField": 10001
+        }
+      },
+      "targeting": {}
+    }
+  }
+}
