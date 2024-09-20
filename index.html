@@ -83,10 +83,12 @@
     <li class="level1 nav-leaf"><a href="#installing">Installing</a></li>
     <li class="level1 nav-leaf"><a href="#openfeature-compatibility">OpenFeature Compatibility</a></li>
     <li class="level1 nav-node"><a href="#openfeature-usage">OpenFeature Usage</a></li>
+    <li class="level2 nav-leaf"><a href="#openfeature-java-compatibility">OpenFeature Java Compatibility</a></li>
+    <li class="level2 nav-leaf"><a href="#featureclient-evaluation">FeatureClient Evaluation</a></li>
     <li class="level2 nav-leaf"><a href="#hooks">Hooks</a></li>
+    <li class="level2 nav-leaf"><a href="#variants">Variants</a></li>
     <li class="level2 nav-leaf"><a href="#implementing-a-new-evaluationprovider">Implementing A New <code>EvaluationProvider</code></a></li>
     <li class="level1 nav-leaf"><a href="#flipt-usage">Flipt Usage</a></li>
-    <li class="level1 nav-leaf"><a href="#future-work">Future Work</a></li>
   </ul>
 
   <p class="footer"></p>
@@ -161,37 +163,96 @@
         <p>The OpenFeature SDK adds features like handling default values in case of errors.
         Eventually the SDK will cover the full range of the <a href="https://openfeature.dev">openfeature</a>
         specification, like hooks, events, static vs dynamic context.</p>
-        <p>See <code>Flipt usage</code> on how to set up the <code>FliptApi</code>. Once done, set up a provider:</p>
+        
+        <h3 id="openfeature-java-compatibility" class="section"><a class="anchor-link left" href="#openfeature-java-compatibility"><i class="icofont-laika link">&#xef71;</i></a>OpenFeature Java Compatibility</h3>
+        <p>The <code>openfeature-provider-java</code> module wraps existing 
+        <a href="https://github.com/open-feature/java-sdk-contrib">OpenFeature Java SDKs</a>.</p>
+        
+        <h4 id="installation" class="section"><a class="anchor-link left" href="#installation"><i class="icofont-laika link">&#xef71;</i></a>Installation</h4>
+        <p>Using Flagd as an example:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> ++= </span><span class="type-name">Seq</span><span>(
+    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>,
+    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-provider-java&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>,
+    </span><span class="string-literal">&quot;dev.openfeature.contrib.providers&quot;</span><span> % </span><span class="string-literal">&quot;flagd&quot;</span><span> % </span><span class="string-literal">&quot;0.8.9&quot;</span><span>,
+)</span></code></pre>
         <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
-</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">circe</span><span>.</span><span class="type-name">Decoder</span><span>
-</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">circe</span><span>.</span><span class="type-name">Encoder</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">dev</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="identifier">contrib</span><span>.</span><span class="identifier">providers</span><span>.</span><span class="identifier">flagd</span><span>.</span><span class="type-name">FlagdOptions</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">dev</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="identifier">contrib</span><span>.</span><span class="identifier">providers</span><span>.</span><span class="identifier">flagd</span><span>.</span><span class="type-name">FlagdProvider</span><span>
 
-</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">flipt</span><span>.</span><span class="type-name">FliptApi</span><span>
 </span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="type-name">OpenFeature</span><span>
-</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="identifier">provider</span><span>.</span><span class="identifier">flipt</span><span>.</span><span class="type-name">FliptProvider</span><span>
-</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="identifier">circe</span><span>.</span><span class="identifier">_</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="identifier">provider</span><span>.</span><span class="identifier">java</span><span>.</span><span class="type-name">JavaProvider</span><span>
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">provider</span><span> =
+    </span><span class="keyword">new</span><span> </span><span class="type-name">FlagdProvider</span><span>(
+        </span><span class="type-name">FlagdOptions</span><span>
+            .</span><span class="identifier">builder</span><span>()
+            .</span><span class="identifier">host</span><span>(</span><span class="string-literal">&quot;host&quot;</span><span>)
+            .</span><span class="identifier">port</span><span>(</span><span class="number-literal">8013</span><span>)
+            .</span><span class="identifier">build</span><span>()
+    )
+
+</span><span class="type-name">JavaProvider</span><span>
+    .</span><span class="identifier">resource</span><span>[</span><span class="type-name">IO</span><span>](</span><span class="identifier">provider</span><span>)
+    .</span><span class="identifier">map</span><span>(</span><span class="type-name">OpenFeature</span><span>[</span><span class="type-name">IO</span><span>])
+    .</span><span class="identifier">evalMap</span><span>(</span><span class="identifier">_</span><span>.</span><span class="identifier">client</span><span>)</span></code></pre>
+        
+        <h3 id="featureclient-evaluation" class="section"><a class="anchor-link left" href="#featureclient-evaluation"><i class="icofont-laika link">&#xef71;</i></a>FeatureClient Evaluation</h3>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
+
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="type-name">FeatureClient</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="type-name">StructureCodec</span><span>
 
 </span><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">SomeVariant</span><span>(</span><span class="identifier">field</span><span>: </span><span class="type-name">String</span><span>, </span><span class="identifier">field2</span><span>: </span><span class="type-name">Int</span><span>)
 
-</span><span class="keyword">def</span><span> </span><span class="declaration-name">provider</span><span>(</span><span class="identifier">flipt</span><span>: </span><span class="type-name">FliptApi</span><span>[</span><span class="type-name">IO</span><span>])(</span><span class="keyword">implicit</span><span> </span><span class="identifier">d</span><span>: </span><span class="type-name">Decoder</span><span>[</span><span class="type-name">SomeVariant</span><span>], </span><span class="identifier">e</span><span>: </span><span class="type-name">Encoder</span><span>.</span><span class="type-name">AsObject</span><span>[</span><span class="type-name">SomeVariant</span><span>]) = {
-    </span><span class="keyword">val</span><span> </span><span class="identifier">featureSdk</span><span> = </span><span class="type-name">OpenFeature</span><span>[</span><span class="type-name">IO</span><span>](</span><span class="keyword">new</span><span> </span><span class="type-name">FliptProvider</span><span>[</span><span class="type-name">IO</span><span>](</span><span class="identifier">flipt</span><span>, </span><span class="string-literal">&quot;some-namespace&quot;</span><span>))
-
-    </span><span class="identifier">featureSdk</span><span>.</span><span class="identifier">client</span><span>.</span><span class="identifier">flatMap</span><span> { </span><span class="identifier">featureClient</span><span> =&gt;
-        </span><span class="keyword">for</span><span> {
-            </span><span class="identifier">eval</span><span> &lt;- </span><span class="identifier">featureClient</span><span>.</span><span class="identifier">getBooleanValue</span><span>(</span><span class="string-literal">&quot;boolean-flag&quot;</span><span>, </span><span class="boolean-literal">false</span><span>)
-            </span><span class="identifier">_</span><span> &lt;- </span><span class="type-name">IO</span><span>.</span><span class="identifier">println</span><span>(</span><span class="string-literal">s&quot;</span><span class="substitution">${eval}</span><span class="string-literal">&quot;</span><span>)
-            </span><span class="identifier">eval2</span><span> &lt;- </span><span class="identifier">featureClient</span><span>.</span><span class="identifier">getStructureValue</span><span>[</span><span class="type-name">SomeVariant</span><span>](
-                </span><span class="string-literal">&quot;structure-flag&quot;</span><span>,
-                </span><span class="type-name">SomeVariant</span><span>(</span><span class="string-literal">&quot;a&quot;</span><span>, </span><span class="number-literal">1</span><span>)
-            )
-            </span><span class="identifier">_</span><span> &lt;- </span><span class="type-name">IO</span><span>.</span><span class="identifier">println</span><span>(</span><span class="string-literal">s&quot;</span><span class="substitution">${eval2}</span><span class="string-literal">&quot;</span><span>)
-        } </span><span class="keyword">yield</span><span> ()
-    }
+</span><span class="keyword">def</span><span> </span><span class="declaration-name">program</span><span>(</span><span class="identifier">features</span><span>: </span><span class="type-name">FeatureClient</span><span>[</span><span class="type-name">IO</span><span>])(
+    </span><span class="keyword">implicit</span><span> </span><span class="identifier">codec</span><span>: </span><span class="type-name">StructureCodec</span><span>[</span><span class="type-name">SomeVariant</span><span>]
+) = {
+    </span><span class="keyword">for</span><span> {
+        </span><span class="identifier">flagEnabled</span><span> &lt;- </span><span class="identifier">features</span><span>.</span><span class="identifier">getBooleanValue</span><span>(</span><span class="string-literal">&quot;boolean-flag&quot;</span><span>, </span><span class="boolean-literal">false</span><span>)
+        </span><span class="identifier">_</span><span> &lt;- </span><span class="type-name">IO</span><span>.</span><span class="identifier">println</span><span>(</span><span class="string-literal">s&quot;</span><span class="substitution">${flagEnabled}</span><span class="string-literal">&quot;</span><span>)
+        </span><span class="identifier">variant</span><span> &lt;- </span><span class="identifier">features</span><span>.</span><span class="identifier">getStructureValue</span><span>[</span><span class="type-name">SomeVariant</span><span>](
+            </span><span class="string-literal">&quot;structure-flag&quot;</span><span>,
+            </span><span class="type-name">SomeVariant</span><span>(</span><span class="string-literal">&quot;a&quot;</span><span>, </span><span class="number-literal">1</span><span>)
+        )
+        </span><span class="identifier">_</span><span> &lt;- </span><span class="type-name">IO</span><span>.</span><span class="identifier">println</span><span>(</span><span class="string-literal">s&quot;</span><span class="substitution">${variant}</span><span class="string-literal">&quot;</span><span>)
+    } </span><span class="keyword">yield</span><span> ()
 }</span></code></pre>
         
         <h3 id="hooks" class="section"><a class="anchor-link left" href="#hooks"><i class="icofont-laika link">&#xef71;</i></a>Hooks</h3>
         <p>Hooks are work-in-progress. All four OpenFeature <a href="https://openfeature.dev/specification/sections/hooks">hook types</a>
         are supported but only on the <code>FeatureClient</code> and <code>Provider</code> interfaces.</p>
+        
+        <h3 id="variants" class="section"><a class="anchor-link left" href="#variants"><i class="icofont-laika link">&#xef71;</i></a>Variants</h3>
+        <p>Providers offer resolving a particular variant, using a Structure type. Typically this is JSON defined on the server side. </p>
+        <p>To provide arbitrary case classes for variant decoding, a <code>StructureCodec[A]</code> is required.</p>
+        <p>This could be done explicitly, but you can also derive them from JSON codecs. Currently only Circe is supported.</p>
+        
+        <h4 id="circe-integration" class="section"><a class="anchor-link left" href="#circe-integration"><i class="icofont-laika link">&#xef71;</i></a>Circe Integration</h4>
+        <p>Provider implicit <code>Decoder[A]</code> and <code>Encoder.AsObject[A]</code>. Import <code>io.cardell.openfeature.circe._</code></p>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">circe</span><span>.</span><span class="type-name">Decoder</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">circe</span><span>.</span><span class="type-name">Encoder</span><span>
+
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="type-name">FeatureClient</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="identifier">circe</span><span>.</span><span class="identifier">_</span><span>
+
+</span><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">SomeVariant</span><span>(</span><span class="identifier">field</span><span>: </span><span class="type-name">String</span><span>, </span><span class="identifier">field2</span><span>: </span><span class="type-name">Int</span><span>)
+
+</span><span class="keyword">def</span><span> </span><span class="declaration-name">circeProgram</span><span>(</span><span class="identifier">features</span><span>: </span><span class="type-name">FeatureClient</span><span>[</span><span class="type-name">IO</span><span>])(
+    </span><span class="keyword">implicit</span><span> </span><span class="identifier">d</span><span>: </span><span class="type-name">Decoder</span><span>[</span><span class="type-name">SomeVariant</span><span>],
+    </span><span class="identifier">e</span><span>: </span><span class="type-name">Encoder</span><span>.</span><span class="type-name">AsObject</span><span>[</span><span class="type-name">SomeVariant</span><span>]
+) = {
+    </span><span class="keyword">for</span><span> {
+        </span><span class="identifier">flagEnabled</span><span> &lt;- </span><span class="identifier">features</span><span>.</span><span class="identifier">getBooleanValue</span><span>(</span><span class="string-literal">&quot;boolean-flag&quot;</span><span>, </span><span class="boolean-literal">false</span><span>)
+        </span><span class="identifier">_</span><span> &lt;- </span><span class="type-name">IO</span><span>.</span><span class="identifier">println</span><span>(</span><span class="string-literal">s&quot;</span><span class="substitution">${flagEnabled}</span><span class="string-literal">&quot;</span><span>)
+        </span><span class="identifier">variant</span><span> &lt;- </span><span class="identifier">features</span><span>.</span><span class="identifier">getStructureValue</span><span>[</span><span class="type-name">SomeVariant</span><span>](
+            </span><span class="string-literal">&quot;structure-flag&quot;</span><span>,
+            </span><span class="type-name">SomeVariant</span><span>(</span><span class="string-literal">&quot;a&quot;</span><span>, </span><span class="number-literal">1</span><span>)
+        )
+        </span><span class="identifier">_</span><span> &lt;- </span><span class="type-name">IO</span><span>.</span><span class="identifier">println</span><span>(</span><span class="string-literal">s&quot;</span><span class="substitution">${variant}</span><span class="string-literal">&quot;</span><span>)
+    } </span><span class="keyword">yield</span><span> ()
+}</span></code></pre>
+        <p>Alternative, <code>Codec.AsObject[A]</code> would work.</p>
         
         <h3 id="implementing-a-new-evaluationprovider" class="section"><a class="anchor-link left" href="#implementing-a-new-evaluationprovider"><i class="icofont-laika link">&#xef71;</i></a>Implementing A New <code>EvaluationProvider</code></h3>
         <p><code>EvaluationProvider</code> does not need to handle any errors that aren&#39;t deemed recoverable, or need
@@ -234,9 +295,9 @@
 </span><span class="comment">// resource: cats.effect.kernel.Resource[IO, FliptApi[IO]] = Bind(
 //   source = Bind(
 //     source = Eval(fa = Pure(value = ())),
-//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$13417/0x00000008036f0040@1561846
+//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$14099/0x000000080390f040@6ced02a9
 //   ),
-//   fs = cats.effect.kernel.Resource$$Lambda$13418/0x00000008036f1040@2feca20f
+//   fs = cats.effect.kernel.Resource$$Lambda$14100/0x000000080390e040@103ecd3d
 // )
 </span><span>
 </span><span class="identifier">resource</span><span>.</span><span class="identifier">use</span><span> { </span><span class="identifier">flipt</span><span> =&gt; 
@@ -252,17 +313,11 @@
         )
     } </span><span class="keyword">yield</span><span> </span><span class="identifier">res</span><span>.</span><span class="identifier">enabled</span><span>
 }
-</span><span class="comment">// res0: IO[Boolean] = FlatMap(
+</span><span class="comment">// res3: IO[Boolean] = FlatMap(
 //   ioe = Pure(value = ()),
-//   f = cats.effect.kernel.Resource$$Lambda$13420/0x00000008036f2840@40d5c631,
+//   f = cats.effect.kernel.Resource$$Lambda$14102/0x000000080390c840@10ced6df,
 //   event = cats.effect.tracing.TracingEvent$StackTrace
 // )</span></code></pre>
-        
-        <h2 id="future-work" class="section"><a class="anchor-link left" href="#future-work"><i class="icofont-laika link">&#xef71;</i></a>Future Work</h2>
-        <ul>
-          <li>Java OpenFeature Provider wrapper, to unlock more SDKs</li>
-          <li>LaunchDarkly Provider using <code>typelevel/catapult</code></li>
-        </ul>
 
         
 <hr class="footer-rule"/>
