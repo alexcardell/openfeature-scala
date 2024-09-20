@@ -210,15 +210,15 @@ lazy val docs = project
       )
     },
     libraryDependencies ++= Seq(
-      "org.http4s" %%% "http4s-ember-client" % V.http4s,
-      "dev.openfeature.contrib.providers" % "flagd" % "0.8.9"
+      "org.http4s"                      %%% "http4s-ember-client" % V.http4s,
+      "dev.openfeature.contrib.providers" % "flagd"               % "0.8.9"
     )
   )
   .dependsOn(
     `openfeature-sdk`.jvm,
     `openfeature-sdk-circe`.jvm,
     `openfeature-provider-java`.jvm,
-    `openfeature-provider-flipt`.jvm,
+    `openfeature-provider-flipt`.jvm
   )
 
 addCommandAlias("fix", "headerCreateAll;scalafixAll;scalafmtAll;scalafmtSbt")
