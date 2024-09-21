@@ -125,7 +125,6 @@ lazy val `openfeature-sdk-otel4s` = crossProject(
 )
   .crossType(CrossType.Pure)
   .in(file("openfeature/sdk-otel4s"))
-  .enablePlugins(NoPublishPlugin)
   .settings(commonDependencies)
   .settings(
     name := "openfeature-sdk-otel4s",
