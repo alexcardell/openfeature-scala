@@ -71,6 +71,7 @@ class TraceHookTest extends CatsEffectSuite {
           assertEquals(spanName, Some(expectedSpanName))
           assertEquals(spanStatus, Some(expectedSpanStatus))
           assertEquals(spanEnded, Some(true))
+          assertEquals(flagKeyAttrExists, Some(true))
         }
 
       }
