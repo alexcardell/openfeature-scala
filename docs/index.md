@@ -111,6 +111,12 @@ def program(features: FeatureClient[IO])(
 Hooks are work-in-progress. All four OpenFeature [hook types](https://openfeature.dev/specification/sections/hooks)
 are supported but only on the `FeatureClient` and `Provider` interfaces.
 
+Hook types:
+- BeforeHook (can optionally manipulate EvaluationContext)
+- AfterHook
+- ErrorHook
+- FinallyHook
+
 ```scala mdoc
 import cats.effect.IO
 import io.cardell.openfeature.FeatureClient
