@@ -238,6 +238,7 @@ lazy val docs = project
   .dependsOn(
     `openfeature-sdk`.jvm,
     `openfeature-sdk-circe`.jvm,
+    `openfeature-sdk-otel4s`.jvm,
     `openfeature-provider-java`.jvm,
     `openfeature-provider-flipt`.jvm
   )

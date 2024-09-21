@@ -111,6 +111,40 @@ def program(features: FeatureClient[IO])(
 Hooks are work-in-progress. All four OpenFeature [hook types](https://openfeature.dev/specification/sections/hooks)
 are supported but only on the `FeatureClient` and `Provider` interfaces.
 
+```scala mdoc
+import cats.effect.IO
+import io.cardell.openfeature.FeatureClient
+import io.cardell.openfeature.BeforeHook
+import io.cardell.openfeature.provider.Provider
+
+val hook = BeforeHook[IO] { case (context, hints @ _) => 
+    IO.println(s"I'm about to evaluate ${context.flagKey}").as(None)
+}
+
+def providerWithHook(provider: Provider[IO]) = 
+    provider.withHook(hook)
+
+// and similarly for `client`
+def clientWithHook(client: FeatureClient[IO]) = 
+    client.withHook(hook)
+```
+
+### otel4s
+
+`otel4s` trace integration is provided, offering a set of trace hooks
+
+```scala mdoc
+import cats.effect.IO
+import org.typelevel.otel4s.trace.Tracer
+import io.cardell.openfeature.FeatureClient
+import io.cardell.openfeature.otel4s.TraceHooks
+
+def tracedClient(
+    client: FeatureClient[IO]
+)(implicit T: Tracer[IO]) = TraceHooks.ioLocal
+    .map(hooks => client.withHooks(hooks))
+```
+
 ### Variants
 
 Providers offer resolving a particular variant, using a Structure type. Typically this is JSON defined on the server side. 
