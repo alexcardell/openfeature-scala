@@ -20,13 +20,7 @@ import cats.Applicative
 import cats.Monad
 import cats.syntax.all._
 
-case class HookContext(
-    flagKey: String,
-    evaluationContext: EvaluationContext,
-    defaultValue: FlagValue
-)
-
-object Hooks {
+protected[openfeature] object Hooks {
 
   def runBefore[F[_]: Monad](
       hooks: List[BeforeHook[F]]
