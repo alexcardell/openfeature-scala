@@ -41,7 +41,7 @@ protected class ProviderImpl[F[_]: MonadThrow](
 
   override def metadata: ProviderMetadata = evaluationProvider.metadata
 
-  override def withHook(hook: Hook[F]): Provider[F] =
+  override def withHook(hook: Hook[F]): ProviderImpl[F] =
     hook match {
       case h: BeforeHook[F] =>
         new ProviderImpl[F](
