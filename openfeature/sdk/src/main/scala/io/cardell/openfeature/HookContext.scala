@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package io.cardell.openfeature.provider
+package io.cardell.openfeature
 
-import io.cardell.openfeature.Hook
-
-trait Provider[F[_]] extends EvaluationProvider[F] {
-  def withHook(hook: Hook[F]): Provider[F]
-
-  def withHooks(hooks: List[Hook[F]]): Provider[F] =
-    hooks.foldLeft(this)(_ withHook _)
-
-}
+case class HookContext(
+    flagKey: String,
+    evaluationContext: EvaluationContext,
+    defaultValue: FlagValue
+)

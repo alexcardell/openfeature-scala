@@ -36,6 +36,7 @@ lazy val projects = Seq(
   `flipt-sdk-server-it`,
   `openfeature-sdk`,
   `openfeature-sdk-circe`,
+  `openfeature-sdk-otel4s`,
   `openfeature-provider-memory`,
   `openfeature-provider-java`,
   `openfeature-provider-java-it`,
@@ -116,6 +117,26 @@ lazy val `openfeature-sdk-circe` = crossProject(
     )
   )
   .dependsOn(`openfeature-sdk`)
+
+lazy val `openfeature-sdk-otel4s` = crossProject(
+  JVMPlatform,
+  JSPlatform,
+  NativePlatform
+)
+  .crossType(CrossType.Pure)
+  .in(file("openfeature/sdk-otel4s"))
+  .settings(commonDependencies)
+  .settings(
+    name := "openfeature-sdk-otel4s",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %%% "otel4s-core-trace"  % V.otel4s,
+      "org.typelevel" %%% "otel4s-sdk-testkit" % V.otel4s % Test
+    )
+  )
+  .dependsOn(
+    `openfeature-sdk`,
+    `openfeature-provider-memory` % "test->test"
+  )
 
 lazy val `openfeature-provider-memory` = crossProject(
   JVMPlatform,
@@ -217,6 +238,7 @@ lazy val docs = project
   .dependsOn(
     `openfeature-sdk`.jvm,
     `openfeature-sdk-circe`.jvm,
+    `openfeature-sdk-otel4s`.jvm,
     `openfeature-provider-java`.jvm,
     `openfeature-provider-flipt`.jvm
   )

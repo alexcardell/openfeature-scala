@@ -27,6 +27,9 @@ trait FeatureClient[F[_]] {
 
   def withHook(hook: Hook[F]): FeatureClient[F]
 
+  def withHooks(hooks: List[Hook[F]]): FeatureClient[F] =
+    hooks.foldLeft(this)(_ withHook _)
+
   def getBooleanValue(flagKey: String, default: Boolean): F[Boolean]
 
   def getBooleanValue(
