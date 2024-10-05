@@ -21,7 +21,6 @@ import munit.CatsEffectSuite
 import org.typelevel.otel4s.sdk.testkit.trace.TracesTestkit
 import org.typelevel.otel4s.trace.StatusCode
 
-import io.cardell.openfeature.AfterHook
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.provider.ProviderImpl
