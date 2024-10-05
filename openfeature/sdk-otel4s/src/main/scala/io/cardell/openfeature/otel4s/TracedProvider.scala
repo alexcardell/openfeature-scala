@@ -28,12 +28,11 @@ import io.cardell.openfeature.otel4s.FeatureFlagAttributes.FeatureFlagKey
 import io.cardell.openfeature.otel4s.FeatureFlagAttributes.FeatureFlagProviderName
 import io.cardell.openfeature.otel4s.FeatureFlagAttributes.FeatureFlagVariant
 import io.cardell.openfeature.provider.EvaluationProvider
-import io.cardell.openfeature.provider.Provider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
 
 class TracedProvider[F[_]: Tracer: MonadThrow](
-    provider: Provider[F]
+    provider: EvaluationProvider[F]
 ) extends EvaluationProvider[F] {
 
   override def metadata: ProviderMetadata = provider.metadata

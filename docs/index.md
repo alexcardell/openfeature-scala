@@ -142,13 +142,22 @@ def clientWithHook(client: FeatureClient[IO]) =
 ```scala mdoc
 import cats.effect.IO
 import org.typelevel.otel4s.trace.Tracer
-import io.cardell.openfeature.FeatureClient
-import io.cardell.openfeature.otel4s.TraceHooks
+import io.cardell.openfeature.provider.EvaluationProvider
+import io.cardell.openfeature.otel4s.TracedProvider
 
-def tracedClient(
-    client: FeatureClient[IO]
-)(implicit T: Tracer[IO]) = TraceHooks.ioLocal
-    .map(hooks => client.withHooks(hooks))
+def tracedProvider(
+    provider: EvaluationProvider[IO]
+)(implicit T: Tracer[IO]) =
+    new TracedProvider[IO](provider)
+
+// or
+
+import io.cardell.openfeature.otel4s.syntax._
+
+def tracedProvider(
+    provider: EvaluationProvider[IO]
+)(implicit T: Tracer[IO]) =
+    provider.withTracing
 ```
 
 ### Variants
