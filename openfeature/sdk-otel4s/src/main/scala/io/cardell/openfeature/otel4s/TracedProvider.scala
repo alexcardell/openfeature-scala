@@ -16,11 +16,8 @@
 
 package io.cardell.openfeature.otel4s
 
-import cats.Applicative
-import cats.Monad
+import cats.MonadThrow
 import cats.syntax.all._
-import org.typelevel.otel4s.Attribute
-import org.typelevel.otel4s.AttributeKey
 import org.typelevel.otel4s.Attributes
 import org.typelevel.otel4s.trace.StatusCode
 import org.typelevel.otel4s.trace.Tracer
@@ -34,7 +31,6 @@ import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.Provider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
-import cats.MonadThrow
 
 class TracedProvider[F[_]: Tracer: MonadThrow](
     provider: Provider[F]
@@ -107,16 +103,19 @@ class TracedProvider[F[_]: Tracer: MonadThrow](
       )
     )
 
-  private def flagAttributes(flagKey: String): Attributes =
-    Attributes(FeatureFlagKey(flagKey), FeatureFlagProviderName(metadata.name))
+  private def flagAttributes(flagKey: String): Attributes = Attributes(
+    FeatureFlagKey(flagKey),
+    FeatureFlagProviderName(metadata.name)
+  )
 
   private def variantAttributes(maybeVariant: Option[String]): Attributes =
     Attributes.empty.concat(FeatureFlagVariant.maybe(maybeVariant))
 
   private def trace[A](flagType: String, flagKey: String)(
       fa: F[ResolutionDetails[A]]
-  ): F[ResolutionDetails[A]] =
-    Tracer[F].span(s"evaluate-${flagType}-flag").use { span =>
+  ): F[ResolutionDetails[A]] = Tracer[F]
+    .span(s"evaluate-${flagType}-flag")
+    .use { span =>
       for {
         _   <- span.addAttributes(flagAttributes(flagKey))
         res <- fa.onError(span.recordException(_))
