@@ -86,6 +86,7 @@
     <li class="level2 nav-leaf"><a href="#openfeature-java-compatibility">OpenFeature Java Compatibility</a></li>
     <li class="level2 nav-leaf"><a href="#featureclient-evaluation">FeatureClient Evaluation</a></li>
     <li class="level2 nav-leaf"><a href="#hooks">Hooks</a></li>
+    <li class="level2 nav-leaf"><a href="#otel4s">otel4s</a></li>
     <li class="level2 nav-leaf"><a href="#variants">Variants</a></li>
     <li class="level2 nav-leaf"><a href="#implementing-a-new-evaluationprovider">Implementing A New <code>EvaluationProvider</code></a></li>
     <li class="level1 nav-leaf"><a href="#flipt-usage">Flipt Usage</a></li>
@@ -109,14 +110,14 @@
         </ul>
         
         <h2 id="installing" class="section"><a class="anchor-link left" href="#installing"><i class="icofont-laika link">&#xef71;</i></a>Installing</h2>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;flipt-sdk-server&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;flipt-sdk-server&quot;</span><span> % </span><span class="string-literal">&quot;0.4.0&quot;</span><span>
 </span><span class="comment">// or
 </span><span class="identifier">libraryDependencies</span><span> ++= </span><span class="type-name">Seq</span><span>(
-    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>,
+    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.4.0&quot;</span><span>,
     </span><span class="comment">// for circe json variant types
-</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk-circe&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>,
+</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk-circe&quot;</span><span> % </span><span class="string-literal">&quot;0.4.0&quot;</span><span>,
     </span><span class="comment">// to use flipt as a backend
-</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-provider-flipt&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>
+</span><span>    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-provider-flipt&quot;</span><span> % </span><span class="string-literal">&quot;0.4.0&quot;</span><span>
 )</span></code></pre>
         
         <h2 id="openfeature-compatibility" class="section"><a class="anchor-link left" href="#openfeature-compatibility"><i class="icofont-laika link">&#xef71;</i></a>OpenFeature Compatibility</h2>
@@ -171,8 +172,8 @@
         <h4 id="installation" class="section"><a class="anchor-link left" href="#installation"><i class="icofont-laika link">&#xef71;</i></a>Installation</h4>
         <p>Using Flagd as an example:</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> ++= </span><span class="type-name">Seq</span><span>(
-    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>,
-    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-provider-java&quot;</span><span> % </span><span class="string-literal">&quot;0.3.0&quot;</span><span>,
+    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-sdk&quot;</span><span> % </span><span class="string-literal">&quot;0.4.0&quot;</span><span>,
+    </span><span class="string-literal">&quot;io.cardell&quot;</span><span> %%% </span><span class="string-literal">&quot;openfeature-provider-java&quot;</span><span> % </span><span class="string-literal">&quot;0.4.0&quot;</span><span>,
     </span><span class="string-literal">&quot;dev.openfeature.contrib.providers&quot;</span><span> % </span><span class="string-literal">&quot;flagd&quot;</span><span> % </span><span class="string-literal">&quot;0.8.9&quot;</span><span>,
 )</span></code></pre>
         <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
@@ -221,6 +222,50 @@
         <h3 id="hooks" class="section"><a class="anchor-link left" href="#hooks"><i class="icofont-laika link">&#xef71;</i></a>Hooks</h3>
         <p>Hooks are work-in-progress. All four OpenFeature <a href="https://openfeature.dev/specification/sections/hooks">hook types</a>
         are supported but only on the <code>FeatureClient</code> and <code>Provider</code> interfaces.</p>
+        <p>Hook types:</p>
+        <ul>
+          <li>BeforeHook (can optionally manipulate EvaluationContext)</li>
+          <li>AfterHook</li>
+          <li>ErrorHook</li>
+          <li>FinallyHook</li>
+        </ul>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="type-name">FeatureClient</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="type-name">BeforeHook</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="identifier">provider</span><span>.</span><span class="type-name">Provider</span><span>
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">hook</span><span> = </span><span class="type-name">BeforeHook</span><span>[</span><span class="type-name">IO</span><span>] { </span><span class="keyword">case</span><span> (</span><span class="identifier">context</span><span>, </span><span class="identifier">hints</span><span> @ </span><span class="identifier">_</span><span>) =&gt; 
+    </span><span class="type-name">IO</span><span>.</span><span class="identifier">println</span><span>(</span><span class="string-literal">s&quot;I&#39;m about to evaluate </span><span class="substitution">${context.flagKey}</span><span class="string-literal">&quot;</span><span>).</span><span class="identifier">as</span><span>(</span><span class="type-name">None</span><span>)
+}
+</span><span class="comment">// hook: BeforeHook[IO] = io.cardell.openfeature.BeforeHook$$anon$1@78feb6ed
+</span><span>
+</span><span class="keyword">def</span><span> </span><span class="declaration-name">providerWithHook</span><span>(</span><span class="identifier">provider</span><span>: </span><span class="type-name">Provider</span><span>[</span><span class="type-name">IO</span><span>]) = 
+    </span><span class="identifier">provider</span><span>.</span><span class="identifier">withHook</span><span>(</span><span class="identifier">hook</span><span>)
+
+</span><span class="comment">// and similarly for `client`
+</span><span class="keyword">def</span><span> </span><span class="declaration-name">clientWithHook</span><span>(</span><span class="identifier">client</span><span>: </span><span class="type-name">FeatureClient</span><span>[</span><span class="type-name">IO</span><span>]) = 
+    </span><span class="identifier">client</span><span>.</span><span class="identifier">withHook</span><span>(</span><span class="identifier">hook</span><span>)</span></code></pre>
+        
+        <h3 id="otel4s" class="section"><a class="anchor-link left" href="#otel4s"><i class="icofont-laika link">&#xef71;</i></a>otel4s</h3>
+        <p><code>otel4s</code> trace integration is provided, offering a set of trace hooks</p>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="type-name">IO</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">org</span><span>.</span><span class="identifier">typelevel</span><span>.</span><span class="identifier">otel4s</span><span>.</span><span class="identifier">trace</span><span>.</span><span class="type-name">Tracer</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="identifier">provider</span><span>.</span><span class="type-name">EvaluationProvider</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="identifier">otel4s</span><span>.</span><span class="type-name">TracedProvider</span><span>
+
+</span><span class="keyword">def</span><span> </span><span class="declaration-name">traceExample</span><span>(
+    </span><span class="identifier">provider</span><span>: </span><span class="type-name">EvaluationProvider</span><span>[</span><span class="type-name">IO</span><span>]
+)(</span><span class="keyword">implicit</span><span> </span><span class="type-name">T</span><span>: </span><span class="type-name">Tracer</span><span>[</span><span class="type-name">IO</span><span>]) =
+    </span><span class="keyword">new</span><span> </span><span class="type-name">TracedProvider</span><span>[</span><span class="type-name">IO</span><span>](</span><span class="identifier">provider</span><span>)
+
+</span><span class="comment">// or
+</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">io</span><span>.</span><span class="identifier">cardell</span><span>.</span><span class="identifier">openfeature</span><span>.</span><span class="identifier">otel4s</span><span>.</span><span class="identifier">syntax</span><span>.</span><span class="identifier">_</span><span>
+
+</span><span class="keyword">def</span><span> </span><span class="declaration-name">tracedProviderSyntax</span><span>(
+    </span><span class="identifier">provider</span><span>: </span><span class="type-name">EvaluationProvider</span><span>[</span><span class="type-name">IO</span><span>]
+)(</span><span class="keyword">implicit</span><span> </span><span class="type-name">T</span><span>: </span><span class="type-name">Tracer</span><span>[</span><span class="type-name">IO</span><span>]) =
+    </span><span class="identifier">provider</span><span>.</span><span class="identifier">withTracing</span></code></pre>
         
         <h3 id="variants" class="section"><a class="anchor-link left" href="#variants"><i class="icofont-laika link">&#xef71;</i></a>Variants</h3>
         <p>Providers offer resolving a particular variant, using a Structure type. Typically this is JSON defined on the server side. </p>
@@ -295,9 +340,9 @@
 </span><span class="comment">// resource: cats.effect.kernel.Resource[IO, FliptApi[IO]] = Bind(
 //   source = Bind(
 //     source = Eval(fa = Pure(value = ())),
-//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$14099/0x000000080390f040@6ced02a9
+//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$14688/0x0000000803b3c840@6f8624b5
 //   ),
-//   fs = cats.effect.kernel.Resource$$Lambda$14100/0x000000080390e040@103ecd3d
+//   fs = cats.effect.kernel.Resource$$Lambda$14689/0x0000000803b3b840@1da7a299
 // )
 </span><span>
 </span><span class="identifier">resource</span><span>.</span><span class="identifier">use</span><span> { </span><span class="identifier">flipt</span><span> =&gt; 
@@ -315,7 +360,7 @@
 }
 </span><span class="comment">// res3: IO[Boolean] = FlatMap(
 //   ioe = Pure(value = ()),
-//   f = cats.effect.kernel.Resource$$Lambda$14102/0x000000080390c840@10ced6df,
+//   f = cats.effect.kernel.Resource$$Lambda$14691/0x0000000803b3a040@24effb5b,
 //   event = cats.effect.tracing.TracingEvent$StackTrace
 // )</span></code></pre>
 
