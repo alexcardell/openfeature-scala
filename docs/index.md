@@ -145,7 +145,7 @@ import org.typelevel.otel4s.trace.Tracer
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.otel4s.TracedProvider
 
-def tracedProvider(
+def traceExample(
     provider: EvaluationProvider[IO]
 )(implicit T: Tracer[IO]) =
     new TracedProvider[IO](provider)
@@ -154,7 +154,7 @@ def tracedProvider(
 
 import io.cardell.openfeature.otel4s.syntax._
 
-def tracedProvider(
+def tracedProviderSyntax(
     provider: EvaluationProvider[IO]
 )(implicit T: Tracer[IO]) =
     provider.withTracing
