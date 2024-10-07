@@ -22,7 +22,7 @@ ThisBuild / tlSitePublishBranch := Some("main")
 ThisBuild / tlSiteKeepFiles     := false
 
 val Scala213 = "2.13.12"
-val Scala33  = "3.3.3"
+val Scala33  = "3.3.4"
 ThisBuild / crossScalaVersions := Seq(Scala213, Scala33)
 ThisBuild / scalaVersion       := Scala213 // the default Scala
 
