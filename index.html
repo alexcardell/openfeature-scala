@@ -237,7 +237,7 @@
 </span><span class="keyword">val</span><span> </span><span class="identifier">hook</span><span> = </span><span class="type-name">BeforeHook</span><span>[</span><span class="type-name">IO</span><span>] { </span><span class="keyword">case</span><span> (</span><span class="identifier">context</span><span>, </span><span class="identifier">hints</span><span> @ </span><span class="identifier">_</span><span>) =&gt; 
     </span><span class="type-name">IO</span><span>.</span><span class="identifier">println</span><span>(</span><span class="string-literal">s&quot;I&#39;m about to evaluate </span><span class="substitution">${context.flagKey}</span><span class="string-literal">&quot;</span><span>).</span><span class="identifier">as</span><span>(</span><span class="type-name">None</span><span>)
 }
-</span><span class="comment">// hook: BeforeHook[IO] = io.cardell.openfeature.BeforeHook$$anon$1@78feb6ed
+</span><span class="comment">// hook: BeforeHook[IO] = io.cardell.openfeature.BeforeHook$$anon$1@77686bda
 </span><span>
 </span><span class="keyword">def</span><span> </span><span class="declaration-name">providerWithHook</span><span>(</span><span class="identifier">provider</span><span>: </span><span class="type-name">Provider</span><span>[</span><span class="type-name">IO</span><span>]) = 
     </span><span class="identifier">provider</span><span>.</span><span class="identifier">withHook</span><span>(</span><span class="identifier">hook</span><span>)
@@ -340,9 +340,9 @@
 </span><span class="comment">// resource: cats.effect.kernel.Resource[IO, FliptApi[IO]] = Bind(
 //   source = Bind(
 //     source = Eval(fa = Pure(value = ())),
-//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$14688/0x0000000803b3c840@6f8624b5
+//     fs = org.http4s.ember.client.EmberClientBuilder$$Lambda$14636/0x0000000803b4f040@75f1544d
 //   ),
-//   fs = cats.effect.kernel.Resource$$Lambda$14689/0x0000000803b3b840@1da7a299
+//   fs = cats.effect.kernel.Resource$$Lambda$14637/0x0000000803b4e040@337dd02b
 // )
 </span><span>
 </span><span class="identifier">resource</span><span>.</span><span class="identifier">use</span><span> { </span><span class="identifier">flipt</span><span> =&gt; 
@@ -360,7 +360,7 @@
 }
 </span><span class="comment">// res3: IO[Boolean] = FlatMap(
 //   ioe = Pure(value = ()),
-//   f = cats.effect.kernel.Resource$$Lambda$14691/0x0000000803b3a040@24effb5b,
+//   f = cats.effect.kernel.Resource$$Lambda$14639/0x0000000803b4c840@b7e566d,
 //   event = cats.effect.tracing.TracingEvent$StackTrace
 // )</span></code></pre>
 
