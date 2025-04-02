@@ -189,7 +189,7 @@ import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.otel4s.TracedEvaluationProvider
 
 val provider: EvaluationProvider[IO] = ???
-implicit T: Tracer[IO] = ???
+implicit val T: Tracer[IO] = ???
 val tracedProvider = new TracedEvaluationProvider[IO](provider)
 
 // or
@@ -203,13 +203,13 @@ val tracedProvider2 = provider.withTracing
 
 `log4cats` trace integration is provided, offering a set of trace hooks
 
-```scala mdoc
+```scala mdoc:compile-only
 import cats.effect.IO
 import org.typelevel.log4cats.LoggerFactory
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.log4cats.LoggedEvaluationProvider
 
-implicit L: LoggerFactory[IO] = ???
+implicit val L: LoggerFactory[IO] = ???
 
 val provider: EvaluationProvider[IO] = ???
 val loggedProvider = new LoggedEvaluationProvider[IO](provider)
