@@ -66,7 +66,7 @@ object ToJavaConverters {
 
   def evaluationContext(ec: EvaluationContext): JContext = {
     val values = ec.values.map { case (k, v) => (k, contextValue(v)) }.asJava
-    new JContext(values)
+    ec.targetingKey.fold(new JContext(values))(tk => new JContext(tk, values))
   }
 
   def structure(structure: Structure): JStructure = {
