@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
 |---|---|
 |Providers|✅|
 |Targeting|✅|
-|Logging|🚧|
+|Logging|✅|
 |Domains|🚧|
 |Eventing|🚧|
 |Shutdown|🚧|
@@ -117,7 +117,7 @@ Hook types:
 - ErrorHook
 - FinallyHook
 
-```scala mdoc
+```scala mdoc:compile-only
 import cats.effect.IO
 import io.cardell.openfeature.FeatureClient
 import io.cardell.openfeature.BeforeHook
@@ -135,31 +135,6 @@ def clientWithHook(client: FeatureClient[IO]) =
     client.withHook(hook)
 ```
 
-### otel4s
-
-`otel4s` trace integration is provided, offering a set of trace hooks
-
-```scala mdoc
-import cats.effect.IO
-import org.typelevel.otel4s.trace.Tracer
-import io.cardell.openfeature.provider.EvaluationProvider
-import io.cardell.openfeature.otel4s.TracedEvaluationProvider
-
-def traceExample(
-    provider: EvaluationProvider[IO]
-)(implicit T: Tracer[IO]) =
-    new TracedProvider[IO](provider)
-
-// or
-
-import io.cardell.openfeature.otel4s.syntax._
-
-def tracedProviderSyntax(
-    provider: EvaluationProvider[IO]
-)(implicit T: Tracer[IO]) =
-    provider.traced
-```
-
 ### Variants
 
 Providers offer resolving a particular variant, using a Structure type. Typically this is JSON defined on the server side.
@@ -167,6 +142,8 @@ Providers offer resolving a particular variant, using a Structure type. Typicall
 To provide arbitrary case classes for variant decoding, a `StructureCodec[A]` is required.
 
 This could be done explicitly, but you can also derive them from JSON codecs. Currently only Circe is supported.
+
+### Integrations
 
 #### Circe Integration
 
@@ -200,6 +177,50 @@ def circeProgram(features: FeatureClient[IO])(
 
 Alternative, `Codec.AsObject[A]` would work.
 
+
+#### otel4s
+
+`otel4s` trace integration is provided, offering a set of trace hooks
+
+```scala mdoc:compile-only
+import cats.effect.IO
+import org.typelevel.otel4s.trace.Tracer
+import io.cardell.openfeature.provider.EvaluationProvider
+import io.cardell.openfeature.otel4s.TracedEvaluationProvider
+
+val provider: EvaluationProvider[IO] = ???
+implicit T: Tracer[IO] = ???
+val tracedProvider = new TracedEvaluationProvider[IO](provider)
+
+// or
+
+import io.cardell.openfeature.otel4s.syntax._
+
+val tracedProvider2 = provider.withTracing
+```
+
+#### log4cats
+
+`log4cats` trace integration is provided, offering a set of trace hooks
+
+```scala mdoc
+import cats.effect.IO
+import org.typelevel.log4cats.LoggerFactory
+import io.cardell.openfeature.provider.EvaluationProvider
+import io.cardell.openfeature.log4cats.LoggedEvaluationProvider
+
+implicit L: LoggerFactory[IO] = ???
+
+val provider: EvaluationProvider[IO] = ???
+val loggedProvider = new LoggedEvaluationProvider[IO](provider)
+
+// or
+
+import io.cardell.openfeature.log4cats.syntax._
+
+val loggedProvider2 = provider.withLogging
+```
+
 ### Implementing A New `EvaluationProvider`
 
 `EvaluationProvider` does not need to handle any errors that aren't deemed recoverable, or need
@@ -212,7 +233,7 @@ Implement the call, response decoding, and handle any recoverable errors that ma
 
 The Flipt client is bare-bones, using it is not recommended, unless as OpenFeature SDK Provider.
 
-```scala mdoc
+```scala mdoc:compile-only
 import cats.effect.IO
 import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.Uri

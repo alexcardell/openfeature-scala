@@ -26,7 +26,7 @@ class EvaluationProviderLoggingOps[F[_]: MonadThrow: LoggerFactory](
     provider: EvaluationProvider[F]
 ) {
 
-  def logged: LoggedEvaluationProvider[F] = LoggedEvaluationProvider[F](
+  def withLogging: LoggedEvaluationProvider[F] = LoggedEvaluationProvider[F](
     provider
   )
 

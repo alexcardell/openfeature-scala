@@ -26,7 +26,8 @@ class EvaluationProviderTracingOps[F[_]: Tracer: MonadThrow](
     provider: EvaluationProvider[F]
 ) {
 
-  def traced: EvaluationProvider[F] = new TracedEvaluationProvider[F](provider)
+  def withTracing: EvaluationProvider[F] =
+    new TracedEvaluationProvider[F](provider)
 
 }
 
