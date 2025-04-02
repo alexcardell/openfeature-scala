@@ -239,6 +239,7 @@ lazy val docs = project
   .in(file("site"))
   .enablePlugins(NoPublishPlugin, TypelevelSitePlugin)
   .settings(
+    tlFatalWarnings := false,
     tlSiteHelium := {
       import laika.helium.config.IconLink
       import laika.helium.config.HeliumIcon
