@@ -157,7 +157,7 @@ import io.cardell.openfeature.otel4s.syntax._
 def tracedProviderSyntax(
     provider: EvaluationProvider[IO]
 )(implicit T: Tracer[IO]) =
-    provider.withTracing
+    provider.traced
 ```
 
 ### Variants

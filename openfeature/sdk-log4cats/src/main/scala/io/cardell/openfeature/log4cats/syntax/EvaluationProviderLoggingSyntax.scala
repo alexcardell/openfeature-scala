@@ -14,27 +14,29 @@
  * limitations under the License.
  */
 
-package io.cardell.openfeature.otel4s.syntax
+package io.cardell.openfeature.log4cats.syntax
 
 import cats.MonadThrow
-import org.typelevel.otel4s.trace.Tracer
+import org.typelevel.log4cats.LoggerFactory
 
-import io.cardell.openfeature.otel4s.TracedEvaluationProvider
+import io.cardell.openfeature.log4cats.LoggedEvaluationProvider
 import io.cardell.openfeature.provider.EvaluationProvider
 
-class EvaluationProviderOps[F[_]: Tracer: MonadThrow](
+class EvaluationProviderLoggingOps[F[_]: MonadThrow: LoggerFactory](
     provider: EvaluationProvider[F]
 ) {
 
-  def withTracing: EvaluationProvider[F] =
-    new TracedEvaluationProvider[F](provider)
+  def logged: LoggedEvaluationProvider[F] = LoggedEvaluationProvider[F](
+    provider
+  )
 
 }
 
-trait EvaluationProviderSyntax {
+trait EvaluationProviderLoggingSyntax {
 
-  implicit def ops[F[_]: Tracer: MonadThrow](
+  implicit def ops[F[_]: MonadThrow: LoggerFactory](
       provider: EvaluationProvider[F]
-  ): EvaluationProviderOps[F] = new EvaluationProviderOps[F](provider)
+  ): EvaluationProviderLoggingOps[F] =
+    new EvaluationProviderLoggingOps[F](provider)
 
 }
