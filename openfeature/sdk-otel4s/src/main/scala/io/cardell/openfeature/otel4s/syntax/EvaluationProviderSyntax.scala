@@ -19,13 +19,16 @@ package io.cardell.openfeature.otel4s.syntax
 import cats.MonadThrow
 import org.typelevel.otel4s.trace.Tracer
 
-import io.cardell.openfeature.otel4s.TracedProvider
+import io.cardell.openfeature.otel4s.TracedEvaluationProvider
 import io.cardell.openfeature.provider.EvaluationProvider
 
 class EvaluationProviderOps[F[_]: Tracer: MonadThrow](
     provider: EvaluationProvider[F]
 ) {
-  def withTracing: EvaluationProvider[F] = new TracedProvider[F](provider)
+
+  def withTracing: EvaluationProvider[F] =
+    new TracedEvaluationProvider[F](provider)
+
 }
 
 trait EvaluationProviderSyntax {

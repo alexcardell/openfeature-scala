@@ -18,6 +18,7 @@ package io.cardell.openfeature.log4cats
 
 import cats.MonadThrow
 import cats.syntax.all._
+import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.StructuredLogger
 
 import io.cardell.openfeature.EvaluationContext
@@ -26,7 +27,7 @@ import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
 
-class LoggedProvider[F[_]: MonadThrow](
+class LoggedEvaluationProvider[F[_]: MonadThrow](
     provider: EvaluationProvider[F]
 )(implicit logger: StructuredLogger[F])
     extends EvaluationProvider[F] {
@@ -136,12 +137,22 @@ class LoggedProvider[F[_]: MonadThrow](
       s"Error occurred evaluating ${flagType} flag ${flagKey}"
     )
 
-  // for {
-  //   _   <- span.addAttributes(flagAttributes(flagKey))
-  //   res <- fa.onError(span.recordException(_))
-  //   _   <- span.addAttributes(variantAttributes(res.variant))
-  //   _   <- span.setStatus(StatusCode.Ok)
-  // } yield res
-  //
+}
+
+object LoggedEvaluationProvider {
+
+  def apply[F[_]: MonadThrow: LoggerFactory](
+      provider: EvaluationProvider[F]
+  ): LoggedEvaluationProvider[F] = {
+    implicit val logger: StructuredLogger[F] = LoggerFactory[F].getLogger
+    new LoggedEvaluationProvider[F](provider)
+  }
+
+  def make[F[_]: MonadThrow: LoggerFactory](
+      provider: EvaluationProvider[F]
+  ): F[LoggedEvaluationProvider[F]] = LoggerFactory[F].create.map {
+    implicit logger =>
+      new LoggedEvaluationProvider[F](provider)
+  }
 
 }

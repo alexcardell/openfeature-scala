@@ -31,7 +31,7 @@ import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
 
-class TracedProvider[F[_]: Tracer: MonadThrow](
+class TracedEvaluationProvider[F[_]: Tracer: MonadThrow](
     provider: EvaluationProvider[F]
 ) extends EvaluationProvider[F] {
 

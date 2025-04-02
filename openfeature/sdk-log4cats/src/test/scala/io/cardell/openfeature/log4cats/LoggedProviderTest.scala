@@ -41,7 +41,7 @@ class LoggedProviderTest extends CatsEffectSuite {
     } yield {
       implicit val il: StructuredLogger[IO] = l
         .asInstanceOf[StructuredLogger[IO]]
-      new LoggedProvider[IO](provider)
+      new LoggedEvaluationProvider[IO](provider)
     }
 
   def setupLogger = StructuredTestingLogger.impl[IO]()
@@ -64,7 +64,7 @@ class LoggedProviderTest extends CatsEffectSuite {
     implicit val logger: StructuredTestingLogger[IO] = setupLogger
 
     val provider = {
-      new LoggedProvider[IO](
+      new LoggedEvaluationProvider[IO](
         new ThrowingEvaluationProvider[IO]()
       )
     }

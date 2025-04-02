@@ -42,10 +42,10 @@ specification, like hooks, events, static vs dynamic context.
 
 ### OpenFeature Java Compatibility
 
-The `openfeature-provider-java` module wraps existing 
+The `openfeature-provider-java` module wraps existing
 [OpenFeature Java SDKs](https://github.com/open-feature/java-sdk-contrib).
 
-#### Installation 
+#### Installation
 
 Using Flagd as an example:
 
@@ -123,15 +123,15 @@ import io.cardell.openfeature.FeatureClient
 import io.cardell.openfeature.BeforeHook
 import io.cardell.openfeature.provider.Provider
 
-val hook = BeforeHook[IO] { case (context, hints @ _) => 
+val hook = BeforeHook[IO] { case (context, hints @ _) =>
     IO.println(s"I'm about to evaluate ${context.flagKey}").as(None)
 }
 
-def providerWithHook(provider: Provider[IO]) = 
+def providerWithHook(provider: Provider[IO]) =
     provider.withHook(hook)
 
 // and similarly for `client`
-def clientWithHook(client: FeatureClient[IO]) = 
+def clientWithHook(client: FeatureClient[IO]) =
     client.withHook(hook)
 ```
 
@@ -143,7 +143,7 @@ def clientWithHook(client: FeatureClient[IO]) =
 import cats.effect.IO
 import org.typelevel.otel4s.trace.Tracer
 import io.cardell.openfeature.provider.EvaluationProvider
-import io.cardell.openfeature.otel4s.TracedProvider
+import io.cardell.openfeature.otel4s.TracedEvaluationProvider
 
 def traceExample(
     provider: EvaluationProvider[IO]
@@ -162,7 +162,7 @@ def tracedProviderSyntax(
 
 ### Variants
 
-Providers offer resolving a particular variant, using a Structure type. Typically this is JSON defined on the server side. 
+Providers offer resolving a particular variant, using a Structure type. Typically this is JSON defined on the server side.
 
 To provide arbitrary case classes for variant decoding, a `StructureCodec[A]` is required.
 
@@ -203,10 +203,10 @@ Alternative, `Codec.AsObject[A]` would work.
 ### Implementing A New `EvaluationProvider`
 
 `EvaluationProvider` does not need to handle any errors that aren't deemed recoverable, or need
-to implement any hook logic. Running hooks, and handling default evaluations on error is handled 
+to implement any hook logic. Running hooks, and handling default evaluations on error is handled
 in the library
 
-Implement the call, response decoding, and handle any recoverable errors that make sense. 
+Implement the call, response decoding, and handle any recoverable errors that make sense.
 
 ## Flipt Usage
 
@@ -230,7 +230,7 @@ val resource = EmberClientBuilder
         FliptApi[IO](client, url, AuthenticationStrategy.ClientToken("token"))
     )
 
-resource.use { flipt => 
+resource.use { flipt =>
     for {
         res <- flipt.evaluateBoolean(
             EvaluationRequest(
