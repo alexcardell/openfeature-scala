@@ -256,6 +256,7 @@ lazy val docs = project
     `openfeature-sdk`.jvm,
     `openfeature-sdk-circe`.jvm,
     `openfeature-sdk-otel4s`.jvm,
+    `openfeature-sdk-log4cats`.jvm,
     `openfeature-provider-java`.jvm,
     `openfeature-provider-flipt`.jvm
   )

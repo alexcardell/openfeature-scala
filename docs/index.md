@@ -212,7 +212,7 @@ import io.cardell.openfeature.log4cats.LoggedEvaluationProvider
 implicit val L: LoggerFactory[IO] = ???
 
 val provider: EvaluationProvider[IO] = ???
-val loggedProvider = new LoggedEvaluationProvider[IO](provider)
+val loggedProvider = LoggedEvaluationProvider[IO](provider)
 
 // or
 
