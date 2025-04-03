@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package io.cardell.openfeature.otel4s
+package io.cardell.openfeature.log4cats
 
 import cats.MonadThrow
 import cats.syntax.all._
-import org.typelevel.otel4s.Attributes
-import org.typelevel.otel4s.trace.StatusCode
-import org.typelevel.otel4s.trace.Tracer
+import org.typelevel.log4cats.LoggerFactory
+import org.typelevel.log4cats.StructuredLogger
 
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.StructureCodec
-import io.cardell.openfeature.otel4s.FeatureFlagAttributes.FeatureFlagKey
-import io.cardell.openfeature.otel4s.FeatureFlagAttributes.FeatureFlagProviderName
-import io.cardell.openfeature.otel4s.FeatureFlagAttributes.FeatureFlagVariant
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
 
-class TracedProvider[F[_]: Tracer: MonadThrow](
+class LoggedEvaluationProvider[F[_]: MonadThrow](
     provider: EvaluationProvider[F]
-) extends EvaluationProvider[F] {
+)(implicit logger: StructuredLogger[F])
+    extends EvaluationProvider[F] {
 
   override def metadata: ProviderMetadata = provider.metadata
 
@@ -42,7 +39,7 @@ class TracedProvider[F[_]: Tracer: MonadThrow](
       defaultValue: Boolean,
       context: EvaluationContext
   ): F[ResolutionDetails[Boolean]] =
-    trace("boolean", flagKey)(
+    logEvaluation("boolean", flagKey)(
       provider.resolveBooleanValue(
         flagKey,
         defaultValue,
@@ -55,7 +52,7 @@ class TracedProvider[F[_]: Tracer: MonadThrow](
       defaultValue: String,
       context: EvaluationContext
   ): F[ResolutionDetails[String]] =
-    trace("string", flagKey)(
+    logEvaluation("string", flagKey)(
       provider.resolveStringValue(
         flagKey,
         defaultValue,
@@ -68,7 +65,7 @@ class TracedProvider[F[_]: Tracer: MonadThrow](
       defaultValue: Int,
       context: EvaluationContext
   ): F[ResolutionDetails[Int]] =
-    trace("int", flagKey)(
+    logEvaluation("int", flagKey)(
       provider.resolveIntValue(
         flagKey,
         defaultValue,
@@ -81,7 +78,7 @@ class TracedProvider[F[_]: Tracer: MonadThrow](
       defaultValue: Double,
       context: EvaluationContext
   ): F[ResolutionDetails[Double]] =
-    trace("double", flagKey)(
+    logEvaluation("double", flagKey)(
       provider.resolveDoubleValue(
         flagKey,
         defaultValue,
@@ -94,7 +91,7 @@ class TracedProvider[F[_]: Tracer: MonadThrow](
       defaultValue: A,
       context: EvaluationContext
   ): F[ResolutionDetails[A]] =
-    trace("structure", flagKey)(
+    logEvaluation("structure", flagKey)(
       provider.resolveStructureValue(
         flagKey,
         defaultValue,
@@ -102,25 +99,60 @@ class TracedProvider[F[_]: Tracer: MonadThrow](
       )
     )
 
-  private def flagAttributes(flagKey: String): Attributes = Attributes(
-    FeatureFlagKey(flagKey),
-    FeatureFlagProviderName(metadata.name)
+  private def flagAttributes(
+      flagKey: String
+  ): Map[String, String] = Map(
+    "event"                      -> "feature_flag.evaluation",
+    "feature_flag.key"           -> flagKey,
+    "feature_flag.provider_name" -> metadata.name
   )
 
-  private def variantAttributes(maybeVariant: Option[String]): Attributes =
-    Attributes.empty.concat(FeatureFlagVariant.maybe(maybeVariant))
-
-  private def trace[A](flagType: String, flagKey: String)(
-      fa: F[ResolutionDetails[A]]
-  ): F[ResolutionDetails[A]] = Tracer[F]
-    .span(s"evaluate-${flagType}-flag")
-    .use { span =>
-      for {
-        _   <- span.addAttributes(flagAttributes(flagKey))
-        res <- fa.onError(span.recordException(_))
-        _   <- span.addAttributes(variantAttributes(res.variant))
-        _   <- span.setStatus(StatusCode.Ok)
-      } yield res
+  private def variantAttributes(
+      maybeVariant: Option[String]
+  ): Option[(String, String)] =
+    maybeVariant match {
+      case Some(value) => Some("feature_flag.result.variant" -> value)
+      case None        => None
     }
+
+  private def logEvaluation[A](flagType: String, flagKey: String)(
+      fa: F[ResolutionDetails[A]]
+  ): F[ResolutionDetails[A]] = {
+    val attrs = flagAttributes(flagKey)
+
+    for {
+      res <- fa.onError(logError(flagKey, flagType, attrs, _))
+      variantAttrs = variantAttributes(res.variant).fold(attrs)(attrs + _)
+      _ <- logger.info(variantAttrs)(s"Evaluated ${flagType} flag ${flagKey}")
+    } yield res
+  }
+
+  private def logError(
+      flagType: String,
+      flagKey: String,
+      attrs: Map[String, String],
+      t: Throwable
+  ) =
+    logger.error(attrs, t)(
+      s"Error occurred evaluating ${flagType} flag ${flagKey}"
+    )
+
+}
+
+object LoggedEvaluationProvider {
+
+  def apply[F[_]: MonadThrow: LoggerFactory](
+      provider: EvaluationProvider[F]
+  ): LoggedEvaluationProvider[F] = {
+    implicit val logger: StructuredLogger[F] = LoggerFactory[F].getLogger
+    new LoggedEvaluationProvider[F](provider)
+  }
+
+  def make[F[_]: MonadThrow: LoggerFactory](
+      provider: EvaluationProvider[F]
+  ): F[LoggedEvaluationProvider[F]] = LoggerFactory[F].create.map {
+    implicit logger =>
+      new LoggedEvaluationProvider[F](provider)
+  }
 
 }

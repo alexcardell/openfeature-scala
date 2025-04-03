@@ -26,7 +26,7 @@ import io.cardell.openfeature.FlagValue
 import io.cardell.openfeature.provider.ProviderImpl
 import io.cardell.openfeature.provider.memory.MemoryProvider
 
-class TracedProviderTest extends CatsEffectSuite {
+class TracedEvaluationProviderTest extends CatsEffectSuite {
 
   val setupProvider = MemoryProvider[IO](
     Map("boolean-flag" -> FlagValue.BooleanValue(true))
@@ -46,7 +46,7 @@ class TracedProviderTest extends CatsEffectSuite {
       setupTracer.flatMap { implicit tracer =>
         for {
           provider <- setupProvider.map(ProviderImpl[IO])
-          tracedProvider = new TracedProvider[IO](provider)
+          tracedProvider = new TracedEvaluationProvider[IO](provider)
           flagResolution <- tracedProvider.resolveBooleanValue(
             "boolean-flag",
             false,

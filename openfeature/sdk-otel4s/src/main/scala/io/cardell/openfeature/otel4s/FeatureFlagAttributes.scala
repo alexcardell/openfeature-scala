@@ -40,7 +40,7 @@ object FeatureFlagAttributes {
     *   representation of the value should be determined by the implementer.
     */
   val FeatureFlagVariant: AttributeKey[String] = AttributeKey(
-    "feature_flag.variant"
+    "feature_flag.result.variant"
   )
 
 }

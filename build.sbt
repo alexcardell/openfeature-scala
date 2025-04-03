@@ -2,7 +2,7 @@ import build.V
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / tlBaseVersion := "0.5"
+ThisBuild / tlBaseVersion := "0.6"
 
 ThisBuild / organization     := "io.cardell"
 ThisBuild / organizationName := "Alex Cardell"
@@ -13,9 +13,6 @@ ThisBuild / developers := List(
   // your GitHub handle and name
   tlGitHubDev("alexcardell", "Alex Cardell")
 )
-
-// publish to s01.oss.sonatype.org (set to true to publish to oss.sonatype.org instead)
-ThisBuild / tlSonatypeUseLegacyHost := false
 
 // publish website from this branch
 ThisBuild / tlSitePublishBranch := Some("main")
@@ -36,6 +33,7 @@ lazy val projects = Seq(
   `openfeature-sdk`,
   `openfeature-sdk-circe`,
   `openfeature-sdk-otel4s`,
+  `openfeature-sdk-log4cats`,
   `openfeature-provider-memory`,
   `openfeature-provider-java`,
   `openfeature-provider-java-it`,
@@ -134,7 +132,27 @@ lazy val `openfeature-sdk-otel4s` = crossProject(
   )
   .dependsOn(
     `openfeature-sdk`,
-    `openfeature-provider-memory` % "test->test"
+    `openfeature-provider-memory` % "test->compile"
+  )
+
+lazy val `openfeature-sdk-log4cats` = crossProject(
+  JVMPlatform,
+  JSPlatform,
+  NativePlatform
+)
+  .crossType(CrossType.Pure)
+  .in(file("openfeature/sdk-log4cats"))
+  .settings(commonDependencies)
+  .settings(
+    name := "openfeature-sdk-log4cats",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %%% "log4cats-core"    % V.log4cats,
+      "org.typelevel" %%% "log4cats-testing" % V.log4cats % Test
+    )
+  )
+  .dependsOn(
+    `openfeature-sdk`,
+    `openfeature-provider-memory` % "test->compile"
   )
 
 lazy val `openfeature-provider-memory` = crossProject(
@@ -221,6 +239,7 @@ lazy val docs = project
   .in(file("site"))
   .enablePlugins(NoPublishPlugin, TypelevelSitePlugin)
   .settings(
+    tlFatalWarnings := false,
     tlSiteHelium := {
       import laika.helium.config.IconLink
       import laika.helium.config.HeliumIcon
@@ -238,6 +257,7 @@ lazy val docs = project
     `openfeature-sdk`.jvm,
     `openfeature-sdk-circe`.jvm,
     `openfeature-sdk-otel4s`.jvm,
+    `openfeature-sdk-log4cats`.jvm,
     `openfeature-provider-java`.jvm,
     `openfeature-provider-flipt`.jvm
   )

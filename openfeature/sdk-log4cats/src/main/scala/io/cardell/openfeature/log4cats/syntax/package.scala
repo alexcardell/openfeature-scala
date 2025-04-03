@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package io.cardell.openfeature.otel4s
+package io.cardell.openfeature.log4cats
 
-package object syntax extends EvaluationProviderTracingSyntax
+package object syntax extends EvaluationProviderLoggingSyntax
