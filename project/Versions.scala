@@ -8,7 +8,7 @@ object V {
   val otel4s     = "0.12.0"
   val log4cats   = "2.7.0"
 
-  val munit           = "1.1.0"
-  val munitCatsEffect = "2.1.0"
-  val testcontainers  = "0.43.0"
+  val munit           = "1.0.0-RC1"
+  val munitCatsEffect = "2.0.0-M5"
+  val testcontainers  = "0.41.3"
 }
