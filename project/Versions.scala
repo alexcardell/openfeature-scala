@@ -6,7 +6,7 @@ object V {
   val otel4s     = "0.13.2"
   val log4cats   = "2.7.0"
   val http4s     = "0.23.32"
-  val circe     = "0.14.8"
+  val circe      = "0.14.8"
 
   val munit           = "1.0.0"
   val munitCatsEffect = "2.1.0"
