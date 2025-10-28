@@ -1,6 +1,6 @@
 addSbtPlugin("org.typelevel"      % "sbt-typelevel"          % "0.8.2")
-addSbtPlugin("org.typelevel"      % "sbt-typelevel-site"     % "0.7.7")
-addSbtPlugin("org.typelevel"      % "sbt-typelevel-scalafix" % "0.7.7")
+addSbtPlugin("org.typelevel"      % "sbt-typelevel-site"     % "0.8.2")
+addSbtPlugin("org.typelevel"      % "sbt-typelevel-scalafix" % "0.8.2")
 addSbtPlugin("org.scala-js"       % "sbt-scalajs"            % "1.18.0")
 addSbtPlugin("org.scala-native"   % "sbt-scala-native"       % "0.4.17")
 addSbtPlugin("com.github.xuwei-k" % "unused-code-plugin"     % "0.4.1")
