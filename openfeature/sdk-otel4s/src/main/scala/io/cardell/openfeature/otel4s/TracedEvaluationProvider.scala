@@ -24,9 +24,9 @@ import org.typelevel.otel4s.trace.Tracer
 
 import io.cardell.openfeature.EvaluationContext
 import io.cardell.openfeature.StructureCodec
-import io.cardell.openfeature.otel4s.FeatureFlagAttributes.FeatureFlagKey
-import io.cardell.openfeature.otel4s.FeatureFlagAttributes.FeatureFlagProviderName
-import io.cardell.openfeature.otel4s.FeatureFlagAttributes.FeatureFlagVariant
+import io.cardell.openfeature.otel4s.FeatureFlagExperimentalAttributes.FeatureFlagKey
+import io.cardell.openfeature.otel4s.FeatureFlagExperimentalAttributes.FeatureFlagProviderName
+import io.cardell.openfeature.otel4s.FeatureFlagExperimentalAttributes.FeatureFlagResultVariant
 import io.cardell.openfeature.provider.EvaluationProvider
 import io.cardell.openfeature.provider.ProviderMetadata
 import io.cardell.openfeature.provider.ResolutionDetails
@@ -108,7 +108,7 @@ class TracedEvaluationProvider[F[_]: Tracer: MonadThrow](
   )
 
   private def variantAttributes(maybeVariant: Option[String]): Attributes =
-    Attributes.empty.concat(FeatureFlagVariant.maybe(maybeVariant))
+    Attributes.empty.concat(FeatureFlagResultVariant.maybe(maybeVariant))
 
   private def trace[A](flagType: String, flagKey: String)(
       fa: F[ResolutionDetails[A]]

@@ -2,7 +2,7 @@ import build.V
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / tlBaseVersion := "0.7"
+ThisBuild / tlBaseVersion := "0.8"
 
 ThisBuild / organization     := "io.cardell"
 ThisBuild / organizationName := "Alex Cardell"
@@ -18,8 +18,8 @@ ThisBuild / developers := List(
 ThisBuild / tlSitePublishBranch := Some("main")
 ThisBuild / tlSiteKeepFiles     := false
 
-val Scala213 = "2.13.16"
-val Scala33  = "3.3.4"
+val Scala213 = "2.13.18"
+val Scala33  = "3.3.7"
 ThisBuild / crossScalaVersions := Seq(Scala213, Scala33)
 ThisBuild / scalaVersion       := Scala213 // the default Scala
 
@@ -127,7 +127,7 @@ lazy val `openfeature-sdk-otel4s` = crossProject(
     name := "openfeature-sdk-otel4s",
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "otel4s-core-trace"  % V.otel4s,
-      "org.typelevel" %%% "otel4s-sdk-testkit" % V.otel4s % Test
+      "org.typelevel" %%% "otel4s-sdk-testkit" % V.otel4sSdk % Test
     )
   )
   .dependsOn(

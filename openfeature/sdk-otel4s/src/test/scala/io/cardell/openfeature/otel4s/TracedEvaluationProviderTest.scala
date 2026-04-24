@@ -61,7 +61,11 @@ class TracedEvaluationProviderTest extends CatsEffectSuite {
           spanEnded  = headSpan.map(_.hasEnded)
           spanAttrs  = headSpan.map(_.attributes.elements)
           flagKeyAttrExists = spanAttrs.map(
-            _.exists(_ == FeatureFlagAttributes.FeatureFlagKey("boolean-flag"))
+            _.exists(
+              _ == FeatureFlagExperimentalAttributes.FeatureFlagKey(
+                "boolean-flag"
+              )
+            )
           )
         } yield {
           assertEquals(flagResult, expectedFlagResult)
